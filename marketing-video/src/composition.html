@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="utf-8" />
+    <title>7MOVEUP – Video-Komposition</title>
+    <style>
+      @font-face {
+        font-family: "Inter Variable";
+        font-weight: 100 900;
+        font-style: normal;
+        src: url("/__fonts/inter-latin-wght-normal.woff2") format("woff2");
+      }
+      :root {
+        --bg: #0b0b0c;
+        --card: #151517;
+        --line: #27272a;
+        --fg: #fafafa;
+        --muted: #a1a1aa;
+        --accent: #ff6a00;
+        --accent-light: #ff8a24;
+      }
+      * { box-sizing: border-box; margin: 0; padding: 0; }
+      html, body { width: 100%; height: 100%; overflow: hidden; background: var(--bg); }
+      body { font-family: "Inter Variable", system-ui, sans-serif; color: var(--fg); -webkit-font-smoothing: antialiased; }
+      #stage { position: relative; overflow: hidden; background: var(--bg); }
+      .glow { position: absolute; border-radius: 50%; filter: blur(110px); pointer-events: none; }
+      #brand { position: absolute; display: flex; align-items: center; gap: 18px; }
+      #brand img { width: 58px; height: 58px; border-radius: 15px; }
+      #brand span { font-weight: 900; font-size: 30px; letter-spacing: 0.08em; }
+      #caption { position: absolute; font-weight: 900; letter-spacing: -0.035em; line-height: 1.04; }
+      #caption .line { display: block; white-space: nowrap; }
+      #caption .accent { color: var(--accent); }
+      #phone { position: absolute; transform-origin: 50% 0; }
+      #device { position: absolute; inset: 0; border-radius: 76px; background: #050506; border: 2px solid var(--line);
+        box-shadow: 0 50px 140px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255, 255, 255, 0.04) inset; }
+      #screen { position: absolute; overflow: hidden; background: var(--bg); }
+      #screen img { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+      #dim { position: absolute; inset: 0; background: var(--bg); opacity: 0; }
+      .ripple { position: absolute; border-radius: 50%; border: 3px solid rgba(255, 255, 255, 0.95); background: rgba(255, 255, 255, 0.22);
+        box-shadow: 0 0 24px rgba(255, 255, 255, 0.25); }
+      .hl { position: absolute; border-radius: 20px; border: 3px solid var(--accent); box-shadow: 0 0 0 6px rgba(255, 106, 0, 0.16), 0 0 40px rgba(255, 106, 0, 0.35); }
+      #finale { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+      #finale img { border-radius: 22%; box-shadow: 0 40px 120px rgba(255, 106, 0, 0.18), 0 30px 80px rgba(0, 0, 0, 0.6); }
+      #wordmark { font-weight: 900; letter-spacing: -0.045em; line-height: 1; }
+      #tagline { font-weight: 800; letter-spacing: 0.2em; color: var(--muted); }
+      #tagline .accent { color: var(--accent); }
+      #url { font-weight: 700; color: var(--muted); letter-spacing: 0.04em; }
+    </style>
+  </head>
+  <body>
+    <div id="stage">
+      <div class="glow" id="glow1"></div>
+      <div class="glow" id="glow2"></div>
+      <div id="brand"><img id="brand-icon" alt="" /><span>7MOVEUP</span></div>
+      <div id="caption"></div>
+      <div id="phone">
+        <div id="device"></div>
+        <div id="screen">
+          <img id="app" alt="" />
+          <div id="overlays"></div>
+          <div id="dim"></div>
+        </div>
+      </div>
+      <div id="finale">
+        <img id="finale-logo" alt="7MOVEUP" />
+        <div id="wordmark"></div>
+        <div id="tagline"></div>
+        <div id="url"></div>
+      </div>
+    </div>
+    <script type="module" src="/__video/composition.js"></script>
+  </body>
+</html>

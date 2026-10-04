@@ -1,0 +1,16 @@
+{
+  "name": "7moveup-marketing-video",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Marketingvideo für 7MOVEUP – nimmt die echte App Frame für Frame auf und rendert 9:16 und 16:9.",
+  "scripts": {
+    "render": "node src/render.mjs",
+    "render:de": "node src/render.mjs --lang de",
+    "render:en": "node src/render.mjs --lang en",
+    "stills": "node src/render.mjs --stills"
+  },
+  "devDependencies": {
+    "playwright": "1.56.1"
+  }
+}

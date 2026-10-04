@@ -1,0 +1,1580 @@
+{
+  "app": "7MOVEUP",
+  "schemaVersion": 1,
+  "exportedAt": "2026-11-09T17:00:00.000Z",
+  "profile": {
+    "id": "demo-profile",
+    "language": "de",
+    "createdAt": "2026-10-19T08:00:00.000Z",
+    "updatedAt": "2026-11-09T17:00:00.000Z"
+  },
+  "customExercises": [],
+  "exerciseNotes": [
+    {
+      "exerciseId": "db-flat-bench-press",
+      "note": "Schulterblätter hinten/unten halten.",
+      "updatedAt": "2026-11-09T17:00:00.000Z"
+    }
+  ],
+  "plans": [
+    {
+      "id": "demo-plan-1",
+      "name": "Tag 1 – Push",
+      "group": "4-Tage Kraft & Core",
+      "templateId": "template-4day-strength-core",
+      "weekdays": [
+        1
+      ],
+      "progressionStepKg": 2,
+      "items": [
+        {
+          "id": "demo-item-1-1",
+          "exerciseId": "db-flat-bench-press",
+          "sets": 4,
+          "repMin": 8,
+          "repMax": 10,
+          "restSec": 90,
+          "weightStepsKg": [
+            14,
+            16,
+            18,
+            20,
+            22
+          ]
+        },
+        {
+          "id": "demo-item-1-2",
+          "exerciseId": "db-incline-bench-press",
+          "sets": 3,
+          "repMin": 8,
+          "repMax": 10,
+          "restSec": 90,
+          "weightStepsKg": [
+            12,
+            14,
+            16,
+            18
+          ]
+        },
+        {
+          "id": "demo-item-1-3",
+          "exerciseId": "seated-db-shoulder-press",
+          "sets": 3,
+          "repMin": 8,
+          "repMax": 10,
+          "restSec": 75,
+          "weightStepsKg": [
+            8,
+            10,
+            12
+          ]
+        },
+        {
+          "id": "demo-item-1-4",
+          "exerciseId": "lateral-raise",
+          "sets": 3,
+          "repMin": 12,
+          "repMax": 15,
+          "restSec": 60,
+          "weightStepsKg": [
+            6
+          ]
+        },
+        {
+          "id": "demo-item-1-5",
+          "exerciseId": "plank",
+          "sets": 3,
+          "durationSec": 40,
+          "restSec": 45
+        }
+      ],
+      "createdAt": "2026-10-19T08:00:00.000Z",
+      "updatedAt": "2026-10-19T08:00:00.000Z"
+    },
+    {
+      "id": "demo-plan-2",
+      "name": "Tag 2 – Beine",
+      "group": "4-Tage Kraft & Core",
+      "templateId": "template-4day-strength-core",
+      "weekdays": [
+        2
+      ],
+      "progressionStepKg": 2,
+      "items": [
+        {
+          "id": "demo-item-2-1",
+          "exerciseId": "db-rdl",
+          "sets": 4,
+          "repMin": 8,
+          "repMax": 8,
+          "restSec": 90
+        },
+        {
+          "id": "demo-item-2-2",
+          "exerciseId": "bulgarian-split-squat",
+          "sets": 3,
+          "repMin": 8,
+          "repMax": 8,
+          "restSec": 75
+        },
+        {
+          "id": "demo-item-2-3",
+          "exerciseId": "db-hip-thrust",
+          "sets": 3,
+          "repMin": 10,
+          "repMax": 12,
+          "restSec": 75
+        },
+        {
+          "id": "demo-item-2-4",
+          "exerciseId": "goblet-squat",
+          "sets": 3,
+          "repMin": 8,
+          "repMax": 10,
+          "restSec": 75,
+          "weightStepsKg": [
+            16,
+            18,
+            20
+          ]
+        },
+        {
+          "id": "demo-item-2-5",
+          "exerciseId": "ab-wheel",
+          "sets": 3,
+          "repMin": 8,
+          "repMax": 8,
+          "restSec": 60
+        },
+        {
+          "id": "demo-item-2-6",
+          "exerciseId": "wall-sit",
+          "sets": 3,
+          "durationSec": 40,
+          "restSec": 60
+        },
+        {
+          "id": "demo-item-2-7",
+          "exerciseId": "dead-bug",
+          "sets": 3,
+          "repMin": 8,
+          "repMax": 8,
+          "restSec": 45
+        }
+      ],
+      "createdAt": "2026-10-19T08:00:00.001Z",
+      "updatedAt": "2026-10-19T08:00:00.001Z"
+    },
+    {
+      "id": "demo-plan-3",
+      "name": "Tag 3 – Pull",
+      "group": "4-Tage Kraft & Core",
+      "templateId": "template-4day-strength-core",
+      "weekdays": [
+        4
+      ],
+      "progressionStepKg": 2,
+      "items": [
+        {
+          "id": "demo-item-3-1",
+          "exerciseId": "one-arm-db-row",
+          "sets": 4,
+          "repMin": 8,
+          "repMax": 10,
+          "restSec": 75,
+          "weightStepsKg": [
+            12,
+            14,
+            16,
+            20
+          ]
+        },
+        {
+          "id": "demo-item-3-2",
+          "exerciseId": "bent-over-db-row",
+          "sets": 3,
+          "repMin": 8,
+          "repMax": 10,
+          "restSec": 75,
+          "weightStepsKg": [
+            14
+          ]
+        },
+        {
+          "id": "demo-item-3-3",
+          "exerciseId": "reverse-fly",
+          "sets": 3,
+          "repMin": 12,
+          "repMax": 15,
+          "restSec": 60,
+          "weightStepsKg": [
+            4,
+            5
+          ]
+        },
+        {
+          "id": "demo-item-3-4",
+          "exerciseId": "side-plank",
+          "sets": 3,
+          "durationSec": 30,
+          "restSec": 45
+        }
+      ],
+      "createdAt": "2026-10-19T08:00:00.002Z",
+      "updatedAt": "2026-10-19T08:00:00.002Z"
+    },
+    {
+      "id": "demo-plan-4",
+      "name": "Tag 4 – Ganzkörper",
+      "group": "4-Tage Kraft & Core",
+      "templateId": "template-4day-strength-core",
+      "weekdays": [
+        5
+      ],
+      "progressionStepKg": 2,
+      "items": [
+        {
+          "id": "demo-item-4-1",
+          "exerciseId": "goblet-squat",
+          "sets": 3,
+          "repMin": 8,
+          "repMax": 10,
+          "restSec": 75,
+          "weightStepsKg": [
+            16,
+            18,
+            20
+          ]
+        },
+        {
+          "id": "demo-item-4-2",
+          "exerciseId": "farmer-carry",
+          "sets": 3,
+          "durationSec": 35,
+          "restSec": 60,
+          "weightStepsKg": [
+            20,
+            22
+          ]
+        },
+        {
+          "id": "demo-item-4-3",
+          "exerciseId": "ab-wheel",
+          "sets": 3,
+          "repMin": 8,
+          "repMax": 8,
+          "restSec": 60
+        },
+        {
+          "id": "demo-item-4-4",
+          "exerciseId": "suitcase-carry",
+          "sets": 3,
+          "durationSec": 40,
+          "restSec": 60
+        }
+      ],
+      "createdAt": "2026-10-19T08:00:00.003Z",
+      "updatedAt": "2026-10-19T08:00:00.003Z"
+    },
+    {
+      "id": "demo-plan-cardio",
+      "name": "Cardio",
+      "weekdays": [
+        1,
+        3
+      ],
+      "items": [
+        {
+          "id": "demo-item-cardio",
+          "exerciseId": "ergometer",
+          "sets": 1,
+          "durationSec": 1800,
+          "note": "locker, 70–90 RPM"
+        }
+      ],
+      "createdAt": "2026-10-19T08:00:00.010Z",
+      "updatedAt": "2026-10-19T08:00:00.010Z"
+    }
+  ],
+  "sessions": [
+    {
+      "id": "demo-session-1",
+      "planId": "demo-plan-1",
+      "planName": "Tag 1 – Push",
+      "date": "2026-10-26",
+      "startedAt": "2026-10-26T17:00:00.000Z",
+      "completedAt": "2026-10-26T17:52:00.000Z",
+      "durationSec": 3120,
+      "progressionStepKg": 2,
+      "exercises": [
+        {
+          "id": "demo-se-1-0",
+          "exerciseId": "db-flat-bench-press",
+          "name": {
+            "de": "Kurzhantel-Flachbankdrücken",
+            "en": "Dumbbell Flat Bench Press"
+          },
+          "trackingType": "weight_reps",
+          "target": {
+            "sets": 4,
+            "repMin": 8,
+            "repMax": 10,
+            "restSec": 90,
+            "weightStepsKg": [
+              14,
+              16,
+              18,
+              20,
+              22
+            ]
+          },
+          "sets": [
+            {
+              "weightPerDumbbellKg": 20,
+              "reps": 10,
+              "done": true,
+              "completedAt": "2026-10-26T17:52:00.000Z"
+            },
+            {
+              "weightPerDumbbellKg": 20,
+              "reps": 9,
+              "done": true,
+              "completedAt": "2026-10-26T17:52:00.000Z"
+            },
+            {
+              "weightPerDumbbellKg": 20,
+              "reps": 9,
+              "done": true,
+              "completedAt": "2026-10-26T17:52:00.000Z"
+            },
+            {
+              "weightPerDumbbellKg": 20,
+              "reps": 8,
+              "done": true,
+              "completedAt": "2026-10-26T17:52:00.000Z"
+            }
+          ]
+        },
+        {
+          "id": "demo-se-1-1",
+          "exerciseId": "db-incline-bench-press",
+          "name": {
+            "de": "Schrägbankdrücken",
+            "en": "Incline Dumbbell Bench Press"
+          },
+          "trackingType": "weight_reps",
+          "target": {
+            "sets": 3,
+            "repMin": 8,
+            "repMax": 10,
+            "restSec": 90,
+            "weightStepsKg": [
+              12,
+              14,
+              16,
+              18
+            ]
+          },
+          "sets": [
+            {
+              "weightPerDumbbellKg": 16,
+              "reps": 10,
+              "done": true,
+              "completedAt": "2026-10-26T17:52:00.000Z"
+            },
+            {
+              "weightPerDumbbellKg": 16,
+              "reps": 9,
+              "done": true,
+              "completedAt": "2026-10-26T17:52:00.000Z"
+            },
+            {
+              "weightPerDumbbellKg": 16,
+              "reps": 8,
+              "done": true,
+              "completedAt": "2026-10-26T17:52:00.000Z"
+            }
+          ]
+        },
+        {
+          "id": "demo-se-1-2",
+          "exerciseId": "seated-db-shoulder-press",
+          "name": {
+            "de": "Schulterdrücken sitzend",
+            "en": "Seated Dumbbell Shoulder Press"
+          },
+          "trackingType": "weight_reps",
+          "target": {
+            "sets": 3,
+            "repMin": 8,
+            "repMax": 10,
+            "restSec": 75,
+            "weightStepsKg": [
+              8,
+              10,
+              12
+            ]
+          },
+          "sets": [
+            {
+              "weightPerDumbbellKg": 10,
+              "reps": 10,
+              "done": true,
+              "completedAt": "2026-10-26T17:52:00.000Z"
+            },
+            {
+              "weightPerDumbbellKg": 10,
+              "reps": 9,
+              "done": true,
+              "completedAt": "2026-10-26T17:52:00.000Z"
+            },
+            {
+              "weightPerDumbbellKg": 10,
+              "reps": 9,
+              "done": true,
+              "completedAt": "2026-10-26T17:52:00.000Z"
+            }
+          ]
+        },
+        {
+          "id": "demo-se-1-3",
+          "exerciseId": "lateral-raise",
+          "name": {
+            "de": "Seitheben",
+            "en": "Lateral Raise"
+          },
+          "trackingType": "weight_reps",
+          "target": {
+            "sets": 3,
+            "repMin": 12,
+            "repMax": 15,
+            "restSec": 60,
+            "weightStepsKg": [
+              6
+            ]
+          },
+          "sets": [
+            {
+              "weightPerDumbbellKg": 6,
+              "reps": 15,
+              "done": true,
+              "completedAt": "2026-10-26T17:52:00.000Z"
+            },
+            {
+              "weightPerDumbbellKg": 6,
+              "reps": 14,
+              "done": true,
+              "completedAt": "2026-10-26T17:52:00.000Z"
+            },
+            {
+              "weightPerDumbbellKg": 6,
+              "reps": 12,
+              "done": true,
+              "completedAt": "2026-10-26T17:52:00.000Z"
+            }
+          ]
+        },
+        {
+          "id": "demo-se-1-4",
+          "exerciseId": "plank",
+          "name": {
+            "de": "Plank",
+            "en": "Plank"
+          },
+          "trackingType": "duration",
+          "target": {
+            "sets": 3,
+            "durationSec": 40,
+            "restSec": 45
+          },
+          "sets": [
+            {
+              "durationSec": 40,
+              "done": true,
+              "completedAt": "2026-10-26T17:52:00.000Z"
+            },
+            {
+              "durationSec": 40,
+              "done": true,
+              "completedAt": "2026-10-26T17:52:00.000Z"
+            },
+            {
+              "durationSec": 40,
+              "done": true,
+              "completedAt": "2026-10-26T17:52:00.000Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "demo-session-2",
+      "planId": "demo-plan-2",
+      "planName": "Tag 2 – Beine",
+      "date": "2026-10-27",
+      "startedAt": "2026-10-27T17:00:00.000Z",
+      "completedAt": "2026-10-27T17:55:00.000Z",
+      "durationSec": 3300,
+      "progressionStepKg": 2,
+      "exercises": [
+        {
+          "id": "demo-se-2-0",
+          "exerciseId": "db-rdl",
+          "name": {
+            "de": "Rumänisches Kreuzheben mit Kurzhanteln",
+            "en": "Dumbbell Romanian Deadlift"
+          },
+          "trackingType": "weight_reps",
+          "target": {
+            "sets": 4,
+            "repMin": 8,
+            "repMax": 8,
+            "restSec": 90
+          },
+          "sets": [
+            {
+              "weightPerDumbbellKg": 20,
+              "reps": 8,
+              "done": true,
+              "completedAt": "2026-10-27T17:55:00.000Z"
+            },
+            {
+              "weightPerDumbbellKg": 20,
+              "reps": 8,
+              "done": true,
+              "completedAt": "2026-10-27T17:55:00.000Z"
+            },
+            {
+              "weightPerDumbbellKg": 20,
+              "reps": 8,
+              "done": true,
+              "completedAt": "2026-10-27T17:55:00.000Z"
+            },
+            {
+              "weightPerDumbbellKg": 20,
+              "reps": 8,
+              "done": true,
+              "completedAt": "2026-10-27T17:55:00.000Z"
+            }
+          ]
+        },
+        {
+          "id": "demo-se-2-1",
+          "exerciseId": "goblet-squat",
+          "name": {
+            "de": "Goblet Squat",
+            "en": "Goblet Squat"
+          },
+          "trackingType": "weight_reps",
+          "target": {
+            "sets": 3,
+            "repMin": 8,
+            "repMax": 10,
+            "restSec": 75,
+            "weightStepsKg": [
+              16,
+              18,
+              20
+            ]
+          },
+          "sets": [
+            {
+              "weightPerDumbbellKg": 18,
+              "reps": 10,
+              "done": true,
+              "completedAt": "2026-10-27T17:55:00.000Z"
+            },
+            {
+              "weightPerDumbbellKg": 18,
+              "reps": 9,
+              "done": true,
+              "completedAt": "2026-10-27T17:55:00.000Z"
+            },
+            {
+              "weightPerDumbbellKg": 18,
+              "reps": 9,
+              "done": true,
+              "completedAt": "2026-10-27T17:55:00.000Z"
+            }
+          ]
+        },
+        {
+          "id": "demo-se-2-2",
+          "exerciseId": "ab-wheel",
+          "name": {
+            "de": "Ab-Wheel",
+            "en": "Ab Wheel Rollout"
+          },
+          "trackingType": "reps",
+          "target": {
+            "sets": 3,
+            "repMin": 8,
+            "repMax": 8,
+            "restSec": 60
+          },
+          "sets": [
+            {
+              "reps": 8,
+              "done": true,
+              "completedAt": "2026-10-27T17:55:00.000Z"
+            },
+            {
+              "reps": 8,
+              "done": true,
+              "completedAt": "2026-10-27T17:55:00.000Z"
+            },
+            {
+              "reps": 7,
+              "done": true,
+              "completedAt": "2026-10-27T17:55:00.000Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "demo-session-3",
+      "planId": "demo-plan-cardio",
+      "planName": "Cardio",
+      "date": "2026-10-28",
+      "startedAt": "2026-10-28T06:00:00.000Z",
+      "completedAt": "2026-10-28T06:25:00.000Z",
+      "durationSec": 1500,
+      "exercises": [
+        {
+          "id": "demo-se-3-0",
+          "exerciseId": "ergometer",
+          "name": {
+            "de": "Ergometer",
+            "en": "Stationary Bike"
+          },
+          "trackingType": "cardio",
+          "target": {
+            "sets": 1,
+            "durationSec": 1800,
+            "note": "locker, 70–90 RPM"
+          },
+          "sets": [
+            {
+              "durationSec": 1500,
+              "watts": 118,
+              "rpm": 80,
+              "heartRate": 116,
+              "done": true,
+              "completedAt": "2026-10-28T06:25:00.000Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "demo-session-4",
+      "planId": "demo-plan-3",
+      "planName": "Tag 3 – Pull",
+      "date": "2026-10-29",
+      "startedAt": "2026-10-29T17:00:00.000Z",
+      "completedAt": "2026-10-29T17:48:00.000Z",
+      "durationSec": 2880,
+      "progressionStepKg": 2,
+      "exercises": [
+        {
+          "id": "demo-se-4-0",
+          "exerciseId": "one-arm-db-row",
+          "name": {
+            "de": "Einarmiges Rudern",
+            "en": "One-arm Dumbbell Row"
+          },
+          "trackingType": "weight_reps",
+          "target": {
+            "sets": 4,
+            "repMin": 8,
+            "repMax": 10,
+            "restSec": 75,
+            "weightStepsKg": [
+              12,
+              14,
+              16,
+              20
+            ]
+          },
+          "sets": [
+            {
+              "weightPerDumbbellKg": 16,
+              "reps": 10,
+              "done": true,
+              "completedAt": "2026-10-29T17:48:00.000Z"
+            },
+            {
+              "weightPerDumbbellKg": 16,
+              "reps": 10,
+              "done": true,
+              "completedAt": "2026-10-29T17:48:00.000Z"
+            },
+            {
+              "weightPerDumbbellKg": 16,
+              "reps": 9,
+              "done": true,
+              "completedAt": "2026-10-29T17:48:00.000Z"
+            },
+            {
+              "weightPerDumbbellKg": 16,
+              "reps": 9,
+              "done": true,
+              "completedAt": "2026-10-29T17:48:00.000Z"
+            }
+          ]
+        },
+        {
+          "id": "demo-se-4-1",
+          "exerciseId": "bent-over-db-row",
+          "name": {
+            "de": "Vorgebeugtes Rudern",
+            "en": "Bent-over Dumbbell Row"
+          },
+          "trackingType": "weight_reps",
+          "target": {
+            "sets": 3,
+            "repMin": 8,
+            "repMax": 10,
+            "restSec": 75,
+            "weightStepsKg": [
+              14
+            ]
+          },
+          "sets": [
+            {
+              "weightPerDumbbellKg": 14,
+              "reps": 10,
+              "done": true,
+              "completedAt": "2026-10-29T17:48:00.000Z"
+            },
+            {
+              "weightPerDumbbellKg": 14,
+              "reps": 9,
+              "done": true,
+              "completedAt": "2026-10-29T17:48:00.000Z"
+            },
+            {
+              "weightPerDumbbellKg": 14,
+              "reps": 9,
+              "done": true,
+              "completedAt": "2026-10-29T17:48:00.000Z"
+            }
+          ]
+        },
+        {
+          "id": "demo-se-4-2",
+          "exerciseId": "side-plank",
+          "name": {
+            "de": "Side Plank",
+            "en": "Side Plank"
+          },
+          "trackingType": "duration",
+          "target": {
+            "sets": 3,
+            "durationSec": 30,
+            "restSec": 45
+          },
+          "sets": [
+            {
+              "durationSec": 30,
+              "done": true,
+              "completedAt": "2026-10-29T17:48:00.000Z"
+            },
+            {
+              "durationSec": 30,
+              "done": true,
+              "completedAt": "2026-10-29T17:48:00.000Z"
+            },
+            {
+              "durationSec": 30,
+              "done": true,
+              "completedAt": "2026-10-29T17:48:00.000Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "demo-session-5",
+      "planId": "demo-plan-4",
+      "planName": "Tag 4 – Ganzkörper",
+      "date": "2026-10-30",
+      "startedAt": "2026-10-30T17:00:00.000Z",
+      "completedAt": "2026-10-30T17:45:00.000Z",
+      "durationSec": 2700,
+      "progressionStepKg": 2,
+      "exercises": [
+        {
+          "id": "demo-se-5-0",
+          "exerciseId": "goblet-squat",
+          "name": {
+            "de": "Goblet Squat",
+            "en": "Goblet Squat"
+          },
+          "trackingType": "weight_reps",
+          "target": {
+            "sets": 3,
+            "repMin": 8,
+            "repMax": 10,
+            "restSec": 75,
+            "weightStepsKg": [
+              16,
+              18,
+              20
+            ]
+          },
+          "sets": [
+            {
+              "weightPerDumbbellKg": 18,
+              "reps": 10,
+              "done": true,
+              "completedAt": "2026-10-30T17:45:00.000Z"
+            },
+            {
+              "weightPerDumbbellKg": 18,
+              "reps": 10,
+              "done": true,
+              "completedAt": "2026-10-30T17:45:00.000Z"
+            },
+            {
+              "weightPerDumbbellKg": 18,
+              "reps": 9,
+              "done": true,
+              "completedAt": "2026-10-30T17:45:00.000Z"
+            }
+          ]
+        },
+        {
+          "id": "demo-se-5-1",
+          "exerciseId": "farmer-carry",
+          "name": {
+            "de": "Farmer Carry",
+            "en": "Farmer Carry"
+          },
+          "trackingType": "duration",
+          "target": {
+            "sets": 3,
+            "durationSec": 35,
+            "restSec": 60,
+            "weightStepsKg": [
+              20,
+              22
+            ]
+          },
+          "sets": [
+            {
+              "durationSec": 35,
+              "weightPerDumbbellKg": 20,
+              "done": true,
+              "completedAt": "2026-10-30T17:45:00.000Z"
+            },
+            {
+              "durationSec": 35,
+              "weightPerDumbbellKg": 20,
+              "done": true,
+              "completedAt": "2026-10-30T17:45:00.000Z"
+            },
+            {
+              "durationSec": 35,
+              "weightPerDumbbellKg": 20,
+              "done": true,
+              "completedAt": "2026-10-30T17:45:00.000Z"
+            }
+          ]
+        },
+        {
+          "id": "demo-se-5-2",
+          "exerciseId": "ab-wheel",
+          "name": {
+            "de": "Ab-Wheel",
+            "en": "Ab Wheel Rollout"
+          },
+          "trackingType": "reps",
+          "target": {
+            "sets": 3,
+            "repMin": 8,
+            "repMax": 8,
+            "restSec": 60
+          },
+          "sets": [
+            {
+              "reps": 8,
+              "done": true,
+              "completedAt": "2026-10-30T17:45:00.000Z"
+            },
+            {
+              "reps": 8,
+              "done": true,
+              "completedAt": "2026-10-30T17:45:00.000Z"
+            },
+            {
+              "reps": 8,
+              "done": true,
+              "completedAt": "2026-10-30T17:45:00.000Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "demo-session-6",
+      "planId": "demo-plan-1",
+      "planName": "Tag 1 – Push",
+      "date": "2026-11-02",
+      "startedAt": "2026-11-02T17:00:00.000Z",
+      "completedAt": "2026-11-02T17:50:00.000Z",
+      "durationSec": 3000,
+      "progressionStepKg": 2,
+      "exercises": [
+        {
+          "id": "demo-se-6-0",
+          "exerciseId": "db-flat-bench-press",
+          "name": {
+            "de": "Kurzhantel-Flachbankdrücken",
+            "en": "Dumbbell Flat Bench Press"
+          },
+          "trackingType": "weight_reps",
+          "target": {
+            "sets": 4,
+            "repMin": 8,
+            "repMax": 10,
+            "restSec": 90,
+            "weightStepsKg": [
+              14,
+              16,
+              18,
+              20,
+              22
+            ]
+          },
+          "sets": [
+            {
+              "weightPerDumbbellKg": 20,
+              "reps": 10,
+              "done": true,
+              "completedAt": "2026-11-02T17:50:00.000Z"
+            },
+            {
+              "weightPerDumbbellKg": 20,
+              "reps": 10,
+              "done": true,
+              "completedAt": "2026-11-02T17:50:00.000Z"
+            },
+            {
+              "weightPerDumbbellKg": 20,
+              "reps": 10,
+              "done": true,
+              "completedAt": "2026-11-02T17:50:00.000Z"
+            },
+            {
+              "weightPerDumbbellKg": 20,
+              "reps": 10,
+              "done": true,
+              "completedAt": "2026-11-02T17:50:00.000Z"
+            }
+          ]
+        },
+        {
+          "id": "demo-se-6-1",
+          "exerciseId": "db-incline-bench-press",
+          "name": {
+            "de": "Schrägbankdrücken",
+            "en": "Incline Dumbbell Bench Press"
+          },
+          "trackingType": "weight_reps",
+          "target": {
+            "sets": 3,
+            "repMin": 8,
+            "repMax": 10,
+            "restSec": 90,
+            "weightStepsKg": [
+              12,
+              14,
+              16,
+              18
+            ]
+          },
+          "sets": [
+            {
+              "weightPerDumbbellKg": 16,
+              "reps": 10,
+              "done": true,
+              "completedAt": "2026-11-02T17:50:00.000Z"
+            },
+            {
+              "weightPerDumbbellKg": 16,
+              "reps": 10,
+              "done": true,
+              "completedAt": "2026-11-02T17:50:00.000Z"
+            },
+            {
+              "weightPerDumbbellKg": 16,
+              "reps": 9,
+              "done": true,
+              "completedAt": "2026-11-02T17:50:00.000Z"
+            }
+          ]
+        },
+        {
+          "id": "demo-se-6-2",
+          "exerciseId": "seated-db-shoulder-press",
+          "name": {
+            "de": "Schulterdrücken sitzend",
+            "en": "Seated Dumbbell Shoulder Press"
+          },
+          "trackingType": "weight_reps",
+          "target": {
+            "sets": 3,
+            "repMin": 8,
+            "repMax": 10,
+            "restSec": 75,
+            "weightStepsKg": [
+              8,
+              10,
+              12
+            ]
+          },
+          "sets": [
+            {
+              "weightPerDumbbellKg": 10,
+              "reps": 10,
+              "done": true,
+              "completedAt": "2026-11-02T17:50:00.000Z"
+            },
+            {
+              "weightPerDumbbellKg": 10,
+              "reps": 10,
+              "done": true,
+              "completedAt": "2026-11-02T17:50:00.000Z"
+            },
+            {
+              "weightPerDumbbellKg": 10,
+              "reps": 10,
+              "done": true,
+              "completedAt": "2026-11-02T17:50:00.000Z"
+            }
+          ]
+        },
+        {
+          "id": "demo-se-6-3",
+          "exerciseId": "lateral-raise",
+          "name": {
+            "de": "Seitheben",
+            "en": "Lateral Raise"
+          },
+          "trackingType": "weight_reps",
+          "target": {
+            "sets": 3,
+            "repMin": 12,
+            "repMax": 15,
+            "restSec": 60,
+            "weightStepsKg": [
+              6
+            ]
+          },
+          "sets": [
+            {
+              "weightPerDumbbellKg": 6,
+              "reps": 15,
+              "done": true,
+              "completedAt": "2026-11-02T17:50:00.000Z"
+            },
+            {
+              "weightPerDumbbellKg": 6,
+              "reps": 15,
+              "done": true,
+              "completedAt": "2026-11-02T17:50:00.000Z"
+            },
+            {
+              "weightPerDumbbellKg": 6,
+              "reps": 14,
+              "done": true,
+              "completedAt": "2026-11-02T17:50:00.000Z"
+            }
+          ]
+        },
+        {
+          "id": "demo-se-6-4",
+          "exerciseId": "plank",
+          "name": {
+            "de": "Plank",
+            "en": "Plank"
+          },
+          "trackingType": "duration",
+          "target": {
+            "sets": 3,
+            "durationSec": 40,
+            "restSec": 45
+          },
+          "sets": [
+            {
+              "durationSec": 40,
+              "done": true,
+              "completedAt": "2026-11-02T17:50:00.000Z"
+            },
+            {
+              "durationSec": 40,
+              "done": true,
+              "completedAt": "2026-11-02T17:50:00.000Z"
+            },
+            {
+              "durationSec": 40,
+              "done": true,
+              "completedAt": "2026-11-02T17:50:00.000Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "demo-session-7",
+      "planId": "demo-plan-2",
+      "planName": "Tag 2 – Beine",
+      "date": "2026-11-03",
+      "startedAt": "2026-11-03T17:00:00.000Z",
+      "completedAt": "2026-11-03T17:54:00.000Z",
+      "durationSec": 3240,
+      "progressionStepKg": 2,
+      "exercises": [
+        {
+          "id": "demo-se-7-0",
+          "exerciseId": "db-rdl",
+          "name": {
+            "de": "Rumänisches Kreuzheben mit Kurzhanteln",
+            "en": "Dumbbell Romanian Deadlift"
+          },
+          "trackingType": "weight_reps",
+          "target": {
+            "sets": 4,
+            "repMin": 8,
+            "repMax": 8,
+            "restSec": 90
+          },
+          "sets": [
+            {
+              "weightPerDumbbellKg": 22,
+              "reps": 8,
+              "done": true,
+              "completedAt": "2026-11-03T17:54:00.000Z"
+            },
+            {
+              "weightPerDumbbellKg": 22,
+              "reps": 8,
+              "done": true,
+              "completedAt": "2026-11-03T17:54:00.000Z"
+            },
+            {
+              "weightPerDumbbellKg": 22,
+              "reps": 8,
+              "done": true,
+              "completedAt": "2026-11-03T17:54:00.000Z"
+            },
+            {
+              "weightPerDumbbellKg": 22,
+              "reps": 8,
+              "done": true,
+              "completedAt": "2026-11-03T17:54:00.000Z"
+            }
+          ]
+        },
+        {
+          "id": "demo-se-7-1",
+          "exerciseId": "goblet-squat",
+          "name": {
+            "de": "Goblet Squat",
+            "en": "Goblet Squat"
+          },
+          "trackingType": "weight_reps",
+          "target": {
+            "sets": 3,
+            "repMin": 8,
+            "repMax": 10,
+            "restSec": 75,
+            "weightStepsKg": [
+              16,
+              18,
+              20
+            ]
+          },
+          "sets": [
+            {
+              "weightPerDumbbellKg": 18,
+              "reps": 10,
+              "done": true,
+              "completedAt": "2026-11-03T17:54:00.000Z"
+            },
+            {
+              "weightPerDumbbellKg": 18,
+              "reps": 10,
+              "done": true,
+              "completedAt": "2026-11-03T17:54:00.000Z"
+            },
+            {
+              "weightPerDumbbellKg": 18,
+              "reps": 10,
+              "done": true,
+              "completedAt": "2026-11-03T17:54:00.000Z"
+            }
+          ]
+        },
+        {
+          "id": "demo-se-7-2",
+          "exerciseId": "ab-wheel",
+          "name": {
+            "de": "Ab-Wheel",
+            "en": "Ab Wheel Rollout"
+          },
+          "trackingType": "reps",
+          "target": {
+            "sets": 3,
+            "repMin": 8,
+            "repMax": 8,
+            "restSec": 60
+          },
+          "sets": [
+            {
+              "reps": 8,
+              "done": true,
+              "completedAt": "2026-11-03T17:54:00.000Z"
+            },
+            {
+              "reps": 8,
+              "done": true,
+              "completedAt": "2026-11-03T17:54:00.000Z"
+            },
+            {
+              "reps": 8,
+              "done": true,
+              "completedAt": "2026-11-03T17:54:00.000Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "demo-session-8",
+      "planId": "demo-plan-cardio",
+      "planName": "Cardio",
+      "date": "2026-11-04",
+      "startedAt": "2026-11-04T06:00:00.000Z",
+      "completedAt": "2026-11-04T06:30:00.000Z",
+      "durationSec": 1800,
+      "exercises": [
+        {
+          "id": "demo-se-8-0",
+          "exerciseId": "ergometer",
+          "name": {
+            "de": "Ergometer",
+            "en": "Stationary Bike"
+          },
+          "trackingType": "cardio",
+          "target": {
+            "sets": 1,
+            "durationSec": 1800,
+            "note": "locker, 70–90 RPM"
+          },
+          "sets": [
+            {
+              "durationSec": 1800,
+              "watts": 122,
+              "rpm": 82,
+              "heartRate": 118,
+              "done": true,
+              "completedAt": "2026-11-04T06:30:00.000Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "demo-session-9",
+      "planId": "demo-plan-3",
+      "planName": "Tag 3 – Pull",
+      "date": "2026-11-05",
+      "startedAt": "2026-11-05T17:00:00.000Z",
+      "completedAt": "2026-11-05T17:49:00.000Z",
+      "durationSec": 2940,
+      "progressionStepKg": 2,
+      "exercises": [
+        {
+          "id": "demo-se-9-0",
+          "exerciseId": "one-arm-db-row",
+          "name": {
+            "de": "Einarmiges Rudern",
+            "en": "One-arm Dumbbell Row"
+          },
+          "trackingType": "weight_reps",
+          "target": {
+            "sets": 4,
+            "repMin": 8,
+            "repMax": 10,
+            "restSec": 75,
+            "weightStepsKg": [
+              12,
+              14,
+              16,
+              20
+            ]
+          },
+          "sets": [
+            {
+              "weightPerDumbbellKg": 16,
+              "reps": 10,
+              "done": true,
+              "completedAt": "2026-11-05T17:49:00.000Z"
+            },
+            {
+              "weightPerDumbbellKg": 16,
+              "reps": 10,
+              "done": true,
+              "completedAt": "2026-11-05T17:49:00.000Z"
+            },
+            {
+              "weightPerDumbbellKg": 16,
+              "reps": 10,
+              "done": true,
+              "completedAt": "2026-11-05T17:49:00.000Z"
+            },
+            {
+              "weightPerDumbbellKg": 16,
+              "reps": 10,
+              "done": true,
+              "completedAt": "2026-11-05T17:49:00.000Z"
+            }
+          ]
+        },
+        {
+          "id": "demo-se-9-1",
+          "exerciseId": "bent-over-db-row",
+          "name": {
+            "de": "Vorgebeugtes Rudern",
+            "en": "Bent-over Dumbbell Row"
+          },
+          "trackingType": "weight_reps",
+          "target": {
+            "sets": 3,
+            "repMin": 8,
+            "repMax": 10,
+            "restSec": 75,
+            "weightStepsKg": [
+              14
+            ]
+          },
+          "sets": [
+            {
+              "weightPerDumbbellKg": 14,
+              "reps": 10,
+              "done": true,
+              "completedAt": "2026-11-05T17:49:00.000Z"
+            },
+            {
+              "weightPerDumbbellKg": 14,
+              "reps": 10,
+              "done": true,
+              "completedAt": "2026-11-05T17:49:00.000Z"
+            },
+            {
+              "weightPerDumbbellKg": 14,
+              "reps": 9,
+              "done": true,
+              "completedAt": "2026-11-05T17:49:00.000Z"
+            }
+          ]
+        },
+        {
+          "id": "demo-se-9-2",
+          "exerciseId": "side-plank",
+          "name": {
+            "de": "Side Plank",
+            "en": "Side Plank"
+          },
+          "trackingType": "duration",
+          "target": {
+            "sets": 3,
+            "durationSec": 30,
+            "restSec": 45
+          },
+          "sets": [
+            {
+              "durationSec": 30,
+              "done": true,
+              "completedAt": "2026-11-05T17:49:00.000Z"
+            },
+            {
+              "durationSec": 30,
+              "done": true,
+              "completedAt": "2026-11-05T17:49:00.000Z"
+            },
+            {
+              "durationSec": 30,
+              "done": true,
+              "completedAt": "2026-11-05T17:49:00.000Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "demo-session-10",
+      "planId": "demo-plan-4",
+      "planName": "Tag 4 – Ganzkörper",
+      "date": "2026-11-06",
+      "startedAt": "2026-11-06T17:00:00.000Z",
+      "completedAt": "2026-11-06T17:46:00.000Z",
+      "durationSec": 2760,
+      "progressionStepKg": 2,
+      "exercises": [
+        {
+          "id": "demo-se-10-0",
+          "exerciseId": "goblet-squat",
+          "name": {
+            "de": "Goblet Squat",
+            "en": "Goblet Squat"
+          },
+          "trackingType": "weight_reps",
+          "target": {
+            "sets": 3,
+            "repMin": 8,
+            "repMax": 10,
+            "restSec": 75,
+            "weightStepsKg": [
+              16,
+              18,
+              20
+            ]
+          },
+          "sets": [
+            {
+              "weightPerDumbbellKg": 20,
+              "reps": 9,
+              "done": true,
+              "completedAt": "2026-11-06T17:46:00.000Z"
+            },
+            {
+              "weightPerDumbbellKg": 20,
+              "reps": 9,
+              "done": true,
+              "completedAt": "2026-11-06T17:46:00.000Z"
+            },
+            {
+              "weightPerDumbbellKg": 20,
+              "reps": 8,
+              "done": true,
+              "completedAt": "2026-11-06T17:46:00.000Z"
+            }
+          ]
+        },
+        {
+          "id": "demo-se-10-1",
+          "exerciseId": "farmer-carry",
+          "name": {
+            "de": "Farmer Carry",
+            "en": "Farmer Carry"
+          },
+          "trackingType": "duration",
+          "target": {
+            "sets": 3,
+            "durationSec": 35,
+            "restSec": 60,
+            "weightStepsKg": [
+              20,
+              22
+            ]
+          },
+          "sets": [
+            {
+              "durationSec": 35,
+              "weightPerDumbbellKg": 22,
+              "done": true,
+              "completedAt": "2026-11-06T17:46:00.000Z"
+            },
+            {
+              "durationSec": 35,
+              "weightPerDumbbellKg": 22,
+              "done": true,
+              "completedAt": "2026-11-06T17:46:00.000Z"
+            },
+            {
+              "durationSec": 35,
+              "weightPerDumbbellKg": 22,
+              "done": true,
+              "completedAt": "2026-11-06T17:46:00.000Z"
+            }
+          ]
+        },
+        {
+          "id": "demo-se-10-2",
+          "exerciseId": "ab-wheel",
+          "name": {
+            "de": "Ab-Wheel",
+            "en": "Ab Wheel Rollout"
+          },
+          "trackingType": "reps",
+          "target": {
+            "sets": 3,
+            "repMin": 8,
+            "repMax": 8,
+            "restSec": 60
+          },
+          "sets": [
+            {
+              "reps": 8,
+              "done": true,
+              "completedAt": "2026-11-06T17:46:00.000Z"
+            },
+            {
+              "reps": 8,
+              "done": true,
+              "completedAt": "2026-11-06T17:46:00.000Z"
+            },
+            {
+              "reps": 8,
+              "done": true,
+              "completedAt": "2026-11-06T17:46:00.000Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "demo-session-11",
+      "planId": "demo-plan-cardio",
+      "planName": "Cardio",
+      "date": "2026-11-09",
+      "startedAt": "2026-11-09T06:00:00.000Z",
+      "completedAt": "2026-11-09T06:30:00.000Z",
+      "durationSec": 1800,
+      "exercises": [
+        {
+          "id": "demo-se-11-0",
+          "exerciseId": "ergometer",
+          "name": {
+            "de": "Ergometer",
+            "en": "Stationary Bike"
+          },
+          "trackingType": "cardio",
+          "target": {
+            "sets": 1,
+            "durationSec": 1800,
+            "note": "locker, 70–90 RPM"
+          },
+          "sets": [
+            {
+              "durationSec": 1800,
+              "watts": 125,
+              "rpm": 84,
+              "heartRate": 118,
+              "done": true,
+              "completedAt": "2026-11-09T06:30:00.000Z"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "settings": {
+    "soundEnabled": true,
+    "hapticsEnabled": true
+  }
+}
