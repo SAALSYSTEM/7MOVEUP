@@ -5,6 +5,7 @@ import { BottomNavBar } from "@/components/ui/bottom-nav-bar";
 import { ToastProvider } from "@/components/ui/toast";
 import { createTranslator } from "@/i18n";
 import { detectBrowserLanguage } from "@/data/local/local-repositories";
+import { asset, ROUTER_BASENAME } from "@/lib/asset";
 import { ExerciseDetailPage } from "@/pages/exercise-detail-page";
 import { ExerciseFormPage } from "@/pages/exercise-form-page";
 import { ExercisesPage } from "@/pages/exercises-page";
@@ -48,7 +49,7 @@ function BootScreen({ state }: { state: "loading" | "error" }) {
   const t = createTranslator(detectBrowserLanguage());
   return (
     <main className="flex min-h-dvh flex-col items-center justify-center gap-5 px-8 text-center">
-      <img src="/icons/app-icon-192.png" alt="7MOVEUP" width={88} height={88} className="h-22 w-22 rounded-[22px]" />
+      <img src={asset("icons/app-icon-192.png")} alt="7MOVEUP" width={88} height={88} className="h-22 w-22 rounded-[22px]" />
       {state === "loading" ? (
         <p className="text-sm font-semibold text-muted">{t("app.loading")}</p>
       ) : (
@@ -71,7 +72,7 @@ export default function App() {
   return (
     <AppProvider fallback={(state) => <BootScreen state={state} />}>
       <ToastProvider>
-        <BrowserRouter>
+        <BrowserRouter basename={ROUTER_BASENAME}>
           <Shell />
         </BrowserRouter>
       </ToastProvider>

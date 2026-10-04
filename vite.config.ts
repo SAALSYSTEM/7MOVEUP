@@ -8,7 +8,14 @@ import { VitePWA } from "vite-plugin-pwa";
 
 import pkg from "./package.json" with { type: "json" };
 
+/**
+ * Basis-Pfad: "/" für lokal und spätere eigene Domain (Cloudflare),
+ * "/<repo>/" für die GitHub-Pages-Vorschau (setzt der Workflow via BASE_PATH).
+ */
+const base = process.env.BASE_PATH ?? "/";
+
 export default defineConfig({
+  base,
   define: {
     __APP_VERSION__: JSON.stringify(pkg.version),
   },
@@ -23,21 +30,22 @@ export default defineConfig({
         name: "7MOVEUP",
         short_name: "7MOVEUP",
         description: "Personal fitness planner and workout log",
-        id: "/",
-        start_url: "/",
-        scope: "/",
+        id: base,
+        start_url: base,
+        scope: base,
         display: "standalone",
         orientation: "portrait",
+        lang: "de",
         background_color: "#0B0B0C",
         theme_color: "#0B0B0C",
         icons: [
-          { src: "/icons/app-icon-192.png", sizes: "192x192", type: "image/png" },
-          { src: "/icons/app-icon-512.png", sizes: "512x512", type: "image/png" },
+          { src: "icons/app-icon-192.png", sizes: "192x192", type: "image/png" },
+          { src: "icons/app-icon-512.png", sizes: "512x512", type: "image/png" },
         ],
       },
       workbox: {
         globPatterns: ["**/*.{js,css,html,png,svg,woff2,webmanifest}"],
-        navigateFallback: "/index.html",
+        navigateFallback: "index.html",
         cleanupOutdatedCaches: true,
       },
     }),

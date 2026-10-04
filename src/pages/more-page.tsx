@@ -16,6 +16,7 @@ import { useToast } from "@/components/ui/toast";
 import { backupService, profileRepository, settingsRepository } from "@/data";
 import { parseBackup, type BackupFile, type BackupParseError } from "@/data/backup";
 import type { Language } from "@/domain/types";
+import { asset } from "@/lib/asset";
 import { dateLocale } from "@/lib/dates";
 import { countdownBeep, finishSignal, isVibrationSupported, unlockAudio } from "@/services/feedback";
 
@@ -257,7 +258,7 @@ export function MorePage() {
         <Section title={t("more.about")} id="about">
           <Card className="p-4">
             <div className="flex items-center gap-3">
-              <img src="/icons/app-icon-192.png" alt="" width={56} height={56} className="h-14 w-14 rounded-2xl" />
+              <img src={asset("icons/app-icon-192.png")} alt="" width={56} height={56} className="h-14 w-14 rounded-2xl" />
               <div>
                 <p className="text-lg font-black tracking-tight">7MOVEUP</p>
                 <p className="text-xs text-subtle">{t("more.version", { version: __APP_VERSION__ })}</p>

@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 
 import { useApp } from "@/app/app-context";
+import { asset } from "@/lib/asset";
 import { cn } from "@/lib/utils";
 
 type AppHeaderProps = {
@@ -16,7 +17,7 @@ export function AppHeader({ left, className }: AppHeaderProps) {
     <header className={cn("mb-6 flex min-h-11 items-center justify-between gap-3", className)}>
       <div className="min-w-0">{left}</div>
       <div className="flex shrink-0 items-center gap-2 rounded-full border border-white/10 bg-card p-1.5 pr-3.5">
-        <img src="/icons/header-icon-64.png" alt="7MOVEUP" width={32} height={32} className="h-8 w-8 rounded-[10px]" />
+        <img src={asset("icons/header-icon-64.png")} alt="7MOVEUP" width={32} height={32} className="h-8 w-8 rounded-[10px]" />
         <span className="max-w-32 truncate text-xs font-extrabold uppercase tracking-wide">{displayName}</span>
       </div>
     </header>
