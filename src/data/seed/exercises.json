@@ -1,0 +1,864 @@
+[
+  {
+    "id": "db-flat-bench-press",
+    "builtIn": true,
+    "name": {
+      "de": "Kurzhantel-Flachbankdrücken",
+      "en": "Dumbbell Flat Bench Press"
+    },
+    "bodyRegions": [
+      "Brust",
+      "Trizeps",
+      "Schulter"
+    ],
+    "equipment": [
+      "Kurzhanteln",
+      "Hantelbank"
+    ],
+    "trackingType": "weight_reps",
+    "defaultSets": 4,
+    "defaultRestSec": 90,
+    "defaultRepMin": 8,
+    "defaultRepMax": 10,
+    "videoUrls": [
+      "https://youtube.com/shorts/_G5xkrVfZ88?si=XN6cYyANf6uRiDe3"
+    ]
+  },
+  {
+    "id": "db-incline-bench-press",
+    "builtIn": true,
+    "name": {
+      "de": "Schrägbankdrücken",
+      "en": "Incline Dumbbell Bench Press"
+    },
+    "bodyRegions": [
+      "Brust",
+      "Schulter",
+      "Trizeps"
+    ],
+    "equipment": [
+      "Kurzhanteln",
+      "Hantelbank"
+    ],
+    "trackingType": "weight_reps",
+    "defaultSets": 3,
+    "defaultRestSec": 90,
+    "defaultRepMin": 8,
+    "defaultRepMax": 10
+  },
+  {
+    "id": "seated-db-shoulder-press",
+    "builtIn": true,
+    "name": {
+      "de": "Schulterdrücken sitzend",
+      "en": "Seated Dumbbell Shoulder Press"
+    },
+    "bodyRegions": [
+      "Schulter",
+      "Trizeps"
+    ],
+    "equipment": [
+      "Kurzhanteln",
+      "Hantelbank"
+    ],
+    "trackingType": "weight_reps",
+    "defaultSets": 3,
+    "defaultRestSec": 75,
+    "defaultRepMin": 8,
+    "defaultRepMax": 10,
+    "videoUrls": [
+      "https://youtube.com/shorts/8kwjeXWyiTY?si=ZE-yXtf8df-0WIi3",
+      "https://youtube.com/shorts/A7sJcr3OCg4?si=vw3cUSt9lfMdBtDX"
+    ]
+  },
+  {
+    "id": "lateral-raise",
+    "builtIn": true,
+    "name": {
+      "de": "Seitheben",
+      "en": "Lateral Raise"
+    },
+    "bodyRegions": [
+      "Schulter"
+    ],
+    "equipment": [
+      "Kurzhanteln"
+    ],
+    "trackingType": "weight_reps",
+    "defaultSets": 3,
+    "defaultRestSec": 60,
+    "defaultRepMin": 12,
+    "defaultRepMax": 15,
+    "videoUrls": [
+      "https://youtube.com/shorts/aDZjH8AiMwA?si=F5xfZTh1coaLpkOx"
+    ]
+  },
+  {
+    "id": "push-up",
+    "builtIn": true,
+    "name": {
+      "de": "Liegestütz",
+      "en": "Push-up"
+    },
+    "bodyRegions": [
+      "Brust",
+      "Trizeps",
+      "Core"
+    ],
+    "equipment": [
+      "Körpergewicht"
+    ],
+    "trackingType": "reps",
+    "defaultSets": 4,
+    "defaultRestSec": 60,
+    "defaultRepMin": 8,
+    "defaultRepMax": 15
+  },
+  {
+    "id": "slow-push-up",
+    "builtIn": true,
+    "name": {
+      "de": "Langsamer Liegestütz",
+      "en": "Slow Push-up"
+    },
+    "bodyRegions": [
+      "Brust",
+      "Trizeps",
+      "Core"
+    ],
+    "equipment": [
+      "Körpergewicht"
+    ],
+    "trackingType": "reps",
+    "defaultSets": 3,
+    "defaultRestSec": 60,
+    "defaultRepMin": 6,
+    "defaultRepMax": 10
+  },
+  {
+    "id": "pike-push-up",
+    "builtIn": true,
+    "name": {
+      "de": "Pike Push-up",
+      "en": "Pike Push-up"
+    },
+    "bodyRegions": [
+      "Schulter",
+      "Trizeps"
+    ],
+    "equipment": [
+      "Körpergewicht"
+    ],
+    "trackingType": "reps",
+    "defaultSets": 4,
+    "defaultRestSec": 60,
+    "defaultRepMin": 8,
+    "defaultRepMax": 12
+  },
+  {
+    "id": "close-grip-push-up",
+    "builtIn": true,
+    "name": {
+      "de": "Enger Liegestütz",
+      "en": "Close-grip Push-up"
+    },
+    "bodyRegions": [
+      "Trizeps",
+      "Brust"
+    ],
+    "equipment": [
+      "Körpergewicht"
+    ],
+    "trackingType": "reps",
+    "defaultSets": 3,
+    "defaultRestSec": 60,
+    "defaultRepMin": 8,
+    "defaultRepMax": 12
+  },
+  {
+    "id": "diamond-hold",
+    "builtIn": true,
+    "name": {
+      "de": "Diamond Hold",
+      "en": "Diamond Hold"
+    },
+    "bodyRegions": [
+      "Trizeps",
+      "Brust",
+      "Core"
+    ],
+    "equipment": [
+      "Körpergewicht"
+    ],
+    "trackingType": "duration",
+    "defaultSets": 2,
+    "defaultRestSec": 45,
+    "defaultDurationSec": 25
+  },
+  {
+    "id": "scapular-push-up",
+    "builtIn": true,
+    "name": {
+      "de": "Scapula Push-up",
+      "en": "Scapular Push-up"
+    },
+    "bodyRegions": [
+      "Schulter",
+      "Rücken"
+    ],
+    "equipment": [
+      "Körpergewicht"
+    ],
+    "trackingType": "reps",
+    "defaultSets": 2,
+    "defaultRestSec": 45,
+    "defaultRepMin": 10,
+    "defaultRepMax": 12
+  },
+  {
+    "id": "one-arm-db-row",
+    "builtIn": true,
+    "name": {
+      "de": "Einarmiges Rudern",
+      "en": "One-arm Dumbbell Row"
+    },
+    "bodyRegions": [
+      "Rücken",
+      "Bizeps"
+    ],
+    "equipment": [
+      "Kurzhanteln",
+      "Hantelbank"
+    ],
+    "trackingType": "weight_reps",
+    "defaultSets": 4,
+    "defaultRestSec": 75,
+    "defaultRepMin": 8,
+    "defaultRepMax": 10,
+    "videoUrls": [
+      "https://youtube.com/shorts/hHQjGiKL4To?si=qA7cDer5MQTc7uO_",
+      "https://youtube.com/shorts/0CBj0TJcaYU?si=3GUsj1Q2hUGCsrbO"
+    ]
+  },
+  {
+    "id": "bent-over-db-row",
+    "builtIn": true,
+    "name": {
+      "de": "Vorgebeugtes Rudern",
+      "en": "Bent-over Dumbbell Row"
+    },
+    "bodyRegions": [
+      "Rücken",
+      "Bizeps"
+    ],
+    "equipment": [
+      "Kurzhanteln"
+    ],
+    "trackingType": "weight_reps",
+    "defaultSets": 3,
+    "defaultRestSec": 75,
+    "defaultRepMin": 8,
+    "defaultRepMax": 10,
+    "videoUrls": [
+      "https://youtube.com/shorts/1HmE4DUkKKU?si=8aEg4U826ipq6lKO",
+      "https://youtube.com/shorts/czsDkLeMa10?si=aGf71RfJ-bBeEa52"
+    ]
+  },
+  {
+    "id": "reverse-fly",
+    "builtIn": true,
+    "name": {
+      "de": "Reverse Flys",
+      "en": "Reverse Fly"
+    },
+    "bodyRegions": [
+      "Rücken",
+      "Schulter"
+    ],
+    "equipment": [
+      "Kurzhanteln"
+    ],
+    "trackingType": "weight_reps",
+    "defaultSets": 3,
+    "defaultRestSec": 60,
+    "defaultRepMin": 12,
+    "defaultRepMax": 15,
+    "videoUrls": [
+      "https://youtube.com/shorts/A-x6_0VrT18?si=A9APKpHq5ALqxYbs",
+      "https://youtube.com/shorts/zU8-1o0OQog?si=3vTq9wZWaRTg8_yx"
+    ]
+  },
+  {
+    "id": "inverted-row",
+    "builtIn": true,
+    "name": {
+      "de": "Inverted Row",
+      "en": "Inverted Row"
+    },
+    "bodyRegions": [
+      "Rücken",
+      "Bizeps"
+    ],
+    "equipment": [
+      "Körpergewicht"
+    ],
+    "trackingType": "reps",
+    "defaultSets": 4,
+    "defaultRestSec": 75,
+    "defaultRepMin": 6,
+    "defaultRepMax": 12
+  },
+  {
+    "id": "doorframe-row",
+    "builtIn": true,
+    "name": {
+      "de": "Türrahmen-Rudern",
+      "en": "Doorframe Row"
+    },
+    "bodyRegions": [
+      "Rücken",
+      "Bizeps"
+    ],
+    "equipment": [
+      "Körpergewicht"
+    ],
+    "trackingType": "reps",
+    "defaultSets": 3,
+    "defaultRestSec": 60,
+    "defaultRepMin": 8,
+    "defaultRepMax": 12
+  },
+  {
+    "id": "reverse-snow-angel",
+    "builtIn": true,
+    "name": {
+      "de": "Reverse Snow Angels",
+      "en": "Reverse Snow Angels"
+    },
+    "bodyRegions": [
+      "Rücken",
+      "Schulter"
+    ],
+    "equipment": [
+      "Körpergewicht"
+    ],
+    "trackingType": "reps",
+    "defaultSets": 3,
+    "defaultRestSec": 45,
+    "defaultRepMin": 12,
+    "defaultRepMax": 15
+  },
+  {
+    "id": "superman-hold",
+    "builtIn": true,
+    "name": {
+      "de": "Superman Hold",
+      "en": "Superman Hold"
+    },
+    "bodyRegions": [
+      "Rücken",
+      "Core"
+    ],
+    "equipment": [
+      "Körpergewicht"
+    ],
+    "trackingType": "duration",
+    "defaultSets": 3,
+    "defaultRestSec": 45,
+    "defaultDurationSec": 30
+  },
+  {
+    "id": "goblet-squat",
+    "builtIn": true,
+    "name": {
+      "de": "Goblet Squat",
+      "en": "Goblet Squat"
+    },
+    "bodyRegions": [
+      "Beine",
+      "Gesäß",
+      "Core"
+    ],
+    "equipment": [
+      "Kurzhanteln",
+      "Kettlebell"
+    ],
+    "trackingType": "weight_reps",
+    "defaultSets": 3,
+    "defaultRestSec": 75,
+    "defaultRepMin": 8,
+    "defaultRepMax": 10,
+    "videoUrls": [
+      "https://youtube.com/shorts/sRr-3fXSSn0?si=m3uyyluLjw9eLZWd",
+      "https://youtube.com/shorts/lRYBbchqxtI?si=hzgc4r_BZWFDBR1w"
+    ]
+  },
+  {
+    "id": "bulgarian-split-squat",
+    "builtIn": true,
+    "name": {
+      "de": "Bulgarian Split Squat",
+      "en": "Bulgarian Split Squat"
+    },
+    "bodyRegions": [
+      "Beine",
+      "Gesäß"
+    ],
+    "equipment": [
+      "Kurzhanteln",
+      "Hantelbank"
+    ],
+    "trackingType": "weight_reps",
+    "defaultSets": 3,
+    "defaultRestSec": 75,
+    "defaultRepMin": 8,
+    "defaultRepMax": 10,
+    "videoUrls": [
+      "https://youtube.com/shorts/uBSoEWZu07k?si=un7r9KMojWzmZH_b"
+    ]
+  },
+  {
+    "id": "reverse-lunge",
+    "builtIn": true,
+    "name": {
+      "de": "Reverse Lunge",
+      "en": "Reverse Lunge"
+    },
+    "bodyRegions": [
+      "Beine",
+      "Gesäß"
+    ],
+    "equipment": [
+      "Kurzhanteln",
+      "Körpergewicht"
+    ],
+    "trackingType": "weight_reps",
+    "defaultSets": 3,
+    "defaultRestSec": 75,
+    "defaultRepMin": 8,
+    "defaultRepMax": 10
+  },
+  {
+    "id": "forward-lunge",
+    "builtIn": true,
+    "name": {
+      "de": "Ausfallschritt vorwärts",
+      "en": "Forward Lunge"
+    },
+    "bodyRegions": [
+      "Beine",
+      "Gesäß"
+    ],
+    "equipment": [
+      "Kurzhanteln",
+      "Körpergewicht"
+    ],
+    "trackingType": "weight_reps",
+    "defaultSets": 3,
+    "defaultRestSec": 75,
+    "defaultRepMin": 8,
+    "defaultRepMax": 10
+  },
+  {
+    "id": "db-rdl",
+    "builtIn": true,
+    "name": {
+      "de": "Rumänisches Kreuzheben mit Kurzhanteln",
+      "en": "Dumbbell Romanian Deadlift"
+    },
+    "bodyRegions": [
+      "Beine",
+      "Gesäß",
+      "Rücken"
+    ],
+    "equipment": [
+      "Kurzhanteln"
+    ],
+    "trackingType": "weight_reps",
+    "defaultSets": 4,
+    "defaultRestSec": 90,
+    "defaultRepMin": 8,
+    "defaultRepMax": 10
+  },
+  {
+    "id": "bodyweight-rdl",
+    "builtIn": true,
+    "name": {
+      "de": "Rumänisches Kreuzheben ohne Gewicht",
+      "en": "Bodyweight Romanian Deadlift"
+    },
+    "bodyRegions": [
+      "Beine",
+      "Gesäß"
+    ],
+    "equipment": [
+      "Körpergewicht"
+    ],
+    "trackingType": "reps",
+    "defaultSets": 4,
+    "defaultRestSec": 45,
+    "defaultRepMin": 12,
+    "defaultRepMax": 12,
+    "videoUrls": [
+      "https://youtube.com/shorts/CBOhr6H7BEY?si=wK_u-5lEE8FOgCD7"
+    ]
+  },
+  {
+    "id": "db-hip-thrust",
+    "builtIn": true,
+    "name": {
+      "de": "Hip Thrust mit Hantel",
+      "en": "Dumbbell Hip Thrust"
+    },
+    "bodyRegions": [
+      "Gesäß",
+      "Beine"
+    ],
+    "equipment": [
+      "Kurzhanteln",
+      "Hantelbank"
+    ],
+    "trackingType": "weight_reps",
+    "defaultSets": 3,
+    "defaultRestSec": 75,
+    "defaultRepMin": 10,
+    "defaultRepMax": 12,
+    "videoUrls": [
+      "https://youtube.com/shorts/ysWdBc1a1FA?si=SxiIB--_-SCCVu4j",
+      "https://youtu.be/YlYAJy0wja0?si=1yaMGTXsgkJIjCdh"
+    ]
+  },
+  {
+    "id": "bodyweight-hip-thrust",
+    "builtIn": true,
+    "name": {
+      "de": "Hip Thrust ohne Gewicht",
+      "en": "Bodyweight Hip Thrust"
+    },
+    "bodyRegions": [
+      "Gesäß",
+      "Beine"
+    ],
+    "equipment": [
+      "Körpergewicht",
+      "Hantelbank"
+    ],
+    "trackingType": "reps",
+    "defaultSets": 4,
+    "defaultRestSec": 45,
+    "defaultRepMin": 12,
+    "defaultRepMax": 12,
+    "videoUrls": [
+      "https://youtube.com/shorts/ZSkzIvqotWA?si=GF_JG9cSLrt4yLiL"
+    ]
+  },
+  {
+    "id": "glute-bridge",
+    "builtIn": true,
+    "name": {
+      "de": "Glute Bridge",
+      "en": "Glute Bridge"
+    },
+    "bodyRegions": [
+      "Gesäß",
+      "Beine"
+    ],
+    "equipment": [
+      "Körpergewicht"
+    ],
+    "trackingType": "reps",
+    "defaultSets": 2,
+    "defaultRestSec": 45,
+    "defaultRepMin": 12,
+    "defaultRepMax": 20
+  },
+  {
+    "id": "single-leg-glute-bridge",
+    "builtIn": true,
+    "name": {
+      "de": "Einbeinige Glute Bridge",
+      "en": "Single-leg Glute Bridge"
+    },
+    "bodyRegions": [
+      "Gesäß",
+      "Beine",
+      "Stabilität/Mobility"
+    ],
+    "equipment": [
+      "Körpergewicht"
+    ],
+    "trackingType": "reps",
+    "defaultSets": 4,
+    "defaultRestSec": 45,
+    "defaultRepMin": 10,
+    "defaultRepMax": 10,
+    "videoUrls": [
+      "https://youtube.com/shorts/X_IGw8U_e38?si=PzuvQT4oQ-lHQzfM"
+    ]
+  },
+  {
+    "id": "low-step-up",
+    "builtIn": true,
+    "name": {
+      "de": "Niedriger Step-up",
+      "en": "Low Step-up"
+    },
+    "bodyRegions": [
+      "Beine",
+      "Gesäß",
+      "Stabilität/Mobility"
+    ],
+    "equipment": [
+      "Step/Erhöhung",
+      "Körpergewicht"
+    ],
+    "trackingType": "reps",
+    "defaultSets": 3,
+    "defaultRestSec": 60,
+    "defaultRepMin": 10,
+    "defaultRepMax": 10,
+    "videoUrls": [
+      "https://youtube.com/shorts/vhrNQLH1GwI?si=AEGB8lXvDoZI0lcq"
+    ]
+  },
+  {
+    "id": "calf-raise",
+    "builtIn": true,
+    "name": {
+      "de": "Wadenheben",
+      "en": "Calf Raise"
+    },
+    "bodyRegions": [
+      "Waden"
+    ],
+    "equipment": [
+      "Körpergewicht",
+      "Kurzhanteln"
+    ],
+    "trackingType": "reps",
+    "defaultSets": 3,
+    "defaultRestSec": 45,
+    "defaultRepMin": 15,
+    "defaultRepMax": 20,
+    "videoUrls": [
+      "https://youtube.com/shorts/xr_bZ3hu_YI?si=2LkzNoFQRvxGluJE"
+    ]
+  },
+  {
+    "id": "wall-sit",
+    "builtIn": true,
+    "name": {
+      "de": "Wall Sit",
+      "en": "Wall Sit"
+    },
+    "bodyRegions": [
+      "Beine",
+      "Stabilität/Mobility"
+    ],
+    "equipment": [
+      "Körpergewicht"
+    ],
+    "trackingType": "duration",
+    "defaultSets": 3,
+    "defaultRestSec": 60,
+    "defaultDurationSec": 40
+  },
+  {
+    "id": "clamshell",
+    "builtIn": true,
+    "name": {
+      "de": "Clamshell",
+      "en": "Clamshell"
+    },
+    "bodyRegions": [
+      "Gesäß",
+      "Stabilität/Mobility"
+    ],
+    "equipment": [
+      "Körpergewicht"
+    ],
+    "trackingType": "reps",
+    "defaultSets": 2,
+    "defaultRestSec": 45,
+    "defaultRepMin": 15,
+    "defaultRepMax": 15
+  },
+  {
+    "id": "single-leg-stand",
+    "builtIn": true,
+    "name": {
+      "de": "Einbein-Stand",
+      "en": "Single-leg Stand"
+    },
+    "bodyRegions": [
+      "Stabilität/Mobility",
+      "Beine"
+    ],
+    "equipment": [
+      "Körpergewicht"
+    ],
+    "trackingType": "duration",
+    "defaultSets": 2,
+    "defaultRestSec": 30,
+    "defaultDurationSec": 40
+  },
+  {
+    "id": "farmer-carry",
+    "builtIn": true,
+    "name": {
+      "de": "Farmer Carry",
+      "en": "Farmer Carry"
+    },
+    "bodyRegions": [
+      "Ganzkörper",
+      "Core"
+    ],
+    "equipment": [
+      "Kurzhanteln",
+      "Kettlebell"
+    ],
+    "trackingType": "duration",
+    "defaultSets": 3,
+    "defaultRestSec": 60,
+    "defaultDurationSec": 35,
+    "videoUrls": [
+      "https://youtube.com/shorts/1uOs1hP3u4A?si=BQK6SG2inSpxRqkX"
+    ]
+  },
+  {
+    "id": "suitcase-carry",
+    "builtIn": true,
+    "name": {
+      "de": "Suitcase Carry",
+      "en": "Suitcase Carry"
+    },
+    "bodyRegions": [
+      "Core",
+      "Ganzkörper"
+    ],
+    "equipment": [
+      "Kurzhanteln",
+      "Kettlebell"
+    ],
+    "trackingType": "duration",
+    "defaultSets": 3,
+    "defaultRestSec": 60,
+    "defaultDurationSec": 40
+  },
+  {
+    "id": "plank",
+    "builtIn": true,
+    "name": {
+      "de": "Plank",
+      "en": "Plank"
+    },
+    "bodyRegions": [
+      "Core"
+    ],
+    "equipment": [
+      "Körpergewicht"
+    ],
+    "trackingType": "duration",
+    "defaultSets": 3,
+    "defaultRestSec": 45,
+    "defaultDurationSec": 40
+  },
+  {
+    "id": "side-plank",
+    "builtIn": true,
+    "name": {
+      "de": "Side Plank",
+      "en": "Side Plank"
+    },
+    "bodyRegions": [
+      "Core",
+      "Stabilität/Mobility"
+    ],
+    "equipment": [
+      "Körpergewicht"
+    ],
+    "trackingType": "duration",
+    "defaultSets": 3,
+    "defaultRestSec": 45,
+    "defaultDurationSec": 30
+  },
+  {
+    "id": "dead-bug",
+    "builtIn": true,
+    "name": {
+      "de": "Dead Bug",
+      "en": "Dead Bug"
+    },
+    "bodyRegions": [
+      "Core",
+      "Stabilität/Mobility"
+    ],
+    "equipment": [
+      "Körpergewicht"
+    ],
+    "trackingType": "reps",
+    "defaultSets": 3,
+    "defaultRestSec": 45,
+    "defaultRepMin": 8,
+    "defaultRepMax": 12,
+    "videoUrls": [
+      "https://youtube.com/shorts/-8xqJ2xXs2A?si=T3mXmAOzE2TMlFkD"
+    ]
+  },
+  {
+    "id": "ab-wheel",
+    "builtIn": true,
+    "name": {
+      "de": "Ab-Wheel",
+      "en": "Ab Wheel Rollout"
+    },
+    "bodyRegions": [
+      "Core"
+    ],
+    "equipment": [
+      "Bauchrolle"
+    ],
+    "trackingType": "reps",
+    "defaultSets": 3,
+    "defaultRestSec": 60,
+    "defaultRepMin": 8,
+    "defaultRepMax": 8
+  },
+  {
+    "id": "hollow-hold",
+    "builtIn": true,
+    "name": {
+      "de": "Hollow Hold",
+      "en": "Hollow Hold"
+    },
+    "bodyRegions": [
+      "Core"
+    ],
+    "equipment": [
+      "Körpergewicht"
+    ],
+    "trackingType": "duration",
+    "defaultSets": 3,
+    "defaultRestSec": 45,
+    "defaultDurationSec": 25
+  },
+  {
+    "id": "mountain-climber-slow",
+    "builtIn": true,
+    "name": {
+      "de": "Mountain Climber langsam",
+      "en": "Slow Mountain Climber"
+    },
+    "bodyRegions": [
+      "Core",
+      "Ganzkörper"
+    ],
+    "equipment": [
+      "Körpergewicht"
+    ],
+    "trackingType": "duration",
+    "defaultSets": 3,
+    "defaultRestSec": 45,
+    "defaultDurationSec": 30
+  }
+]

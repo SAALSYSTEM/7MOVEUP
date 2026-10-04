@@ -1,0 +1,644 @@
+[
+  {
+    "id": "template-4day-strength-core",
+    "builtIn": true,
+    "name": {
+      "de": "4-Tage Kraft & Core",
+      "en": "4-Day Strength & Core"
+    },
+    "days": [
+      {
+        "name": {
+          "de": "Tag 1 – Push",
+          "en": "Day 1 – Push"
+        },
+        "items": [
+          {
+            "exerciseId": "db-flat-bench-press",
+            "sets": 4,
+            "repMin": 8,
+            "repMax": 10,
+            "restSec": 90,
+            "suggestedWeightPerDumbbellKg": [
+              14,
+              16,
+              18,
+              20,
+              22
+            ]
+          },
+          {
+            "exerciseId": "db-incline-bench-press",
+            "sets": 3,
+            "repMin": 8,
+            "repMax": 10,
+            "restSec": 90,
+            "suggestedWeightPerDumbbellKg": [
+              12,
+              14,
+              16,
+              18
+            ]
+          },
+          {
+            "exerciseId": "seated-db-shoulder-press",
+            "sets": 3,
+            "repMin": 8,
+            "repMax": 10,
+            "restSec": 75,
+            "suggestedWeightPerDumbbellKg": [
+              8,
+              10,
+              12
+            ]
+          },
+          {
+            "exerciseId": "lateral-raise",
+            "sets": 3,
+            "repMin": 12,
+            "repMax": 15,
+            "restSec": 60,
+            "suggestedWeightPerDumbbellKg": [
+              6
+            ]
+          },
+          {
+            "exerciseId": "plank",
+            "sets": 3,
+            "durationSec": 40,
+            "restSec": 45
+          }
+        ]
+      },
+      {
+        "name": {
+          "de": "Tag 2 – Beine",
+          "en": "Day 2 – Legs"
+        },
+        "items": [
+          {
+            "exerciseId": "db-rdl",
+            "sets": 4,
+            "repMin": 8,
+            "repMax": 8,
+            "restSec": 90
+          },
+          {
+            "exerciseId": "bulgarian-split-squat",
+            "sets": 3,
+            "repMin": 8,
+            "repMax": 8,
+            "restSec": 75
+          },
+          {
+            "exerciseId": "db-hip-thrust",
+            "sets": 3,
+            "repMin": 10,
+            "repMax": 12,
+            "restSec": 75
+          },
+          {
+            "exerciseId": "goblet-squat",
+            "sets": 3,
+            "repMin": 8,
+            "repMax": 10,
+            "restSec": 75,
+            "suggestedWeightKg": [
+              16,
+              18,
+              20
+            ]
+          },
+          {
+            "exerciseId": "ab-wheel",
+            "sets": 3,
+            "repMin": 8,
+            "repMax": 8,
+            "restSec": 60
+          },
+          {
+            "exerciseId": "wall-sit",
+            "sets": 3,
+            "durationSec": 40,
+            "restSec": 60
+          },
+          {
+            "exerciseId": "dead-bug",
+            "sets": 3,
+            "repMin": 8,
+            "repMax": 8,
+            "restSec": 45
+          }
+        ]
+      },
+      {
+        "name": {
+          "de": "Tag 3 – Pull",
+          "en": "Day 3 – Pull"
+        },
+        "items": [
+          {
+            "exerciseId": "one-arm-db-row",
+            "sets": 4,
+            "repMin": 8,
+            "repMax": 10,
+            "restSec": 75,
+            "suggestedWeightPerDumbbellKg": [
+              12,
+              14,
+              16,
+              20
+            ]
+          },
+          {
+            "exerciseId": "bent-over-db-row",
+            "sets": 3,
+            "repMin": 8,
+            "repMax": 10,
+            "restSec": 75,
+            "suggestedWeightPerDumbbellKg": [
+              14
+            ]
+          },
+          {
+            "exerciseId": "reverse-fly",
+            "sets": 3,
+            "repMin": 12,
+            "repMax": 15,
+            "restSec": 60,
+            "suggestedWeightPerDumbbellKg": [
+              4,
+              5
+            ]
+          },
+          {
+            "exerciseId": "side-plank",
+            "sets": 3,
+            "durationSec": 30,
+            "restSec": 45
+          }
+        ]
+      },
+      {
+        "name": {
+          "de": "Tag 4 – Ganzkörper",
+          "en": "Day 4 – Full Body"
+        },
+        "items": [
+          {
+            "exerciseId": "goblet-squat",
+            "sets": 3,
+            "repMin": 8,
+            "repMax": 10,
+            "restSec": 75,
+            "suggestedWeightKg": [
+              16,
+              18,
+              20
+            ]
+          },
+          {
+            "exerciseId": "farmer-carry",
+            "sets": 3,
+            "durationSec": 35,
+            "restSec": 60,
+            "suggestedWeightPerDumbbellKg": [
+              20,
+              22
+            ]
+          },
+          {
+            "exerciseId": "ab-wheel",
+            "sets": 3,
+            "repMin": 8,
+            "repMax": 8,
+            "restSec": 60
+          },
+          {
+            "exerciseId": "suitcase-carry",
+            "sets": 3,
+            "durationSec": 40,
+            "restSec": 60
+          }
+        ],
+        "notes": {
+          "de": "Danach 10 Min Mobility: Hüftbeuger, Hamstrings, 90/90, Cat–Cow, Thorax-Rotation, Knöchel-Mobilisation.",
+          "en": "Then 10 min mobility: hip flexor, hamstrings, 90/90, cat-cow, thoracic rotation, ankle mobility."
+        }
+      }
+    ],
+    "planNotes": {
+      "de": [
+        "Wenn die obere Wiederholungszahl in allen Sätzen erreicht wird: Steigerung möglich; bei passenden Übungen +2 kg als Hinweis.",
+        "Ca. 2 Wiederholungen im Tank lassen."
+      ],
+      "en": [
+        "When the top rep target is reached in every set: progression may be possible; show +2 kg as a hint where appropriate.",
+        "Keep about 2 reps in reserve."
+      ]
+    }
+  },
+  {
+    "id": "template-6day-fitness-strength",
+    "builtIn": true,
+    "name": {
+      "de": "6-Tage Fitness & Kraft",
+      "en": "6-Day Fitness & Strength"
+    },
+    "days": [
+      {
+        "name": {
+          "de": "Montag – Ergometer locker",
+          "en": "Monday – Easy Bike"
+        },
+        "cardio": {
+          "type": "ergometer",
+          "durationMin": [
+            35,
+            45
+          ],
+          "intensity": "easy"
+        }
+      },
+      {
+        "name": {
+          "de": "Dienstag – Unterkörper A",
+          "en": "Tuesday – Lower Body A"
+        },
+        "items": [
+          {
+            "exerciseId": "goblet-squat",
+            "sets": 3,
+            "repMin": 8,
+            "repMax": 12,
+            "suggestedWeightKg": [
+              10,
+              14
+            ]
+          },
+          {
+            "exerciseId": "bulgarian-split-squat",
+            "sets": 3,
+            "repMin": 8,
+            "repMax": 10,
+            "suggestedWeightPerDumbbellKg": [
+              4,
+              6
+            ]
+          },
+          {
+            "exerciseId": "db-rdl",
+            "sets": 3,
+            "repMin": 8,
+            "repMax": 12,
+            "suggestedWeightPerDumbbellKg": [
+              8,
+              10
+            ]
+          },
+          {
+            "exerciseId": "db-hip-thrust",
+            "sets": 3,
+            "repMin": 10,
+            "repMax": 12,
+            "suggestedWeightKg": [
+              14,
+              20
+            ]
+          },
+          {
+            "exerciseId": "calf-raise",
+            "sets": 3,
+            "repMin": 12,
+            "repMax": 15
+          }
+        ]
+      },
+      {
+        "name": {
+          "de": "Mittwoch – Oberkörper",
+          "en": "Wednesday – Upper Body"
+        },
+        "items": [
+          {
+            "exerciseId": "db-flat-bench-press",
+            "sets": 3,
+            "repMin": 8,
+            "repMax": 12,
+            "suggestedWeightPerDumbbellKg": [
+              4,
+              6
+            ]
+          },
+          {
+            "exerciseId": "one-arm-db-row",
+            "sets": 3,
+            "repMin": 8,
+            "repMax": 12,
+            "suggestedWeightKg": [
+              6,
+              8
+            ]
+          },
+          {
+            "exerciseId": "seated-db-shoulder-press",
+            "sets": 3,
+            "repMin": 8,
+            "repMax": 10,
+            "suggestedWeightPerDumbbellKg": [
+              3,
+              5
+            ]
+          },
+          {
+            "exerciseId": "lateral-raise",
+            "sets": 2,
+            "repMin": 12,
+            "repMax": 15,
+            "suggestedWeightPerDumbbellKg": [
+              2,
+              3
+            ]
+          },
+          {
+            "exerciseId": "reverse-fly",
+            "sets": 2,
+            "repMin": 12,
+            "repMax": 15,
+            "suggestedWeightPerDumbbellKg": [
+              2,
+              3
+            ]
+          }
+        ]
+      },
+      {
+        "name": {
+          "de": "Donnerstag – Core & Mobility",
+          "en": "Thursday – Core & Mobility"
+        },
+        "items": [
+          {
+            "exerciseId": "ab-wheel",
+            "sets": 3,
+            "repMin": 5,
+            "repMax": 8
+          },
+          {
+            "exerciseId": "dead-bug",
+            "sets": 3,
+            "repMin": 10,
+            "repMax": 10
+          },
+          {
+            "exerciseId": "side-plank",
+            "sets": 3,
+            "durationSec": 35
+          },
+          {
+            "exerciseId": "glute-bridge",
+            "sets": 2,
+            "repMin": 15,
+            "repMax": 15
+          }
+        ]
+      },
+      {
+        "name": {
+          "de": "Freitag – Ergometer Intervalle",
+          "en": "Friday – Bike Intervals"
+        },
+        "cardio": {
+          "type": "ergometer_intervals",
+          "warmupMin": 5,
+          "rounds": 6,
+          "workSec": 60,
+          "easySec": 120,
+          "cooldownMin": 5
+        }
+      },
+      {
+        "name": {
+          "de": "Samstag – Unterkörper B",
+          "en": "Saturday – Lower Body B"
+        },
+        "items": [
+          {
+            "exerciseId": "reverse-lunge",
+            "sets": 3,
+            "repMin": 8,
+            "repMax": 10,
+            "suggestedWeightPerDumbbellKg": [
+              4,
+              6
+            ]
+          },
+          {
+            "exerciseId": "db-hip-thrust",
+            "sets": 3,
+            "repMin": 8,
+            "repMax": 12,
+            "suggestedWeightKg": [
+              16,
+              20
+            ]
+          },
+          {
+            "exerciseId": "db-rdl",
+            "sets": 3,
+            "repMin": 10,
+            "repMax": 12,
+            "suggestedWeightPerDumbbellKg": [
+              8,
+              10
+            ]
+          },
+          {
+            "exerciseId": "goblet-squat",
+            "sets": 2,
+            "repMin": 12,
+            "repMax": 15,
+            "suggestedWeightKg": [
+              10,
+              14
+            ]
+          },
+          {
+            "exerciseId": "clamshell",
+            "sets": 2,
+            "repMin": 15,
+            "repMax": 20
+          }
+        ]
+      },
+      {
+        "name": {
+          "de": "Sonntag – Frei",
+          "en": "Sunday – Rest"
+        },
+        "rest": true
+      }
+    ]
+  },
+  {
+    "id": "template-4day-bodyweight",
+    "builtIn": true,
+    "name": {
+      "de": "4-Tage Bodyweight",
+      "en": "4-Day Bodyweight"
+    },
+    "days": [
+      {
+        "name": {
+          "de": "Tag 1 – Oberkörper Druck",
+          "en": "Day 1 – Upper Push"
+        },
+        "items": [
+          {
+            "exerciseId": "push-up",
+            "sets": 4,
+            "repMin": 8,
+            "repMax": 15
+          },
+          {
+            "exerciseId": "slow-push-up",
+            "sets": 3,
+            "repMin": 6,
+            "repMax": 10
+          },
+          {
+            "exerciseId": "pike-push-up",
+            "sets": 4,
+            "repMin": 8,
+            "repMax": 12
+          },
+          {
+            "exerciseId": "close-grip-push-up",
+            "sets": 3,
+            "repMin": 8,
+            "repMax": 12
+          },
+          {
+            "exerciseId": "diamond-hold",
+            "sets": 2,
+            "durationSec": 25
+          },
+          {
+            "exerciseId": "plank",
+            "sets": 1,
+            "durationSec": 50
+          },
+          {
+            "exerciseId": "side-plank",
+            "sets": 1,
+            "durationSec": 50
+          }
+        ]
+      },
+      {
+        "name": {
+          "de": "Tag 2 – Unterkörper",
+          "en": "Day 2 – Lower Body"
+        },
+        "items": [
+          {
+            "exerciseId": "single-leg-glute-bridge",
+            "sets": 4,
+            "repMin": 10,
+            "repMax": 10
+          },
+          {
+            "exerciseId": "bodyweight-hip-thrust",
+            "sets": 4,
+            "repMin": 12,
+            "repMax": 12
+          },
+          {
+            "exerciseId": "bodyweight-rdl",
+            "sets": 4,
+            "repMin": 12,
+            "repMax": 12
+          },
+          {
+            "exerciseId": "low-step-up",
+            "sets": 3,
+            "repMin": 10,
+            "repMax": 10
+          },
+          {
+            "exerciseId": "calf-raise",
+            "sets": 4,
+            "repMin": 15,
+            "repMax": 20
+          },
+          {
+            "exerciseId": "dead-bug",
+            "sets": 3,
+            "repMin": 12,
+            "repMax": 12
+          }
+        ]
+      },
+      {
+        "name": {
+          "de": "Tag 3 – Oberkörper Zug",
+          "en": "Day 3 – Upper Pull"
+        },
+        "items": [
+          {
+            "exerciseId": "inverted-row",
+            "sets": 4,
+            "repMin": 6,
+            "repMax": 12
+          },
+          {
+            "exerciseId": "doorframe-row",
+            "sets": 3,
+            "repMin": 8,
+            "repMax": 12
+          },
+          {
+            "exerciseId": "reverse-snow-angel",
+            "sets": 3,
+            "repMin": 15,
+            "repMax": 15
+          },
+          {
+            "exerciseId": "superman-hold",
+            "sets": 3,
+            "durationSec": 30
+          }
+        ]
+      },
+      {
+        "name": {
+          "de": "Tag 4 – Ganzkörper & Core",
+          "en": "Day 4 – Full Body & Core"
+        },
+        "items": [
+          {
+            "exerciseId": "slow-push-up",
+            "sets": 4,
+            "repMin": 8,
+            "repMax": 8
+          },
+          {
+            "exerciseId": "bulgarian-split-squat",
+            "sets": 3,
+            "repMin": 10,
+            "repMax": 10
+          },
+          {
+            "exerciseId": "mountain-climber-slow",
+            "sets": 3,
+            "durationSec": 30
+          }
+        ],
+        "notes": {
+          "de": "Danach 10 Minuten Mobility.",
+          "en": "Then 10 minutes of mobility."
+        }
+      }
+    ]
+  }
+]
