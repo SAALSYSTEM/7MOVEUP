@@ -1,0 +1,15 @@
+// Cloudflare Workers (Static Assets) – Deployment über den GitHub-Import (Workers Builds).
+// Workers Builds überschreibt "name" automatisch mit dem Namen des verbundenen Workers.
+{
+  "name": "7moveup",
+  "compatibility_date": "2026-06-01",
+  // baut vor jedem `wrangler deploy` – unabhängig davon, was im Dashboard als Build-Befehl steht
+  "build": {
+    "command": "npm run build"
+  },
+  "assets": {
+    "directory": "./dist",
+    // SPA: unbekannte Pfade wie /training liefern index.html
+    "not_found_handling": "single-page-application"
+  }
+}

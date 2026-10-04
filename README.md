@@ -78,7 +78,18 @@ Details zu Schichten, Datenmodell und Entscheidungen: [`docs/ARCHITECTURE.md`](d
 
 Import wird mit zod validiert, verlangt eine Bestätigung und ersetzt dann die lokalen Daten. Neuere Schema-Versionen werden abgelehnt.
 
+## Deployment
+
+**Cloudflare Workers (Static Assets)** über den GitHub-Import: Jeder Push auf `main` wird von Cloudflare gebaut und ausgerollt.
+
+- Konfiguration: [`wrangler.jsonc`](wrangler.jsonc) – `wrangler deploy` baut selbst (`npm run build`) und lädt `dist/` hoch.
+- SPA-Routing: `not_found_handling: "single-page-application"` → Direktaufrufe wie `/training` liefern die App.
+- Node-Version für den Cloudflare-Build: `.node-version` (22).
+- Lokal mit der Cloudflare-Laufzeit testen: `npx wrangler dev`.
+
+Die GitHub-Pages-Vorschau (`.github/workflows/deploy-pages.yml`) baut mit `BASE_PATH=/<repo>/` und ist nur eine Test-Spielwiese.
+
 ## Status
 
-- V1 lokal fertig, **noch nicht deployed**. Cloudflare folgt erst nach Freigabe der Vorschau.
+- V1.1, Deployment über Cloudflare Workers.
 - Supabase ist bewusst nicht angebunden; die Repository-Schicht ist dafür vorbereitet.
