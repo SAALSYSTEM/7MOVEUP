@@ -1,109 +1,101 @@
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { cn } from "@/lib/utils";
 
 type MotivationLoopProps = {
-  lines: string[];
+  words: readonly string[];
   className?: string;
 };
 
-/** Sichtbarkeitsdauer pro Durchlauf in ms (Einblenden + Halten + Ausblenden). */
-const CYCLE_MS = 4600;
-
-const lineClass =
-  "text-balance text-[clamp(2.15rem,10.5vw,4.6rem)] font-black uppercase leading-[0.98] tracking-[-0.05em]";
+/** Einblenden (s) – Wort fährt leicht von unten ein */
+const ENTER_SEC = 0.42;
+/** Ausblenden (s) – Wort fährt leicht nach oben heraus */
+const EXIT_SEC = 0.38;
+/** voll sichtbare Zeit pro Wort (ms) */
+const HOLD_MS = 1200;
+/** letztes Wort steht etwas länger, bevor der Spruch von vorn beginnt */
+const LAST_WORD_HOLD_MS = 1400;
 
 /**
- * Tagesspruch als Endlosschleife: Wörter gleiten weich herein, bleiben kurz stehen,
- * verlassen die Fläche und der GLEICHE Spruch beginnt von vorn – solange die Seite offen ist.
- * Bei prefers-reduced-motion wird der Spruch statisch gezeigt.
+ * Tagesspruch als Wortfolge: Es ist immer genau ein Wort sichtbar.
+ * SMALL → STEPS → BIG → PROGRESS → SMALL → … endlos, solange die Startseite offen ist.
  */
-export function MotivationLoop({ lines, className }: MotivationLoopProps) {
-  const reduceMotion = useReducedMotion();
-  const [cycle, setCycle] = useState(0);
-
-  useEffect(() => {
-    if (reduceMotion) return;
-    const timer = window.setInterval(() => setCycle((value) => value + 1), CYCLE_MS);
-    return () => window.clearInterval(timer);
-  }, [reduceMotion]);
-
-  const staticLines = lines.map((line, lineIndex) => (
-    <div key={`${line}-${lineIndex}`} className={cn(lineClass, lineIndex === lines.length - 1 ? "text-accent" : "text-fg")}>
-      {line.split(" ").map((word, wordIndex) => (
-        <span key={`${word}-${wordIndex}`} className="mr-[0.22em] inline-block last:mr-0">
-          {word}
-        </span>
-      ))}
-    </div>
-  ));
-
-  const label = lines.join(" ");
-
-  if (reduceMotion) {
-    return (
-      <div className={cn("space-y-1", className)}>{staticLines}</div>
-    );
-  }
+export function MotivationLoop({ words, className }: MotivationLoopProps) {
+  const reduceMotion = useReducedMotion() ?? false;
+  // zählt endlos hoch → jedes Wort bekommt einen neuen Key, auch beim zweiten Durchlauf
+  const [step, setStep] = useState(0);
+  const index = step % words.length;
+  const isLast = index === words.length - 1;
+  const longest = Math.max(...words.map((w) => w.length));
 
   return (
-    <div className={cn("relative", className)} role="img" aria-label={label}>
-      {/* unsichtbarer Platzhalter bestimmt die Höhe – nichts wird abgeschnitten */}
-      <div className="invisible" aria-hidden>
-        {staticLines}
+    <div role="img" aria-label={words.join(" ")} className={cn("@container w-full", className)}>
+      <div
+        aria-hidden
+        className="relative flex h-[1.2em] items-center justify-center overflow-hidden font-black uppercase leading-none tracking-[-0.045em]"
+        // Größe richtet sich nach dem längsten Wort des Spruchs → kein Größensprung zwischen Wörtern
+        style={{ fontSize: `min(6.25rem, calc(100cqw / ${(longest * 0.74).toFixed(2)}))` }}
+      >
+        <AnimatePresence mode="wait" initial>
+          <Word
+            key={step}
+            word={words[index]}
+            accent={isLast}
+            holdMs={isLast ? LAST_WORD_HOLD_MS : HOLD_MS}
+            reduceMotion={reduceMotion}
+            onDone={() => setStep((value) => value + 1)}
+          />
+        </AnimatePresence>
       </div>
-      <AnimatePresence mode="wait">
-        <motion.div
-          key={cycle}
-          initial="hidden"
-          animate="show"
-          exit="exit"
-          aria-hidden
-          variants={{
-            hidden: {},
-            show: { transition: { staggerChildren: 0.09, delayChildren: 0.05 } },
-            exit: { transition: { staggerChildren: 0.04, staggerDirection: -1 } },
-          }}
-          className="absolute inset-0"
-        >
-          {lines.map((line, lineIndex) => (
-            <motion.div
-              key={`${line}-${lineIndex}`}
-              className={cn(lineClass, lineIndex === lines.length - 1 ? "text-accent" : "text-fg")}
-              variants={{
-                hidden: {},
-                show: { transition: { staggerChildren: 0.09 } },
-                exit: { transition: { staggerChildren: 0.035, staggerDirection: -1 } },
-              }}
-            >
-              {line.split(" ").map((word, wordIndex) => (
-                <motion.span
-                  key={`${word}-${wordIndex}`}
-                  className="mr-[0.22em] inline-block last:mr-0"
-                  variants={{
-                    hidden: { y: "0.55em", opacity: 0, filter: "blur(10px)" },
-                    show: {
-                      y: 0,
-                      opacity: 1,
-                      filter: "blur(0px)",
-                      transition: { type: "spring", stiffness: 170, damping: 22, mass: 0.9 },
-                    },
-                    exit: {
-                      y: "-0.45em",
-                      opacity: 0,
-                      filter: "blur(8px)",
-                      transition: { duration: 0.38, ease: [0.4, 0, 0.6, 1] },
-                    },
-                  }}
-                >
-                  {word}
-                </motion.span>
-              ))}
-            </motion.div>
-          ))}
-        </motion.div>
-      </AnimatePresence>
     </div>
+  );
+}
+
+function Word({
+  word,
+  accent,
+  holdMs,
+  reduceMotion,
+  onDone,
+}: {
+  word: string;
+  accent: boolean;
+  holdMs: number;
+  reduceMotion: boolean;
+  onDone: () => void;
+}) {
+  const onDoneRef = useRef(onDone);
+  useEffect(() => {
+    onDoneRef.current = onDone;
+  });
+
+  // Zeit läuft ab Mount: Einblenden + Haltezeit, danach übernimmt das Ausblenden (AnimatePresence)
+  useEffect(() => {
+    const id = window.setTimeout(() => onDoneRef.current(), ENTER_SEC * 1000 + holdMs);
+    return () => window.clearTimeout(id);
+  }, [holdMs]);
+
+  const offset = reduceMotion ? 0 : 1;
+
+  return (
+    <motion.span
+      className={cn("block whitespace-nowrap", accent ? "text-accent" : "text-fg")}
+      initial={{ opacity: 0, y: `${0.3 * offset}em`, filter: `blur(${4 * offset}px)` }}
+      animate={{
+        opacity: 1,
+        y: "0em",
+        filter: "blur(0px)",
+        transition: { duration: ENTER_SEC, ease: [0.22, 1, 0.36, 1] },
+      }}
+      exit={{
+        opacity: 0,
+        y: `${-0.24 * offset}em`,
+        filter: `blur(${4 * offset}px)`,
+        transition: { duration: EXIT_SEC, ease: [0.4, 0, 0.7, 1] },
+      }}
+    >
+      {word}
+    </motion.span>
   );
 }

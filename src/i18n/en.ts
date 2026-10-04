@@ -30,6 +30,7 @@ export const en: Record<TranslationKey, string> = {
   "nav.more": "More",
 
   "profile.fallback": "ME",
+  "header.profile": "Open profile",
 
   "home.start": "Start workout",
   "home.continue": "Continue workout",

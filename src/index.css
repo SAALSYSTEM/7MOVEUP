@@ -82,7 +82,7 @@
 }
 
 @utility pb-nav {
-  padding-bottom: calc(env(safe-area-inset-bottom) + 104px);
+  padding-bottom: calc(env(safe-area-inset-bottom) + 128px);
 }
 
 @utility tabular {

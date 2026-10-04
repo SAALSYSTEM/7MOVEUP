@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { Link } from "react-router-dom";
 
 import { useApp } from "@/app/app-context";
 import { asset } from "@/lib/asset";
@@ -12,14 +13,18 @@ type AppHeaderProps = {
 
 /** Kompakter Header: links Kontext, rechts Brand-Icon + lokaler Profilname (Fallback ICH/ME). */
 export function AppHeader({ left, className }: AppHeaderProps) {
-  const { displayName } = useApp();
+  const { displayName, t } = useApp();
   return (
     <header className={cn("mb-6 flex min-h-11 items-center justify-between gap-3", className)}>
       <div className="min-w-0">{left}</div>
-      <div className="flex shrink-0 items-center gap-2 rounded-full border border-white/10 bg-card p-1.5 pr-3.5">
+      <Link
+        to="/more#profile"
+        aria-label={`${t("header.profile")}: ${displayName}`}
+        className="flex shrink-0 items-center gap-2 rounded-full border border-white/10 bg-card p-1.5 pr-3.5 transition-colors hover:bg-elevated active:scale-[0.98]"
+      >
         <img src={asset("icons/header-icon-64.png")} alt="7MOVEUP" width={32} height={32} className="h-8 w-8 rounded-[10px]" />
         <span className="max-w-32 truncate text-xs font-extrabold uppercase tracking-wide">{displayName}</span>
-      </div>
+      </Link>
     </header>
   );
 }

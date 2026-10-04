@@ -1,25 +1,24 @@
-import type { Language } from "@/domain/types";
-
-type Phrase = Record<Language, string[]>;
-
-/** 10 Sprüche (Texte aus der Starter-Referenz), DE/EN semantisch gleich. */
-export const DAILY_MOTIVATIONS: Phrase[] = [
-  { de: ["FÜHL DICH GUT.", "TRAINIER HEUTE."], en: ["FEEL GOOD.", "TRAIN TODAY."] },
-  { de: ["JEDEN TAG", "STÄRKER."], en: ["STRONGER", "EVERY DAY."] },
-  { de: ["KEINE AUSREDEN.", "EINFACH STARTEN."], en: ["NO EXCUSES.", "JUST START."] },
-  { de: ["BEWEG DICH.", "KOPF FREI."], en: ["MOVE YOUR BODY.", "CLEAR YOUR MIND."] },
-  { de: ["TRAINIER HART.", "FÜHL DICH STARK."], en: ["TRAIN HARD.", "FEEL GREAT."] },
-  { de: ["SEI HEUTE", "FÜR DICH DA."], en: ["SHOW UP", "FOR YOURSELF."] },
-  { de: ["EIN WORKOUT KANN", "DEINEN TAG VERÄNDERN."], en: ["ONE WORKOUT CAN", "CHANGE YOUR DAY."] },
-  { de: ["SCHWITZEN.", "LÄCHELN. WIEDERHOLEN."], en: ["SWEAT.", "SMILE. REPEAT."] },
-  { de: ["KLEINE SCHRITTE.", "GROSSER FORTSCHRITT."], en: ["SMALL STEPS.", "BIG PROGRESS."] },
-  { de: ["HEUTE IST EIN GUTER TAG,", "STÄRKER ZU WERDEN."], en: ["TODAY IS A GOOD DAY", "TO GET STRONGER."] },
+/**
+ * 10 kurze Tagessprüche (2–5 Wörter). Ein Spruch gilt den ganzen Kalendertag,
+ * auf der Startseite läuft er Wort für Wort in einer Endlosschleife.
+ */
+export const DAILY_QUOTES: readonly (readonly string[])[] = [
+  ["FEEL", "GOOD", "TODAY"],
+  ["MOVE", "AND", "BREATHE"],
+  ["STRONGER", "EVERY", "DAY"],
+  ["JUST", "START", "TODAY"],
+  ["TRAIN", "FEEL", "BETTER"],
+  ["MOVE", "CLEAR", "YOUR", "MIND"],
+  ["SMALL", "STEPS", "BIG", "PROGRESS"],
+  ["SHOW", "UP", "TODAY"],
+  ["PUSH", "BREATHE", "REPEAT"],
+  ["MAKE", "TODAY", "COUNT"],
 ];
 
 /**
  * Feste, gemischte Reihenfolge über 10 Tage. Weil es eine Permutation ist,
  * unterscheiden sich zwei aufeinanderfolgende Tage garantiert, und jeder Spruch
- * kommt alle 10 Tage einmal dran.
+ * kommt alle 10 Tage einmal dran. Kein Zufall → kein Wechsel beim Reload.
  */
 const DAY_ORDER = [3, 7, 0, 5, 9, 1, 6, 2, 8, 4];
 
@@ -28,11 +27,11 @@ function localDayNumber(date: Date): number {
   return Math.floor(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()) / 86_400_000);
 }
 
-export function dailyMotivationIndex(date: Date = new Date()): number {
+export function dailyQuoteIndex(date: Date = new Date()): number {
   const day = localDayNumber(date);
   return DAY_ORDER[((day % DAY_ORDER.length) + DAY_ORDER.length) % DAY_ORDER.length];
 }
 
-export function getDailyMotivation(language: Language, date: Date = new Date()): string[] {
-  return DAILY_MOTIVATIONS[dailyMotivationIndex(date)][language];
+export function getDailyQuote(date: Date = new Date()): readonly string[] {
+  return DAILY_QUOTES[dailyQuoteIndex(date)];
 }

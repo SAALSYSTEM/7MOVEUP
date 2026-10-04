@@ -10,7 +10,7 @@ import { Page } from "@/components/layout/page";
 import { exerciseCountLabel } from "@/lib/weekdays";
 import { Card, SectionTitle } from "@/components/ui/card";
 import { exerciseRepository, planRepository, workoutRepository } from "@/data";
-import { getDailyMotivation } from "@/domain/motivation";
+import { getDailyQuote } from "@/domain/motivation";
 import { countImprovements } from "@/domain/progression";
 import { nextPlanned, openPlansToday, plansForDate, sessionsForDate, sessionsThisWeek, weekSummary } from "@/domain/schedule";
 import type { WorkoutPlan } from "@/domain/types";
@@ -25,7 +25,7 @@ export function HomePage() {
   const [starting, setStarting] = useState(false);
   const locale = dateLocale(language);
   const today = useToday();
-  const motivation = getDailyMotivation(language, today);
+  const quote = getDailyQuote(today);
 
   const { data } = useData(async () => {
     const [plans, completed, active, exercises] = await Promise.all([
@@ -87,12 +87,12 @@ export function HomePage() {
           aria-hidden
           className="pointer-events-none absolute -right-24 -top-24 h-64 w-64 rounded-full bg-accent/10 blur-3xl"
         />
-        <MotivationLoop lines={motivation} className="relative" />
+        <MotivationLoop words={quote} className="relative py-8" />
         <button
           type="button"
           onClick={onStart}
           disabled={starting || !data}
-          className="relative mt-6 flex min-h-14 w-full items-center justify-center gap-2 rounded-2xl bg-accent px-5 text-base font-black text-black transition hover:bg-accent-light active:scale-[0.99] disabled:opacity-60"
+          className="relative mt-2 flex min-h-14 w-full items-center justify-center gap-2 rounded-2xl bg-accent px-5 text-base font-black text-black transition hover:bg-accent-light active:scale-[0.99] disabled:opacity-60"
         >
           {active ? <Play size={20} aria-hidden /> : <Dumbbell size={20} aria-hidden />}
           {active ? t("home.continue") : t("home.start")}

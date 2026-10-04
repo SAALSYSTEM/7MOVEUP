@@ -1,6 +1,7 @@
 import { format } from "date-fns";
 import { Download, HardDrive, Upload, Volume2 } from "lucide-react";
-import { useRef, useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 
 import { useApp } from "@/app/app-context";
 import { AppHeader, PageTitle } from "@/components/layout/app-header";
@@ -56,6 +57,17 @@ export function MorePage() {
   const { t, profile, settings, language } = useApp();
   const toast = useToast();
   const fileInput = useRef<HTMLInputElement>(null);
+  const nameInput = useRef<HTMLInputElement>(null);
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  // Tap auf den Profil-Chip oben rechts → direkt ins Namensfeld
+  useEffect(() => {
+    if (location.hash !== "#profile") return;
+    nameInput.current?.focus({ preventScroll: true });
+    nameInput.current?.select();
+    navigate({ pathname: location.pathname, hash: "" }, { replace: true });
+  }, [location.hash, location.pathname, navigate]);
   const [nameDraft, setNameDraft] = useState<string | null>(null);
   const name = nameDraft ?? profile.displayName ?? "";
   const [pendingImport, setPendingImport] = useState<BackupFile | null>(null);
@@ -137,6 +149,7 @@ export function MorePage() {
           <Card className="p-4">
             <Label htmlFor="display-name">{t("more.displayName")}</Label>
             <Input
+              ref={nameInput}
               id="display-name"
               value={name}
               maxLength={40}

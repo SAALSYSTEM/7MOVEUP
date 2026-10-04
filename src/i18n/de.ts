@@ -30,6 +30,7 @@ export const de = {
   "nav.more": "Mehr",
 
   "profile.fallback": "ICH",
+  "header.profile": "Profil öffnen",
 
   // Heute
   "home.start": "Training starten",
