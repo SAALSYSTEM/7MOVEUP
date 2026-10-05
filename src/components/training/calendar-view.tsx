@@ -327,7 +327,7 @@ export function CalendarView({
                     <span className="h-9 w-1.5 shrink-0 rounded-full bg-fg/70" aria-hidden />
                     <div className="min-w-0 flex-1">
                       <p className="truncate font-bold">{t("calendar.legendBody")}</p>
-                      <p className="text-xs text-subtle">{canCaptureSelected ? t("calendar.measureOpen") : t("calendar.measureDay")}</p>
+                      <p className="text-xs text-subtle">{t("calendar.measureOpen")}</p>
                     </div>
                     {canCaptureSelected && (
                       <button

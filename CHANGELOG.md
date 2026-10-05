@@ -14,7 +14,7 @@ Branch `feature-koerperwerte` – Preview-Test, noch keine Versionsnummer.
 - **Messtage:** an gewählten Wochentagen zeigt Heute „Körperwerte erfassen“.
 - **Fortschritt:** drei Kacheln (Gewicht, Körperfett, Muskel), Analyse mit 30 Tage · 365 Tage · Gesamt, eigenes Liniendiagramm, Entwicklung (bzw. „Zu wenige Werte“), Ø · Min · Max.
 - **Metrisch/Imperial** (Mehr bzw. Messwerte): Anzeige in kg/cm oder lb/in; gespeichert wird immer metrisch und ungerundet.
-- **Kalender:** Messungen als Punkt, kommende Messtage als Ring im Raster. In den Tagesdetails steht ein Messtag unter „Geplant“ (heute/vergangen mit „Erfassen“), eine erfasste Messung unter „Abgeschlossen“; Antippen öffnet die Erfassung.
+- **Kalender:** Messungen als Punkt, kommende Körperwerte-Termine (Messtage) als Ring im Raster; Beschriftung im Kalender einheitlich „Körperwerte“. In den Tagesdetails steht ein Messtag unter „Geplant“ (heute/vergangen mit „Erfassen“), eine erfasste Messung unter „Abgeschlossen“; Antippen öffnet die Erfassung.
 - **Geräte:** neue Standardgeräte Langhantel, Kraftmaschine, Kabelzug, Klimmzugstange, Widerstandsband. Eigene Geräte lassen sich bei eigenen Übungen einmal anlegen und sind danach überall wählbar und im Übungsfilter; gleiche Namen (auch zu Standardgeräten) werden erkannt.
 - **Backup-Datum:** Mehr → Daten zeigt „Letztes Backup: vor X Tagen“ / „Noch kein Backup erstellt“; Heute zeigt unten eine kleine Zeile, hervorgehoben mit „Backup erstellen“ ab 7 Tagen und neuen Daten.
 
