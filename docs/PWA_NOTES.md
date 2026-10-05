@@ -16,3 +16,4 @@
 - **Haptik:** `navigator.vibrate` gibt es auf iOS nicht. Ersatz ist die System-Haptik von `<input type="checkbox" switch>` (ab iOS 18). Seit iOS 26.5 nur noch bei einem echten Fingertipp – darum liegt über den Abhaken-Buttons eine unsichtbare Switch-Fläche (`src/components/ui/haptic-tap.tsx`). Countdown-Signale können auf dem iPhone nicht vibrieren.
 - iOS Safe Areas im Header und in der Bottom Navigation berücksichtigen.
 - Manifest/Icon-Dateien liegen im Starter unter `public/`.
+- **Verrutschte Navigation (iOS 26):** Schließt sich die Tastatur – oder verschwindet ein fokussiertes Feld beim Seitenwechsel –, bleiben fixierte Elemente teils nach oben verschoben (WebKit-Bug 297779). Gegenmittel in `src/lib/viewport.ts`: vor dem Verlassen des Trainings den Fokus lösen, nach Tastatur-Schließen und Seitenwechsel einen 1-px-Scroll auslösen (nur iOS).

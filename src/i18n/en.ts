@@ -152,6 +152,8 @@ export const en: Record<TranslationKey, string> = {
   "session.seconds": "Seconds",
   "session.timer": "Timer",
   "session.openTimer": "Open timer for set {n}",
+  "session.info": "Notes & videos",
+  "session.infoHint": "Applies to this exercise in every workout.",
   "session.restTimer": "Rest",
   "session.skip": "Skip",
   "session.notFound": "Workout not found.",

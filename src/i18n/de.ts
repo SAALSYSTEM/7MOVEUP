@@ -158,6 +158,8 @@ export const de = {
   "session.seconds": "Sekunden",
   "session.timer": "Timer",
   "session.openTimer": "Timer für Satz {n} öffnen",
+  "session.info": "Notizen & Videos",
+  "session.infoHint": "Gilt für diese Übung in allen Trainings.",
   "session.restTimer": "Pause",
   "session.skip": "Überspringen",
   "session.notFound": "Training nicht gefunden.",

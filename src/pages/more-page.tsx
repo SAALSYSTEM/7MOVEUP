@@ -19,7 +19,8 @@ import { parseBackup, type BackupFile, type BackupParseError } from "@/data/back
 import type { Language } from "@/domain/types";
 import { asset } from "@/lib/asset";
 import { dateLocale } from "@/lib/dates";
-import { countdownBeep, finishSignal, getHapticsSupport, isIOS, unlockAudio } from "@/services/feedback";
+import { isIOS } from "@/lib/device";
+import { countdownBeep, finishSignal, getHapticsSupport, unlockAudio } from "@/services/feedback";
 
 function slug(text: string) {
   return text

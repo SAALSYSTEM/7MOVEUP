@@ -1,32 +1,27 @@
 import { format } from "date-fns";
-import { History, Pencil, Plus, Trash2 } from "lucide-react";
+import { History, Pencil, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
 import { useApp } from "@/app/app-context";
-import { VideoEmbed } from "@/components/exercises/video-embed";
+import { ExerciseNotesVideos } from "@/components/exercises/exercise-notes-videos";
 import { EmptyState, Page } from "@/components/layout/page";
 import { SubHeader } from "@/components/layout/sub-header";
 import { Button } from "@/components/ui/button";
-import { Card, SectionTitle } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/chip";
 import { ConfirmSheet } from "@/components/ui/confirm-sheet";
-import { Input, Textarea } from "@/components/ui/input";
-import { FieldError, Label } from "@/components/ui/label";
-import { useToast } from "@/components/ui/toast";
 import { exerciseRepository, workoutRepository } from "@/data";
 import { exerciseName } from "@/i18n";
 import { dateLocale, parseDateKey } from "@/lib/dates";
 import { exerciseDefaultsSummary, formatSeconds } from "@/lib/exercise-format";
 import { formatPerformance } from "@/lib/performance-format";
 import { useData } from "@/hooks/use-data";
-import { isSafeHttpUrl } from "@/lib/video";
 
 export function ExerciseDetailPage() {
   const { exerciseId = "" } = useParams();
   const { t, language } = useApp();
   const navigate = useNavigate();
-  const toast = useToast();
 
   const { data, loading } = useData(async () => {
     const [exercise, note, last] = await Promise.all([
@@ -37,9 +32,6 @@ export function ExerciseDetailPage() {
     return { exercise, note, last };
   }, [exerciseId]);
 
-  const [noteDraft, setNoteDraft] = useState<string | null>(null);
-  const [videoDraft, setVideoDraft] = useState("");
-  const [videoError, setVideoError] = useState<string>();
   const [confirmDelete, setConfirmDelete] = useState(false);
 
   if (!data && loading) return <Page />;
@@ -54,47 +46,8 @@ export function ExerciseDetailPage() {
   }
 
   const name = exerciseName(exercise, language);
-  const ownVideos = data?.note?.videoUrls ?? [];
   const defaults = exerciseDefaultsSummary(exercise, t);
   const last = data?.last;
-
-  const savedNote = data?.note?.note ?? "";
-  const noteValue = noteDraft ?? savedNote;
-  const noteDirty = noteDraft !== null && noteDraft.trim() !== savedNote;
-
-  const saveNote = async () => {
-    if (!noteDirty) {
-      setNoteDraft(null);
-      return;
-    }
-    await exerciseRepository.saveNote(exercise.id, { note: noteValue.trim() });
-    setNoteDraft(null);
-    toast(t("exercise.noteSaved"));
-  };
-
-  const addVideo = async () => {
-    const url = videoDraft.trim();
-    if (!isSafeHttpUrl(url)) {
-      setVideoError(t("exercise.invalidUrl"));
-      return;
-    }
-    setVideoError(undefined);
-    if (exercise.builtIn) {
-      await exerciseRepository.saveNote(exercise.id, { videoUrls: [...ownVideos, url] });
-    } else {
-      await exerciseRepository.saveCustom({ ...exercise, videoUrls: [...(exercise.videoUrls ?? []), url] });
-    }
-    setVideoDraft("");
-    toast(t("common.saved"));
-  };
-
-  const removeOwnVideo = async (url: string) => {
-    await exerciseRepository.saveNote(exercise.id, { videoUrls: ownVideos.filter((v) => v !== url) });
-  };
-
-  const removeCustomVideo = async (url: string) => {
-    await exerciseRepository.saveCustom({ ...exercise, videoUrls: (exercise.videoUrls ?? []).filter((v) => v !== url) });
-  };
 
   const deleteExercise = async () => {
     await exerciseRepository.deleteCustom(exercise.id);
@@ -168,76 +121,7 @@ export function ExerciseDetailPage() {
         </Card>
       )}
 
-      <section className="mt-7" aria-labelledby="note-title">
-        <SectionTitle id="note-title">{t("exercise.note")}</SectionTitle>
-        <label htmlFor="exercise-note" className="sr-only">
-          {t("exercise.note")}
-        </label>
-        <Textarea
-          id="exercise-note"
-          value={noteValue}
-          placeholder={t("exercise.notePlaceholder")}
-          onChange={(e) => setNoteDraft(e.target.value)}
-          onBlur={() => void saveNote()}
-        />
-        {noteDirty && (
-          <div className="mt-2 flex justify-end">
-            <Button size="sm" onClick={() => void saveNote()}>
-              {t("common.save")}
-            </Button>
-          </div>
-        )}
-      </section>
-
-      <section className="mt-7" aria-labelledby="videos-title">
-        <SectionTitle id="videos-title">{t("exercise.videos")}</SectionTitle>
-        <div className="space-y-3">
-          {(exercise.videoUrls ?? []).map((url) => (
-            <VideoEmbed
-              key={url}
-              url={url}
-              title={name}
-              sourceLabel={exercise.builtIn ? t("exercise.builtInVideo") : undefined}
-              onRemove={exercise.builtIn ? undefined : () => void removeCustomVideo(url)}
-            />
-          ))}
-          {ownVideos.map((url) => (
-            <VideoEmbed key={url} url={url} title={name} sourceLabel={t("exercise.myVideo")} onRemove={() => void removeOwnVideo(url)} />
-          ))}
-          {!exercise.videoUrls?.length && ownVideos.length === 0 && (
-            <p className="text-sm text-muted">{t("exercise.noVideos")}</p>
-          )}
-        </div>
-
-        <form
-          className="mt-4"
-          onSubmit={(e) => {
-            e.preventDefault();
-            void addVideo();
-          }}
-        >
-          <Label htmlFor="video-url">{t("exercise.addVideo")}</Label>
-          <div className="flex gap-2">
-            <Input
-              id="video-url"
-              type="url"
-              inputMode="url"
-              autoComplete="off"
-              value={videoDraft}
-              onChange={(e) => {
-                setVideoDraft(e.target.value);
-                setVideoError(undefined);
-              }}
-              placeholder={t("exercise.videoPlaceholder")}
-              aria-invalid={Boolean(videoError)}
-            />
-            <Button type="submit" size="icon" className="h-12 w-12 shrink-0 rounded-2xl" aria-label={t("exercise.addVideo")} disabled={!videoDraft.trim()}>
-              <Plus size={20} aria-hidden />
-            </Button>
-          </div>
-          <FieldError>{videoError}</FieldError>
-        </form>
-      </section>
+      <ExerciseNotesVideos key={exercise.id} exercise={exercise} note={data?.note} className="mt-7" />
 
       {!exercise.builtIn && (
         <div className="mt-10">

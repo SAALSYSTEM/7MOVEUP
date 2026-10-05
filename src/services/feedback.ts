@@ -13,6 +13,8 @@
  *   auf älteren iOS-Versionen; auf neueren bleibt er folgenlos.
  */
 
+import { isIOS } from "@/lib/device";
+
 type AudioContextCtor = typeof AudioContext;
 type Note = { frequency: number; duration: number; offset?: number; volume?: number };
 
@@ -114,13 +116,6 @@ function play(notes: Note[]) {
 }
 
 // ------------------------------------------------------------------ Haptik
-
-/** iPhone/iPad (auch iPadOS mit Desktop-User-Agent) */
-export function isIOS() {
-  if (typeof navigator === "undefined") return false;
-  const ua = navigator.userAgent;
-  return /iPhone|iPad|iPod/.test(ua) || (/Macintosh/.test(ua) && navigator.maxTouchPoints > 1);
-}
 
 export type HapticsSupport = "vibrate" | "ios" | "none";
 

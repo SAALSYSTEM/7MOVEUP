@@ -1,6 +1,5 @@
 import { format } from "date-fns";
-import { Check, Minus, Plus, StickyNote, Timer, TrendingUp, Video } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Check, Info, Minus, Plus, StickyNote, Timer, TrendingUp } from "lucide-react";
 
 import { useApp } from "@/app/app-context";
 import { Card } from "@/components/ui/card";
@@ -26,6 +25,8 @@ type Props = {
   onChange: (entry: SessionExercise) => void;
   onSetDone: (setIndex: number) => void;
   onOpenTimer: (setIndex: number) => void;
+  /** Notiz & Videos der Übung im Sheet öffnen */
+  onOpenInfo: () => void;
 };
 
 export function SessionExerciseCard({
@@ -39,6 +40,7 @@ export function SessionExerciseCard({
   onChange,
   onSetDone,
   onOpenTimer,
+  onOpenInfo,
 }: Props) {
   const { t, language } = useApp();
   const name = localized(entry.name, language);
@@ -79,7 +81,7 @@ export function SessionExerciseCard({
     onChange({ ...entry, sets: entry.sets.slice(0, lastIndex) });
   };
 
-  const detailHref = `/exercises/${encodeURIComponent(entry.exerciseId)}`;
+  const hasInfo = Boolean(personalNote) || hasVideo;
 
   return (
     <Card className={cn("overflow-hidden transition-colors", allDone && "border-success/40")}>
@@ -103,14 +105,19 @@ export function SessionExerciseCard({
               ) : null}
             </p>
           </div>
-          {hasVideo && (
-            <Link
-              to={detailHref}
-              className="-mr-1 -mt-1 flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-muted hover:bg-white/5 hover:text-fg"
-              aria-label={`${t("exercise.openVideo")}: ${name}`}
+          {exercise && (
+            <button
+              type="button"
+              onClick={onOpenInfo}
+              className={cn(
+                "relative -mr-1 -mt-1 flex h-11 w-11 shrink-0 items-center justify-center rounded-full hover:bg-white/5",
+                hasInfo ? "text-accent" : "text-muted hover:text-fg",
+              )}
+              aria-label={`${t("session.info")}: ${name}`}
             >
-              <Video size={19} aria-hidden />
-            </Link>
+              <Info size={20} aria-hidden />
+              {hasInfo && <span className="absolute right-2 top-2 h-2 w-2 rounded-full bg-accent ring-2 ring-card" aria-hidden />}
+            </button>
           )}
         </div>
 
@@ -118,10 +125,14 @@ export function SessionExerciseCard({
           <div className="mt-3 space-y-1.5">
             {entry.target.note && <p className="text-sm text-muted">{entry.target.note}</p>}
             {personalNote && (
-              <Link to={detailHref} className="flex items-start gap-2 rounded-xl bg-elevated px-3 py-2 text-sm text-muted">
+              <button
+                type="button"
+                onClick={onOpenInfo}
+                className="flex w-full items-start gap-2 rounded-xl bg-elevated px-3 py-2 text-left text-sm text-muted"
+              >
                 <StickyNote size={14} className="mt-0.5 shrink-0 text-accent" aria-hidden />
                 <span className="line-clamp-3 whitespace-pre-line">{personalNote}</span>
-              </Link>
+              </button>
             )}
           </div>
         )}

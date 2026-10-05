@@ -5,6 +5,7 @@ import { useNavigate, useParams } from "react-router-dom";
 
 import { useApp } from "@/app/app-context";
 import { EmptyState, Page } from "@/components/layout/page";
+import { ExerciseInfoSheet } from "@/components/training/exercise-info-sheet";
 import { RestTimer } from "@/components/training/rest-timer";
 import { SessionExerciseCard } from "@/components/training/session-exercise-card";
 import { TimerSheet } from "@/components/training/timer-sheet";
@@ -18,6 +19,7 @@ import type { Exercise, ExerciseNote, PerformanceSnapshot, SessionExercise, Work
 import { localized } from "@/i18n";
 import { useWakeLock } from "@/hooks/use-countdown";
 import { formatDuration } from "@/lib/dates";
+import { dismissKeyboard } from "@/lib/viewport";
 import { tick, unlockAudio } from "@/services/feedback";
 import { finishSession } from "@/services/workout-service";
 
@@ -52,6 +54,8 @@ export function SessionPage() {
   const [discardOpen, setDiscardOpen] = useState(false);
   const [durationMin, setDurationMin] = useState<number | undefined>();
   const [showPlanNotes, setShowPlanNotes] = useState(false);
+  /** Info-Sheet: Übung bleibt gesetzt, solange das Sheet ausblendet */
+  const [info, setInfo] = useState<{ exerciseId: string; open: boolean } | null>(null);
   const saveQueue = useRef<Promise<void>>(Promise.resolve());
   const sessionRef = useRef<WorkoutSession | null>(null);
   const restRunId = useRef(0);
@@ -108,6 +112,20 @@ export function SessionPage() {
       .catch(console.error);
   }, []);
 
+  /** nach Änderungen im Info-Sheet Notiz/Übung neu laden (Karte zeigt die Notiz direkt an) */
+  const refreshExerciseInfo = useCallback(async (exerciseId: string) => {
+    const [exercise, note] = await Promise.all([exerciseRepository.getById(exerciseId), exerciseRepository.getNote(exerciseId)]);
+    setContext((prev) => {
+      if (!prev) return prev;
+      const exercises = new Map(prev.exercises);
+      const notes = new Map(prev.notes);
+      if (exercise) exercises.set(exerciseId, exercise);
+      if (note) notes.set(exerciseId, note);
+      else notes.delete(exerciseId);
+      return { ...prev, exercises, notes };
+    });
+  }, []);
+
   const totals = useMemo(() => {
     const all = session?.exercises.flatMap((e) => e.sets) ?? [];
     return { done: all.filter((s) => s.done).length, total: all.length };
@@ -139,23 +157,31 @@ export function SessionPage() {
   };
 
   const openFinish = () => {
+    dismissKeyboard();
     setDurationMin(Math.max(1, Math.round(elapsed / 60)));
     setFinishOpen(true);
   };
 
+  /** Seite verlassen: erst Tastatur schließen – sonst bleibt auf iOS die Navigation verrutscht. */
+  const leave = (to: string, options?: { replace?: boolean }) => {
+    dismissKeyboard();
+    navigate(to, options);
+  };
+
   const confirmFinish = async () => {
+    dismissKeyboard();
     await saveQueue.current;
     await finishSession(session, (durationMin ?? Math.round(elapsed / 60)) * 60);
     setFinishOpen(false);
     toast(t("session.finished"));
-    navigate("/", { replace: true });
+    leave("/", { replace: true });
   };
 
   const discard = async () => {
     await saveQueue.current;
     await workoutRepository.deleteSession(session.id);
     setDiscardOpen(false);
-    navigate("/training", { replace: true });
+    leave("/training", { replace: true });
   };
 
   return (
@@ -164,7 +190,7 @@ export function SessionPage() {
         <div className="flex items-center gap-2">
           <button
             type="button"
-            onClick={() => navigate("/training")}
+            onClick={() => leave("/training")}
             className="-ml-2 flex h-11 w-11 shrink-0 items-center justify-center rounded-full hover:bg-white/5"
             aria-label={t("common.close")}
           >
@@ -228,6 +254,10 @@ export function SessionPage() {
                 onChange={(next) => updateExercise(index, next)}
                 onSetDone={(setIndex) => startRest(entry, setIndex)}
                 onOpenTimer={(setIndex) => setTimerTarget({ exerciseIndex: index, setIndex })}
+                onOpenInfo={() => {
+                  dismissKeyboard();
+                  setInfo({ exerciseId: entry.exerciseId, open: true });
+                }}
               />
             </li>
           );
@@ -265,6 +295,16 @@ export function SessionPage() {
             ),
           });
           if (!alreadyDone) startRest(entry, setIndex);
+        }}
+      />
+
+      <ExerciseInfoSheet
+        open={Boolean(info?.open)}
+        onClose={() => setInfo((prev) => (prev ? { ...prev, open: false } : prev))}
+        exercise={info ? context.exercises.get(info.exerciseId) : undefined}
+        note={info ? context.notes.get(info.exerciseId) : undefined}
+        onChanged={() => {
+          if (info) void refreshExerciseInfo(info.exerciseId);
         }}
       />
 

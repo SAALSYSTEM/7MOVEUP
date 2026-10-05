@@ -4,6 +4,9 @@ import { registerSW } from "virtual:pwa-register";
 
 import App from "./App";
 import "./index.css";
+import { installViewportRepair } from "./lib/viewport";
+
+installViewportRepair();
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
