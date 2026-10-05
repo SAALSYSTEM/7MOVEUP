@@ -1,7 +1,6 @@
 # 7MOVEUP – Projektstand
 
-Stand: Branch `feature-koerperwerte`. Noch nicht freigegeben, noch nicht auf `main`, keine neue Versionsnummer.
-Die veröffentlichte Version ist 1.2.0 (`main`, Cloudflare-Produktion). Änderungen seither: [`CHANGELOG.md`](CHANGELOG.md) → „Unveröffentlicht“.
+Stand: Version 1.3.0 (`main`, Cloudflare-Produktion), freigegeben nach dem Test der Preview auf dem Handy. Änderungen: [`CHANGELOG.md`](CHANGELOG.md).
 
 ## Grundsätze
 
@@ -108,7 +107,6 @@ IndexedDB-Datenbank `7moveup` über Dexie (`src/data/local/db.ts`):
 
 ## Nächste Schritte
 
-1. Preview auf dem Handy testen (Backup aus der Produktion exportieren → in der Preview importieren).
-2. Nach Freigabe: Merge nach `main`, Versionsnummer vergeben, Produktion.
-3. Marketing-Video neu rendern, wenn der Launch vorbereitet wird (Navigation hat sich geändert).
-4. Danach erst weitere Bereiche planen. Bewusst **noch nicht**: Blutdruck, Puls, Ernährung, Barcode, Lebensmitteldatenbank, Fotoanalyse, Blutwerte, Supplemente, Supabase/Accounts/Cloud-Sync, Planarchive, Dashboards.
+1. Neue Entwicklungsstufen wieder auf einem Feature-Branch (Cloudflare-Preview), `main` erst nach Freigabe.
+2. Marketing-Video neu rendern, wenn der Launch vorbereitet wird (Navigation hat sich geändert).
+3. Danach erst weitere Bereiche planen. Bewusst **noch nicht**: Blutdruck, Puls, Ernährung, Barcode, Lebensmitteldatenbank, Fotoanalyse, Blutwerte, Supplemente, Supabase/Accounts/Cloud-Sync, Planarchive, Dashboards.

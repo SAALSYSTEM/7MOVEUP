@@ -2,9 +2,9 @@
 
 Alle nennenswerten Änderungen an 7MOVEUP. Neueste oben.
 
-## Unveröffentlicht
+## 1.3.0 – 2026-10-05
 
-Branch `feature-koerperwerte` – Preview-Test, noch keine Versionsnummer.
+Körperwerte, neue Navigation, eigene Geräte. Auf dem Handy getestet (Preview `feature-koerperwerte`).
 
 ### Neu
 

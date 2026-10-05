@@ -97,5 +97,5 @@ Die GitHub-Pages-Vorschau (`.github/workflows/deploy-pages.yml`) baut mit `BASE_
 
 ## Status
 
-- Veröffentlicht: 1.2.0 (Cloudflare Workers, `main`). In Arbeit: Körperwerte & neue Navigation (siehe `CHANGELOG.md` → Unveröffentlicht).
+- Veröffentlicht: 1.3.0 (Cloudflare Workers, `main`) – Körperwerte & neue Navigation, siehe `CHANGELOG.md`.
 - Supabase ist bewusst nicht angebunden; die Repository-Schicht ist dafür vorbereitet.
