@@ -6,6 +6,7 @@ type SwitchProps = {
   id?: string;
   disabled?: boolean;
   "aria-describedby"?: string;
+  "aria-label"?: string;
 };
 
 export function Switch({ checked, onCheckedChange, id, disabled, ...aria }: SwitchProps) {

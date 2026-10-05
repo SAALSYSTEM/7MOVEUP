@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { todayProgress } from "./schedule";
+import { nextEvent, todayProgress } from "./schedule";
 import type { WorkoutPlan, WorkoutSession } from "./types";
 
 // Montag, 5. Oktober 2026
@@ -45,5 +45,23 @@ describe("Heute geplant – Fortschritt", () => {
 
   it("freier Tag mit Training → Erledigt", () => {
     expect(todayProgress([plan("legs", [2])], [done("legs")], MONDAY).state).toBe("done");
+  });
+});
+
+describe("Als Nächstes", () => {
+  it("erstes Ereignis ab morgen – Training und Messtag am selben Tag zusammen", () => {
+    const plans = [plan("push", [1]), plan("legs", [3])];
+    const next = nextEvent(plans, [3], MONDAY);
+    expect(next?.date.getDate()).toBe(7);
+    expect(next?.trainings.map((p) => p.id)).toEqual(["legs"]);
+    expect(next?.measure).toBe(true);
+  });
+
+  it("Messtag allein zählt auch; heute wird nie wiederholt", () => {
+    const next = nextEvent([plan("push", [1])], [2], MONDAY);
+    expect(next?.date.getDate()).toBe(6);
+    expect(next?.trainings).toEqual([]);
+    expect(next?.measure).toBe(true);
+    expect(nextEvent([], [], MONDAY)).toBeUndefined();
   });
 });

@@ -13,6 +13,7 @@ export const settingsRepository = local.settings;
 export const exerciseRepository = local.exercises;
 export const planRepository = local.plans;
 export const workoutRepository = local.workouts;
+export const bodyRepository = local.body;
 export const backupService = createLocalBackupService(db, local);
 
 /** Persistenten Speicher anfragen, damit der Browser IndexedDB nicht still räumt. */
@@ -26,4 +27,4 @@ export async function requestPersistentStorage() {
   }
 }
 
-export type { BackupService } from "./local/local-backup";
+export type { BackupInfo, BackupService } from "./local/local-backup";

@@ -74,7 +74,7 @@ export function SessionPage() {
         return;
       }
       if (loaded.completedAt) {
-        navigate("/training?tab=calendar", { replace: true });
+        navigate("/calendar", { replace: true });
         return;
       }
       const ids = Array.from(new Set(loaded.exercises.map((e) => e.exerciseId)));

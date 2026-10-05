@@ -14,9 +14,9 @@ Lokale mobile-first PWA ohne Backend. Daten zuerst in IndexedDB. UI greift über
 
 ## Routing
 
-- `/` Heute
-- `/training` Training mit `Plan | Kalender`
-- `/exercises` Übungen
+- `/` Heute · `/calendar` Kalender (gehört zu Heute)
+- `/training` Training mit Tabs `Plan | Übungen` · `/exercises` Übungen
+- `/progress` Fortschritt · `/progress/metrics` Messwerte
 - `/food` Coming Soon
 - `/more` Mehr
 
@@ -32,12 +32,13 @@ IndexedDB speichert:
 - Trainingseinheiten
 - Satzdaten/Zeiten
 - Kalenderzuordnung
+- Körperwerte (Messwert-Einstellungen, Messungen)
 
 Keine Blob-Videos in V1.
 
 ## Backup
 
-Ein Export enthält nur den aktuellen Nutzer. Format versioniert mit `schemaVersion: 1`.
+Ein Export enthält nur den aktuellen Nutzer. Format versioniert mit `schemaVersion` (aktuell 2; Version 1 wird weiterhin importiert).
 
 ## Supabase später
 
@@ -62,16 +63,17 @@ Die UI soll von lokalen Details entkoppelt sein. Später können Repository-Impl
 
 Die UI importiert nie Dexie. Repositories melden Schreibvorgänge über `src/data/events.ts`; `useData()` lädt daraufhin neu. Eine Supabase-Implementierung muss nur dieselben Interfaces erfüllen und nach Schreibvorgängen `notifyDataChanged()` aufrufen.
 
-### IndexedDB-Tabellen (Dexie, DB `7moveup`, Version 1)
+### IndexedDB-Tabellen (Dexie, DB `7moveup`, Version 2)
 
-`meta` (aktuelles Profil), `profiles`, `settings`, `customExercises`, `exerciseNotes` (`[profileId+exerciseId]`), `plans`, `sessions`.
+`meta` (aktuelles Profil, letztes Backup), `profiles`, `settings`, `customExercises`, `exerciseNotes` (`[profileId+exerciseId]`), `plans`, `sessions`; seit Version 2 zusätzlich `bodySettings` und `measurements` (`[profileId+date]`). Schema-Änderungen nur additiv.
 Built-in-Übungen liegen nicht in der DB, sondern kommen aus den Seed-Dateien – so können spätere Seed-Updates ohne Migration ausgeliefert werden.
 
 ### Entscheidungen
 
 - **Körperregionen/Equipment als stabile Schlüssel** (`chest`, `dumbbells` …) statt deutscher Labels; `Trizeps`/`Bizeps` aus dem Seed werden auf `Arme` gemappt.
 - **Ergometer** als 41. Built-in-Übung (`id: ergometer`, Tracking `cardio`): Die 6-Tage-Vorlage hat zwei Ergometer-Tage, die 40 Seed-Übungen enthalten aber keine Cardio-Übung.
-- **Vorlagen → Pläne:** Beim Übernehmen entsteht pro Trainingstag ein editierbarer Plan mit vorgeschlagenen Wochentagen (4-Tage: Mo/Di/Do/Fr, 6-Tage: Mo–Sa). Planung gilt ab dem Anlagetag, nicht rückwirkend.
+- **Ein Plan, Vorlagen ersetzen ihn:** Der persönliche Plan besteht aus Trainingstagen (`plans`) mit Wochentagen. Eine Vorlage zu übernehmen ersetzt nach Rückfrage alle Trainingstage (4-Tage: Mo/Di/Do/Fr, 6-Tage: Mo–Sa); absolvierte Trainings bleiben unverändert. Planung gilt ab dem Anlagetag, nicht rückwirkend.
+- **Körperwerte:** gespeichert in Basiseinheit (kg, cm, %, kcal) und ungerundet; Imperial ist nur Anzeige. Details und weitere Entscheidungen: `PROJECT_STATE.md`.
 - **Gewicht** wird immer als `weightPerDumbbellKg` gespeichert und bei Kurzhantel-/Kettlebell-Übungen als „kg je Hantel“ angezeigt.
 - **Tagesspruch (v1.1):** 10 kurze Sprüche à 2–5 Wörter (`src/domain/motivation.ts`). Auswahl über eine feste 10er-Permutation der lokalen Tagesnummer → am selben Tag stabil, am Folgetag garantiert anders, alle 10 Tage jeder Spruch einmal. Die Startseite zeigt immer nur ein Wort: einblenden 0,42 s → 1,2 s stehen (letztes Wort 1,4 s) → ausblenden 0,38 s → nächstes Wort, endlos. Schriftgröße richtet sich nach dem längsten Wort des Tages, damit nichts springt.
 - **Progression:** obere Wiederholungszahl in allen geplanten Arbeitssätzen erreicht → „Steigerung möglich“. Plan mit `progressionStepKg` (4-Tage Kraft & Core: 2) zeigt bei Grundübungen (≤ 12 Wdh.) zusätzlich „+2 kg“. Nie automatische Änderung.

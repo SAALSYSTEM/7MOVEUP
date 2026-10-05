@@ -44,10 +44,15 @@ export type Profile = {
   updatedAt: string;
 };
 
+/** Anzeige der Körperwerte: metrisch (kg, cm) oder imperial (lb, in). Gespeichert wird immer in kg/cm. */
+export type UnitSystem = "metric" | "imperial";
+
 export type Settings = {
   profileId: string;
   soundEnabled: boolean;
   hapticsEnabled: boolean;
+  /** fehlt bei älteren Daten → metrisch */
+  unitSystem?: UnitSystem;
   updatedAt: string;
 };
 
@@ -187,4 +192,42 @@ export type PerformanceSnapshot = {
   trackingType: TrackingType;
   target: SessionTarget;
   sets: SetLog[];
+};
+
+// ------------------------------------------------------------------ Körperwerte
+
+/** Eigener Messwert des Nutzers – Einheit frei, wird nicht umgerechnet. */
+export type CustomBodyMetric = {
+  /** stabiler Schlüssel, beginnt mit "custom-" */
+  key: string;
+  name: string;
+  /** frei, z. B. "cm" oder "Punkte"; fest, sobald Werte existieren */
+  unit: string;
+  step: number;
+  createdAt: string;
+};
+
+/** Auswahl und Reihenfolge der Messwerte, eigene Messwerte, Messtage – je Profil ein Datensatz. */
+export type BodySettings = {
+  profileId: string;
+  /** Reihenfolge = Anzeigereihenfolge; fehlende Standardwerte werden beim Lesen ergänzt */
+  metrics: { key: string; enabled: boolean }[];
+  custom: CustomBodyMetric[];
+  /** Wochentage, an denen gemessen werden soll */
+  measureWeekdays: Weekday[];
+  updatedAt: string;
+};
+
+/** Eine Erfassung (z. B. ein Ablesen der Waage). Werte immer in Basiseinheit (kg, cm, %, kcal). */
+export type BodyMeasurement = {
+  id: string;
+  profileId: string;
+  /** lokaler Tag yyyy-MM-dd */
+  date: string;
+  /** optionale Uhrzeit HH:mm */
+  time?: string;
+  /** Messwert-Schlüssel → Zahl; nur bestätigte Werte */
+  values: Record<string, number>;
+  createdAt: string;
+  updatedAt: string;
 };

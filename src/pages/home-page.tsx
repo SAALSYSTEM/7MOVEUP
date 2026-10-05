@@ -1,40 +1,52 @@
-import { format, isToday, isTomorrow } from "date-fns";
-import { ArrowRight, CalendarClock, CircleCheck, Clock3, Dumbbell, Flame, Play, TrendingUp } from "lucide-react";
-import { useState, type ReactNode } from "react";
-import { useNavigate } from "react-router-dom";
+import { format, isTomorrow } from "date-fns";
+import { ArrowRight, CalendarClock, CalendarDays, CircleCheck, Dumbbell, Play, Weight } from "lucide-react";
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 
 import { useApp } from "@/app/app-context";
+import { MeasurementSheet } from "@/components/body/measurement-sheet";
+import { BackupLine } from "@/components/home/backup-line";
 import { MotivationLoop } from "@/components/home/motivation-loop";
 import { AppHeader } from "@/components/layout/app-header";
 import { Page } from "@/components/layout/page";
-import { exerciseCountLabel } from "@/lib/weekdays";
 import { Card, SectionTitle } from "@/components/ui/card";
-import { exerciseRepository, planRepository, workoutRepository } from "@/data";
+import { planRepository, workoutRepository } from "@/data";
 import { getDailyQuote } from "@/domain/motivation";
 import { countImprovements } from "@/domain/progression";
-import { nextPlanned, openPlansToday, plansForDate, sessionsForDate, sessionsThisWeek, todayProgress, weekSummary } from "@/domain/schedule";
+import { nextEvent, openPlansToday, plansForDate, sessionsForDate, sessionsThisWeek, todayProgress, weekSummary } from "@/domain/schedule";
 import type { WorkoutPlan } from "@/domain/types";
+import { useBackupExport, useBackupStatus } from "@/hooks/use-backup";
+import { useBodyData } from "@/hooks/use-body-data";
 import { useData } from "@/hooks/use-data";
 import { useToday } from "@/hooks/use-today";
-import { dateLocale, parseDateKey } from "@/lib/dates";
+import { dateLocale, isoWeekday, localDateKey } from "@/lib/dates";
+import { exerciseCountLabel } from "@/lib/weekdays";
 import { startSessionFromPlan } from "@/services/workout-service";
 
+/**
+ * Heute beantwortet: Was steht jetzt bzw. als Nächstes an?
+ * Motivation + Training starten · heute fällig (Training, Messtag) · als Nächstes · Woche kompakt
+ * · Kalender öffnen · Backup-Zeile.
+ */
 export function HomePage() {
   const { t, language } = useApp();
   const navigate = useNavigate();
   const [starting, setStarting] = useState(false);
+  const [captureOpen, setCaptureOpen] = useState(false);
   const locale = dateLocale(language);
   const today = useToday();
   const quote = getDailyQuote(today);
+  const body = useBodyData();
+  const backup = useBackupStatus();
+  const { exportBackup, busy: backupBusy } = useBackupExport();
 
   const { data } = useData(async () => {
-    const [plans, completed, active, exercises] = await Promise.all([
+    const [plans, completed, active] = await Promise.all([
       planRepository.getAll(),
       workoutRepository.getCompletedSessions(),
       workoutRepository.getActiveSession(),
-      exerciseRepository.getAll(),
     ]);
-    return { plans, completed, active, exercises };
+    return { plans, completed, active };
   });
 
   const plans = data?.plans ?? [];
@@ -43,12 +55,24 @@ export function HomePage() {
   const openToday = openPlansToday(plans, completed, today);
   const plannedToday = plansForDate(plans, today);
   const doneToday = sessionsForDate(completed, today);
-  const progress = todayProgress(plans, completed, today);
   const summary = weekSummary(plans, completed, today);
   const improvements = countImprovements(completed, sessionsThisWeek(completed, today));
-  const next = nextPlanned(plans, completed, today);
-  const last = completed.at(-1);
   const hasHistory = completed.length > 0;
+
+  // Körperwerte heute: geplanter Messtag und/oder bereits erfasst
+  const measureWeekdays = body.bodySettings?.measureWeekdays ?? [];
+  const measureDay = measureWeekdays.includes(isoWeekday(today));
+  const measuredToday = body.measurements.some((m) => m.date === localDateKey(today));
+  const showMeasure = measureDay || measuredToday;
+
+  // Fortschritt des Tages über Trainings + Messtag
+  const training = todayProgress(plans, completed, today);
+  const total = training.total + (measureDay ? 1 : 0);
+  const done = training.done + (measureDay && measuredToday ? 1 : 0);
+  const dayState =
+    total === 0 ? (training.state === "done" || measuredToday ? "done" : "none") : done === total ? "done" : done > 0 ? "partial" : "none";
+
+  const next = nextEvent(plans, measureWeekdays, today);
 
   const startPlan = async (plan: WorkoutPlan) => {
     if (starting) return;
@@ -67,27 +91,22 @@ export function HomePage() {
     navigate("/training?choose=1");
   };
 
-  const relativeDay = (date: Date) =>
-    isToday(date) ? t("home.today") : isTomorrow(date) ? t("home.tomorrow") : format(date, "EEEE", { locale });
+  const relativeDay = (date: Date) => (isTomorrow(date) ? t("home.tomorrow") : format(date, "EEEE", { locale }));
+  const hasTodayItems = plannedToday.length > 0 || showMeasure;
 
   return (
     <Page>
       <AppHeader
         left={
           <div>
-            <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-subtle">
-              {format(today, "EEEE", { locale })}
-            </p>
+            <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-subtle">{format(today, "EEEE", { locale })}</p>
             <p className="text-sm font-semibold text-muted">{format(today, language === "de" ? "d. MMMM" : "MMMM d", { locale })}</p>
           </div>
         }
       />
 
       <section className="relative mb-5 overflow-hidden rounded-[28px] border border-white/10 bg-[#101012] p-5 sm:p-7">
-        <div
-          aria-hidden
-          className="pointer-events-none absolute -right-24 -top-24 h-64 w-64 rounded-full bg-accent/10 blur-3xl"
-        />
+        <div aria-hidden className="pointer-events-none absolute -right-24 -top-24 h-64 w-64 rounded-full bg-accent/10 blur-3xl" />
         <MotivationLoop words={quote} className="relative py-8" />
         <button
           type="button"
@@ -99,74 +118,44 @@ export function HomePage() {
           {active ? t("home.continue") : t("home.start")}
           <ArrowRight size={18} aria-hidden />
         </button>
-        {active && (
-          <p className="relative mt-3 truncate text-center text-xs font-semibold text-muted">{active.planName}</p>
-        )}
+        {active && <p className="relative mt-3 truncate text-center text-xs font-semibold text-muted">{active.planName}</p>}
       </section>
 
-      <section className="mb-5" aria-labelledby="week-title">
-        <SectionTitle id="week-title">{t("home.week")}</SectionTitle>
-        {hasHistory || summary.plannedCount > 0 ? (
-          <div className="grid grid-cols-3 gap-2">
-            <StatCard
-              icon={<Flame size={18} aria-hidden />}
-              value={
-                summary.plannedCount > 0
-                  ? `${summary.completedCount} / ${summary.plannedCount}`
-                  : String(summary.completedCount)
-              }
-              label={t("home.workouts")}
-            />
-            <StatCard
-              icon={<Clock3 size={18} aria-hidden />}
-              value={hasHistory ? String(summary.minutes) : "–"}
-              label={t("home.minutes")}
-            />
-            <StatCard
-              icon={<TrendingUp size={18} aria-hidden />}
-              value={hasHistory ? String(improvements) : "–"}
-              label={t("home.improvements")}
-            />
-          </div>
-        ) : (
-          <Card className="p-4 text-sm leading-relaxed text-muted">{t("home.emptyWeek")}</Card>
-        )}
-      </section>
-
-      <section className="space-y-3">
+      {/* Heute fällig */}
+      <section className="mb-3" aria-labelledby="today-title">
         <Card className="p-4">
           <div className="mb-2 flex items-center justify-between">
-            <span className="text-[11px] font-bold uppercase tracking-[0.16em] text-subtle">{t("home.plannedToday")}</span>
-            {progress.state === "done" && (
+            <h2 id="today-title" className="text-[11px] font-bold uppercase tracking-[0.16em] text-subtle">
+              {t("home.plannedToday")}
+            </h2>
+            {dayState === "done" && (
               <span className="inline-flex items-center gap-1 text-xs font-bold text-success">
                 <CircleCheck size={14} aria-hidden /> {t("home.doneBadge")}
               </span>
             )}
-            {progress.state === "partial" && (
-              <span className="tabular text-xs font-bold text-muted">
-                {t("home.doneOf", { done: progress.done, total: progress.total })}
-              </span>
+            {dayState === "partial" && (
+              <span className="tabular text-xs font-bold text-muted">{t("home.doneOf", { done, total })}</span>
             )}
           </div>
-          {plannedToday.length > 0 ? (
+          {hasTodayItems ? (
             <ul className="space-y-2">
               {plannedToday.map((plan) => {
-                const done = doneToday.some((s) => s.planId === plan.id);
+                const isDone = doneToday.some((s) => s.planId === plan.id);
                 return (
                   <li key={plan.id}>
                     <button
                       type="button"
-                      disabled={done || Boolean(active) || starting}
+                      disabled={isDone || Boolean(active) || starting}
                       onClick={() => void startPlan(plan)}
                       className="flex min-h-12 w-full items-center justify-between gap-3 rounded-2xl bg-elevated px-4 py-3 text-left disabled:cursor-default"
                     >
                       <span className="min-w-0">
-                        <span className={done ? "block truncate font-bold text-muted line-through" : "block truncate font-bold"}>
+                        <span className={isDone ? "block truncate font-bold text-muted line-through" : "block truncate font-bold"}>
                           {plan.name}
                         </span>
                         <span className="block text-xs text-subtle">{exerciseCountLabel(t, plan.items.length)}</span>
                       </span>
-                      {done ? (
+                      {isDone ? (
                         <CircleCheck size={20} className="shrink-0 text-success" aria-label={t("home.doneBadge")} />
                       ) : (
                         <Play size={18} className="shrink-0 text-accent" aria-hidden />
@@ -175,52 +164,92 @@ export function HomePage() {
                   </li>
                 );
               })}
+              {showMeasure && (
+                <li>
+                  <button
+                    type="button"
+                    onClick={() => setCaptureOpen(true)}
+                    className="flex min-h-12 w-full items-center justify-between gap-3 rounded-2xl bg-elevated px-4 py-3 text-left"
+                  >
+                    <span className="flex min-w-0 items-center gap-3">
+                      <Weight size={18} className={measuredToday ? "shrink-0 text-muted" : "shrink-0 text-fg"} aria-hidden />
+                      <span className="min-w-0">
+                        <span className={measuredToday ? "block truncate font-bold text-muted" : "block truncate font-bold"}>
+                          {measuredToday ? t("home.bodyDone") : t("body.captureTitle")}
+                        </span>
+                        <span className="block text-xs text-subtle">{measuredToday ? t("home.bodyEdit") : t("home.bodyHint")}</span>
+                      </span>
+                    </span>
+                    {measuredToday ? (
+                      <CircleCheck size={20} className="shrink-0 text-success" aria-label={t("home.doneBadge")} />
+                    ) : (
+                      <ArrowRight size={18} className="shrink-0 text-accent" aria-hidden />
+                    )}
+                  </button>
+                </li>
+              )}
             </ul>
           ) : (
             <p className="text-sm text-muted">{plans.length === 0 ? t("home.noPlans") : t("home.noPlanToday")}</p>
           )}
         </Card>
-
-        {next && !isToday(next.date) && (
-          <Card className="flex items-center gap-3 p-4">
-            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-accent/12 text-accent">
-              <CalendarClock size={18} aria-hidden />
-            </span>
-            <div className="min-w-0">
-              <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-subtle">{t("home.next")}</p>
-              <p className="truncate font-bold">
-                <span className="text-accent-light">{relativeDay(next.date)}</span> · {next.plan.name}
-              </p>
-            </div>
-          </Card>
-        )}
-
-        <Card className="p-4">
-          <p className="mb-1 text-[11px] font-bold uppercase tracking-[0.16em] text-subtle">{t("home.lastWorkout")}</p>
-          {last ? (
-            <div>
-              <p className="truncate font-bold">{last.planName}</p>
-              <p className="mt-0.5 text-xs text-muted">
-                {format(parseDateKey(last.date), language === "de" ? "EEEE, d. MMMM" : "EEEE, MMMM d", { locale })}
-                {last.durationSec ? ` · ${t("home.minutesShort", { count: Math.round(last.durationSec / 60) })}` : ""}
-              </p>
-            </div>
-          ) : (
-            <p className="text-sm text-muted">{t("home.noHistory")}</p>
-          )}
-        </Card>
       </section>
+
+      {/* Als Nächstes – genau eine Zeile, nie etwas von heute */}
+      {next && (
+        <Card className="mb-3 flex items-center gap-3 p-4">
+          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-accent/12 text-accent">
+            <CalendarClock size={18} aria-hidden />
+          </span>
+          <div className="min-w-0">
+            <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-subtle">{t("home.next")}</p>
+            <p className="truncate font-bold">
+              <span className="text-accent-light">{relativeDay(next.date)}</span> ·{" "}
+              {[...next.trainings.map((p) => p.name), ...(next.measure ? [t("calendar.legendBody")] : [])].join(" · ")}
+            </p>
+          </div>
+        </Card>
+      )}
+
+      <div className="mb-6 flex justify-end">
+        <Link
+          to="/calendar"
+          className="inline-flex h-10 items-center gap-1.5 rounded-xl px-2 text-sm font-bold text-accent-light hover:bg-white/5"
+        >
+          <CalendarDays size={16} aria-hidden /> {t("home.openCalendar")}
+        </Link>
+      </div>
+
+      {/* Woche kompakt */}
+      <section aria-labelledby="week-title">
+        <SectionTitle id="week-title">{t("home.week")}</SectionTitle>
+        {hasHistory || summary.plannedCount > 0 ? (
+          <Card className="grid grid-cols-3 divide-x divide-line py-3">
+            <WeekStat
+              value={summary.plannedCount > 0 ? `${summary.completedCount}/${summary.plannedCount}` : String(summary.completedCount)}
+              label={t("home.workouts")}
+            />
+            <WeekStat value={hasHistory ? String(summary.minutes) : "–"} label={t("home.minutes")} />
+            <WeekStat value={hasHistory ? String(improvements) : "–"} label={t("home.improvements")} />
+          </Card>
+        ) : (
+          <Card className="p-4 text-sm leading-relaxed text-muted">{t("home.emptyWeek")}</Card>
+        )}
+      </section>
+
+      {backup.reminder && <BackupLine reminder={backup.reminder} onBackup={() => void exportBackup()} busy={backupBusy} />}
+
+      <MeasurementSheet open={captureOpen} onClose={() => setCaptureOpen(false)} />
     </Page>
   );
 }
 
-function StatCard({ icon, value, label }: { icon: ReactNode; value: string; label: string }) {
+function WeekStat({ value, label }: { value: string; label: string }) {
   return (
-    <Card className="p-3">
-      <div className="mb-4 text-accent">{icon}</div>
+    <div className="px-3 text-center">
       <div className="tabular text-xl font-black tracking-tight">{value}</div>
-      <div className="mt-1 text-[11px] text-subtle">{label}</div>
-    </Card>
+      <div className="mt-0.5 text-[11px] text-subtle">{label}</div>
+    </div>
   );
 }
 

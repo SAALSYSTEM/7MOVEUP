@@ -3,7 +3,12 @@ import { z } from "zod";
 import { BODY_REGIONS, EQUIPMENT, TRACKING_TYPES } from "@/domain/types";
 
 export const BACKUP_APP_ID = "7MOVEUP";
-export const BACKUP_SCHEMA_VERSION = 1;
+/**
+ * 1 = V1 (Profil, Übungen, Notizen, Pläne, Trainings, Einstellungen)
+ * 2 = + Körperwerte (Messungen, Messwert-Auswahl, Messtage) und Einheiten-Einstellung.
+ * Version-1-Dateien bleiben importierbar: die neuen Felder sind optional.
+ */
+export const BACKUP_SCHEMA_VERSION = 2;
 
 const isoDate = z.string().min(1);
 const localized = z.object({ de: z.string(), en: z.string() });
@@ -110,6 +115,35 @@ const sessionSchema = z.object({
   ),
 });
 
+const customMetricSchema = z.object({
+  key: z.string().min(1),
+  name: z.string().min(1).max(60),
+  unit: z.string().max(20),
+  step: z.number().positive(),
+  createdAt: isoDate,
+});
+
+const bodySettingsSchema = z.object({
+  profileId: z.string().optional(),
+  metrics: z.array(z.object({ key: z.string().min(1), enabled: z.boolean() })),
+  custom: z.array(customMetricSchema).default([]),
+  measureWeekdays: z.array(z.number().int().min(1).max(7)).default([]),
+  updatedAt: isoDate,
+});
+
+const measurementSchema = z.object({
+  id: z.string().min(1),
+  profileId: z.string().optional(),
+  date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+  time: z
+    .string()
+    .regex(/^\d{2}:\d{2}$/)
+    .optional(),
+  values: z.record(z.string(), z.number().finite()),
+  createdAt: isoDate,
+  updatedAt: isoDate,
+});
+
 export const backupSchema = z.object({
   app: z.literal(BACKUP_APP_ID),
   schemaVersion: z.number().int().min(1),
@@ -120,8 +154,15 @@ export const backupSchema = z.object({
   plans: z.array(planSchema).default([]),
   sessions: z.array(sessionSchema).default([]),
   settings: z
-    .object({ soundEnabled: z.boolean().default(true), hapticsEnabled: z.boolean().default(true) })
+    .object({
+      soundEnabled: z.boolean().default(true),
+      hapticsEnabled: z.boolean().default(true),
+      unitSystem: z.enum(["metric", "imperial"]).optional(),
+    })
     .default({ soundEnabled: true, hapticsEnabled: true }),
+  // ab Version 2 – fehlen in Version-1-Dateien
+  bodySettings: bodySettingsSchema.optional(),
+  measurements: z.array(measurementSchema).default([]),
 });
 
 export type BackupFile = z.infer<typeof backupSchema>;
@@ -136,7 +177,8 @@ export type BackupParseResult = { ok: true; backup: BackupFile } | { ok: false; 
 
 /**
  * Migrationen älterer Schema-Versionen landen hier.
- * V1 kennt nur Version 1 – neuere Dateien werden abgelehnt statt falsch gelesen.
+ * 1 → 2: nichts umzubauen, Körperwerte fehlen einfach (Standardwerte greifen).
+ * Neuere Dateien werden abgelehnt statt still Daten zu verlieren.
  */
 function migrate(raw: Record<string, unknown>): Record<string, unknown> {
   return raw;

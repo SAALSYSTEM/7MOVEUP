@@ -9,15 +9,16 @@ import {
   startOfDay,
   startOfMonth,
 } from "date-fns";
-import { Check, ChevronLeft, ChevronRight, Moon, Play } from "lucide-react";
+import { Check, ChevronLeft, ChevronRight, Moon, Play, Plus, Weight } from "lucide-react";
 import { useMemo, useState } from "react";
 
 import { useApp } from "@/app/app-context";
 import { Card } from "@/components/ui/card";
+import { formatMetric, type MetricView } from "@/domain/body";
 import { dayStatus, planKind, type DayStatus } from "@/domain/schedule";
-import type { Exercise, WorkoutPlan, WorkoutSession } from "@/domain/types";
+import type { BodyMeasurement, Exercise, Weekday, WorkoutPlan, WorkoutSession } from "@/domain/types";
 import { useToday } from "@/hooks/use-today";
-import { dateLocale } from "@/lib/dates";
+import { dateLocale, isoWeekday, localDateKey } from "@/lib/dates";
 import { cn } from "@/lib/utils";
 
 import { exerciseCountLabel, WEEKDAYS } from "@/lib/weekdays";
@@ -28,10 +29,25 @@ type Props = {
   exercisesById: Map<string, Exercise>;
   onStart: (plan: WorkoutPlan, date: Date) => void;
   canStart: boolean;
+  /** Körperwerte: erfasste Messungen und geplante Messtage */
+  measurements?: BodyMeasurement[];
+  measureWeekdays?: Weekday[];
+  metrics?: MetricView[];
+  onOpenMeasurement?: (date: string) => void;
 };
 
 /** Monatskalender (Dark/Orange): Plan- und Erledigt-Status pro Tag, Tap zeigt Details. */
-export function CalendarView({ plans, completed, exercisesById, onStart, canStart }: Props) {
+export function CalendarView({
+  plans,
+  completed,
+  exercisesById,
+  onStart,
+  canStart,
+  measurements = [],
+  measureWeekdays = [],
+  metrics = [],
+  onOpenMeasurement,
+}: Props) {
   const { t, language } = useApp();
   const locale = dateLocale(language);
   const today = useToday();
@@ -47,6 +63,17 @@ export function CalendarView({ plans, completed, exercisesById, onStart, canStar
   );
   const leadingBlanks = getISODay(startOfMonth(month)) - 1;
   const selectedStatus = dayStatus(selected, plans, completed, exercisesById);
+  const measuredDays = useMemo(() => new Set(measurements.map((m) => m.date)), [measurements]);
+  const selectedKey = localDateKey(selected);
+  const selectedMeasurement = measurements.filter((m) => m.date === selectedKey).at(-1);
+  const isMeasureDay = measureWeekdays.includes(isoWeekday(selected));
+  const canCaptureSelected = Boolean(onOpenMeasurement) && !isAfter(startOfDay(selected), startOfDay(today));
+  const measurementSummary = (m: BodyMeasurement) =>
+    metrics
+      .filter((metric) => typeof m.values[metric.key] === "number")
+      .slice(0, 3)
+      .map((metric) => `${metric.name} ${formatMetric(metric, m.values[metric.key], language)}`)
+      .join(" · ");
 
   const statusLabel = (status: DayStatus) => {
     switch (status.kind) {
@@ -113,15 +140,16 @@ export function CalendarView({ plans, completed, exercisesById, onStart, canStar
           {days.map((status) => {
             const isTodayCell = isSameDay(status.date, today);
             const isSelected = isSameDay(status.date, selected);
+            const measured = measuredDays.has(localDateKey(status.date));
             return (
               <button
                 key={status.date.toISOString()}
                 type="button"
                 onClick={() => setSelected(status.date)}
                 aria-pressed={isSelected}
-                aria-label={`${format(status.date, language === "de" ? "EEEE, d. MMMM" : "EEEE, MMMM d", { locale })} – ${statusLabel(status)}`}
+                aria-label={`${format(status.date, language === "de" ? "EEEE, d. MMMM" : "EEEE, MMMM d", { locale })} – ${statusLabel(status)}${measured ? ` · ${t("calendar.bodyLogged")}` : ""}`}
                 className={cn(
-                  "flex h-12 items-center justify-center rounded-2xl transition-colors",
+                  "relative flex h-12 items-center justify-center rounded-2xl transition-colors",
                   isSelected ? "bg-elevated" : "hover:bg-white/[0.03]",
                 )}
               >
@@ -142,6 +170,7 @@ export function CalendarView({ plans, completed, exercisesById, onStart, canStar
                     </span>
                   )}
                 </span>
+                {measured && <span className="absolute bottom-0.5 left-1/2 h-1.5 w-1.5 -translate-x-1/2 rounded-full bg-fg" aria-hidden />}
               </button>
             );
           })}
@@ -163,6 +192,14 @@ export function CalendarView({ plans, completed, exercisesById, onStart, canStar
           <li className="flex items-center gap-1.5">
             <span className="h-3 w-3 rounded-full bg-line" aria-hidden /> {t("calendar.legendRest")}
           </li>
+          {onOpenMeasurement && (
+            <li className="flex items-center gap-1.5">
+              <span className="flex h-3 w-3 items-center justify-center" aria-hidden>
+                <span className="h-1.5 w-1.5 rounded-full bg-fg" />
+              </span>
+              {t("calendar.legendBody")}
+            </li>
+          )}
         </ul>
       </Card>
 
@@ -171,7 +208,7 @@ export function CalendarView({ plans, completed, exercisesById, onStart, canStar
           {format(selected, language === "de" ? "EEEE, d. MMMM" : "EEEE, MMMM d", { locale })}
         </h3>
 
-        {selectedStatus.completed.length === 0 && selectedStatus.planned.length === 0 && (
+        {selectedStatus.completed.length === 0 && selectedStatus.planned.length === 0 && !selectedMeasurement && !isMeasureDay && (
           <Card className="flex items-center gap-3 p-4 text-sm text-muted">
             <Moon size={18} className="shrink-0 text-subtle" aria-hidden />
             {t("calendar.rest")}
@@ -246,6 +283,48 @@ export function CalendarView({ plans, completed, exercisesById, onStart, canStar
                 );
               })}
             </ul>
+          </div>
+        )}
+
+        {(selectedMeasurement || (isMeasureDay && canCaptureSelected)) && (
+          <div className="mt-3">
+            <p className="mb-2 px-1 text-[11px] font-bold uppercase tracking-[0.16em] text-subtle">{t("calendar.body")}</p>
+            {selectedMeasurement ? (
+              <button
+                type="button"
+                onClick={() => onOpenMeasurement?.(selectedKey)}
+                disabled={!onOpenMeasurement}
+                className="flex w-full items-center gap-3 rounded-[20px] border border-line bg-card p-4 text-left hover:bg-elevated"
+              >
+                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white/10 text-fg">
+                  <Weight size={17} aria-hidden />
+                </span>
+                <span className="min-w-0">
+                  <span className="block truncate font-bold">
+                    {t("calendar.bodyLogged")}
+                    {selectedMeasurement.time ? ` · ${selectedMeasurement.time}` : ""}
+                  </span>
+                  <span className="block truncate text-xs text-subtle">{measurementSummary(selectedMeasurement)}</span>
+                </span>
+              </button>
+            ) : (
+              <Card className="flex items-center gap-3 p-4">
+                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white/10 text-fg">
+                  <Weight size={17} aria-hidden />
+                </span>
+                <div className="min-w-0 flex-1">
+                  <p className="truncate font-bold">{t("calendar.measureDay")}</p>
+                  <p className="text-xs text-subtle">{t("calendar.measureOpen")}</p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => onOpenMeasurement?.(selectedKey)}
+                  className="inline-flex h-11 shrink-0 items-center gap-1.5 rounded-xl bg-accent px-3.5 text-sm font-extrabold text-black"
+                >
+                  <Plus size={15} aria-hidden /> {t("progress.capture")}
+                </button>
+              </Card>
+            )}
           </div>
         )}
       </section>

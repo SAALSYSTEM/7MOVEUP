@@ -1,4 +1,6 @@
 import type {
+  BodyMeasurement,
+  BodySettings,
   Exercise,
   ExerciseNote,
   PerformanceSnapshot,
@@ -23,7 +25,7 @@ export interface ProfileRepository {
 
 export interface SettingsRepository {
   get(): Promise<Settings>;
-  update(patch: Partial<Pick<Settings, "soundEnabled" | "hapticsEnabled">>): Promise<Settings>;
+  update(patch: Partial<Pick<Settings, "soundEnabled" | "hapticsEnabled" | "unitSystem">>): Promise<Settings>;
 }
 
 export interface ExerciseRepository {
@@ -41,6 +43,8 @@ export interface PlanRepository {
   getById(id: string): Promise<WorkoutPlan | undefined>;
   save(plan: WorkoutPlan): Promise<WorkoutPlan>;
   saveMany(plans: WorkoutPlan[]): Promise<void>;
+  /** ersetzt den aktuellen persönlichen Plan (alle Trainingstage) – Trainings-Historie bleibt unberührt */
+  replaceAll(plans: WorkoutPlan[]): Promise<void>;
   delete(id: string): Promise<void>;
 }
 
@@ -52,4 +56,23 @@ export interface WorkoutRepository {
   deleteSession(id: string): Promise<void>;
   /** letzte abgeschlossene Leistung einer Übung, optional vor einem Zeitpunkt */
   getLastPerformance(exerciseId: string, beforeIso?: string): Promise<PerformanceSnapshot | undefined>;
+}
+
+export type MeasurementInput = {
+  /** vorhandene Messung aktualisieren */
+  id?: string;
+  date: string;
+  time?: string;
+  /** nur bestätigte Werte, in Basiseinheit */
+  values: Record<string, number>;
+};
+
+export interface BodyRepository {
+  /** Auswahl, Reihenfolge, eigene Messwerte, Messtage (Standardvorlage, solange nichts gespeichert ist) */
+  getSettings(): Promise<BodySettings>;
+  saveSettings(patch: Partial<Pick<BodySettings, "metrics" | "custom" | "measureWeekdays">>): Promise<BodySettings>;
+  /** alle Messungen, älteste zuerst */
+  getMeasurements(): Promise<BodyMeasurement[]>;
+  saveMeasurement(input: MeasurementInput): Promise<BodyMeasurement>;
+  deleteMeasurement(id: string): Promise<void>;
 }

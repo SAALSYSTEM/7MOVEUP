@@ -1,17 +1,18 @@
 import { motion } from "framer-motion";
-import { Dumbbell, Home, ListFilter, MoreHorizontal, Utensils, type LucideIcon } from "lucide-react";
-import { NavLink } from "react-router-dom";
+import { ChartLine, Dumbbell, Home, MoreHorizontal, Utensils, type LucideIcon } from "lucide-react";
+import { Link, useLocation } from "react-router-dom";
 
 import { useApp } from "@/app/app-context";
 import type { TranslationKey } from "@/i18n";
 import { cn } from "@/lib/utils";
 
-const navItems: { labelKey: TranslationKey; icon: LucideIcon; to: string }[] = [
-  { labelKey: "nav.today", icon: Home, to: "/" },
-  { labelKey: "nav.training", icon: Dumbbell, to: "/training" },
-  { labelKey: "nav.exercises", icon: ListFilter, to: "/exercises" },
-  { labelKey: "nav.food", icon: Utensils, to: "/food" },
-  { labelKey: "nav.more", icon: MoreHorizontal, to: "/more" },
+/** Feste Hauptnavigation: genau fünf Punkte. `match` = Pfade, die zum Bereich gehören. */
+const navItems: { labelKey: TranslationKey; icon: LucideIcon; to: string; match: (path: string) => boolean }[] = [
+  { labelKey: "nav.today", icon: Home, to: "/", match: (p) => p === "/" || p.startsWith("/calendar") },
+  { labelKey: "nav.training", icon: Dumbbell, to: "/training", match: (p) => p.startsWith("/training") || p.startsWith("/exercises") },
+  { labelKey: "nav.progress", icon: ChartLine, to: "/progress", match: (p) => p.startsWith("/progress") },
+  { labelKey: "nav.food", icon: Utensils, to: "/food", match: (p) => p.startsWith("/food") },
+  { labelKey: "nav.more", icon: MoreHorizontal, to: "/more", match: (p) => p.startsWith("/more") },
 ];
 
 /**
@@ -20,6 +21,7 @@ const navItems: { labelKey: TranslationKey; icon: LucideIcon; to: string }[] = [
  */
 export function BottomNavBar({ className }: { className?: string }) {
   const { t } = useApp();
+  const { pathname } = useLocation();
 
   return (
     <>
@@ -42,46 +44,45 @@ export function BottomNavBar({ className }: { className?: string }) {
         {navItems.map((item) => {
           const Icon = item.icon;
           const label = t(item.labelKey);
+          const isActive = item.match(pathname);
 
           return (
-            <NavLink
+            <Link
               key={item.to}
               to={item.to}
-              end={item.to === "/"}
               aria-label={label}
+              aria-current={isActive ? "page" : undefined}
               className="flex min-w-11 justify-center rounded-full"
             >
-              {({ isActive }) => (
-                <motion.div
-                  layout
-                  whileTap={{ scale: 0.94 }}
-                  transition={{ type: "spring", stiffness: 380, damping: 32 }}
-                  className={cn(
-                    "flex h-11 items-center justify-center rounded-full px-3 transition-colors",
-                    isActive ? "bg-accent/15 text-accent" : "text-muted hover:bg-white/5 hover:text-fg",
-                  )}
+              <motion.div
+                layout
+                whileTap={{ scale: 0.94 }}
+                transition={{ type: "spring", stiffness: 380, damping: 32 }}
+                className={cn(
+                  "flex h-11 items-center justify-center rounded-full px-3 transition-colors",
+                  isActive ? "bg-accent/15 text-accent" : "text-muted hover:bg-white/5 hover:text-fg",
+                )}
+              >
+                <Icon size={21} strokeWidth={2.15} aria-hidden />
+                <motion.span
+                  initial={false}
+                  animate={{
+                    width: isActive ? "auto" : 0,
+                    opacity: isActive ? 1 : 0,
+                    marginLeft: isActive ? 8 : 0,
+                  }}
+                  transition={{
+                    width: { type: "spring", stiffness: 350, damping: 32 },
+                    opacity: { duration: 0.16 },
+                    marginLeft: { duration: 0.16 },
+                  }}
+                  className="overflow-hidden whitespace-nowrap text-xs font-bold"
+                  aria-hidden
                 >
-                  <Icon size={21} strokeWidth={2.15} aria-hidden />
-                  <motion.span
-                    initial={false}
-                    animate={{
-                      width: isActive ? "auto" : 0,
-                      opacity: isActive ? 1 : 0,
-                      marginLeft: isActive ? 8 : 0,
-                    }}
-                    transition={{
-                      width: { type: "spring", stiffness: 350, damping: 32 },
-                      opacity: { duration: 0.16 },
-                      marginLeft: { duration: 0.16 },
-                    }}
-                    className="overflow-hidden whitespace-nowrap text-xs font-bold"
-                    aria-hidden
-                  >
-                    {label}
-                  </motion.span>
-                </motion.div>
-              )}
-            </NavLink>
+                  {label}
+                </motion.span>
+              </motion.div>
+            </Link>
           );
         })}
       </motion.nav>

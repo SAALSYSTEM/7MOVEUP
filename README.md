@@ -1,7 +1,9 @@
 # 7MOVEUP
 
-Persönliche, mobile-first Fitness-PWA: Tagesmotivation → Training starten → Gewichte/Wiederholungen/Zeiten schnell protokollieren → Fortschritt sehen.
+Persönliche, mobile-first Fitness-PWA: Tagesmotivation → Training starten → Gewichte/Wiederholungen/Zeiten schnell protokollieren → Körperwerte erfassen → Fortschritt sehen.
 Kein Account, kein Backend – alle Daten liegen lokal im Browser (IndexedDB) des jeweiligen Geräts.
+
+Aktueller Stand, Entscheidungen und nächste Schritte: [`PROJECT_STATE.md`](PROJECT_STATE.md) · Änderungen: [`CHANGELOG.md`](CHANGELOG.md)
 
 ## Stack
 
@@ -42,14 +44,15 @@ src/
   components/
     ui/           shadcn-artige Basis-Komponenten inkl. bottom-nav-bar
     layout/       Header, Seitencontainer
-    home/         Motivationsanimation
-    training/     Kalender, Session-Karte, Timer, Pausen-Timer
+    home/         Motivationsanimation, Backup-Zeile
+    training/     Kalender, Session-Karte, Timer, Pausen-Timer, Tabs Plan|Übungen
+    body/         Körperwerte: Erfassung, Eingabefeld, Liniendiagramm (SVG)
     exercises/    Filter, Liste, Video-Embed
   data/           Repository-Verträge, Backup-Schema, Seed, local/ (Dexie)
-  domain/         Typen + reine Logik (Tagesspruch, Progression, Kalender)
-  hooks/          useData, useCountdown, useToday
+  domain/         Typen + reine Logik (Tagesspruch, Progression, Kalender, Körperwerte, Statistik, Backup-Hinweis)
+  hooks/          useData, useCountdown, useToday, useBodyData, useBackup
   i18n/           de.ts / en.ts
-  pages/          Heute, Training, Plan-Editor, Session, Übungen, Essen, Mehr
+  pages/          Heute, Kalender, Training, Plan-Editor, Session, Übungen, Fortschritt, Messwerte, Essen, Mehr
   services/       Session starten/abschließen, Töne/Vibration (iPhone-Besonderheiten: docs/PWA_NOTES.md)
 public/icons/     App-Icon, Favicon, Header-Icon (aus brand/)
 brand/            verbindliche Logo-Vorlage (1:1, nicht verändern)
@@ -65,18 +68,20 @@ Details zu Schichten, Datenmodell und Entscheidungen: [`docs/ARCHITECTURE.md`](d
 ```json
 {
   "app": "7MOVEUP",
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "exportedAt": "2026-10-04T…",
   "profile": {},
   "customExercises": [],
   "exerciseNotes": [],
   "plans": [],
   "sessions": [],
-  "settings": {}
+  "settings": {},
+  "bodySettings": {},
+  "measurements": []
 }
 ```
 
-Import wird mit zod validiert, verlangt eine Bestätigung und ersetzt dann die lokalen Daten. Neuere Schema-Versionen werden abgelehnt.
+Import wird mit zod validiert, verlangt eine Bestätigung und ersetzt dann die lokalen Daten (inkl. Körperwerte). Dateien mit `schemaVersion: 1` werden weiterhin importiert; neuere Schema-Versionen werden abgelehnt.
 
 ## Deployment
 
@@ -86,10 +91,11 @@ Import wird mit zod validiert, verlangt eine Bestätigung und ersetzt dann die l
 - SPA-Routing: `not_found_handling: "single-page-application"` → Direktaufrufe wie `/training` liefern die App.
 - Node-Version für den Cloudflare-Build: `.node-version` (22).
 - Lokal mit der Cloudflare-Laufzeit testen: `npx wrangler dev`.
+- Feature-Branches: Cloudflare baut sie als Preview-Version (eigene `*.workers.dev`-Adresse), die Produktion bleibt unberührt. Die Preview hat einen eigenen lokalen Speicher – Daten per Backup-Datei mitnehmen.
 
 Die GitHub-Pages-Vorschau (`.github/workflows/deploy-pages.yml`) baut mit `BASE_PATH=/<repo>/` und ist nur eine Test-Spielwiese.
 
 ## Status
 
-- V1.1, Deployment über Cloudflare Workers.
+- Veröffentlicht: 1.2.0 (Cloudflare Workers, `main`). In Arbeit: Körperwerte & neue Navigation (siehe `CHANGELOG.md` → Unveröffentlicht).
 - Supabase ist bewusst nicht angebunden; die Repository-Schicht ist dafür vorbereitet.

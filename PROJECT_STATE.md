@@ -1,0 +1,111 @@
+# 7MOVEUP – Projektstand
+
+Stand: Branch `feature-koerperwerte`. Noch nicht freigegeben, noch nicht auf `main`, keine neue Versionsnummer.
+Die veröffentlichte Version ist 1.2.0 (`main`, Cloudflare-Produktion). Änderungen seither: [`CHANGELOG.md`](CHANGELOG.md) → „Unveröffentlicht“.
+
+## Grundsätze
+
+- **Local-first:** alle Daten in IndexedDB auf dem Gerät. Kein Account, kein Supabase, keine Server-Datenbank, kein Cloud-Sync.
+- **Datensicherung = Backup-Datei** (Mehr → Daten sichern / importieren). Gerätewechsel und Preview-Tests laufen über Export → Import.
+- **Bestehende Daten gehen nie verloren:** Schema-Änderungen nur additiv (neue Tabellen, optionale Felder). Alte Backups bleiben importierbar.
+- **Kein Overengineering:** eine Lösung pro Aufgabe, keine Archive, keine Statusmodelle, keine großen Bibliotheken.
+- Freigabe für `main`, Produktion und Versionsnummer erfolgt erst nach dem Test auf dem Handy.
+
+## Navigation
+
+Feste Bottom-Navigation mit fünf Punkten:
+
+| Punkt | Route(n) | Inhalt |
+| --- | --- | --- |
+| Heute | `/`, `/calendar` | Motivation, Training starten, heute fällig, als Nächstes, Woche kompakt, „Kalender öffnen“, Backup-Zeile |
+| Training | `/training`, `/training/plans/:id`, `/training/session/:id`, `/exercises/…` | Tabs **Plan \| Übungen** – Plan, Vorlagen, Übungsbibliothek |
+| Fortschritt | `/progress`, `/progress/metrics` | Körperwerte: 3 Kacheln, Analyse, Messwerte verwalten |
+| Essen | `/food` | Coming Soon |
+| Mehr | `/more` | Profil, Sprache, Einheiten, Ton/Haptik, Daten (Backup) |
+
+Der Kalender hat keinen eigenen Navigationspunkt; er öffnet sich über „Kalender öffnen“ auf Heute und gehört in der Navigation zu Heute. Alte Links `/training?tab=calendar` leiten auf `/calendar` um.
+
+## Entscheidungen
+
+### Training
+
+- **Genau ein persönlicher Plan** (= alle Trainingstage des Profils, auch selbst angelegte). Dazu beliebig viele Vorlagen.
+- **Vorlage übernehmen ersetzt den Plan** nach Rückfrage (nennt die Anzahl der Trainingstage). Absolvierte Trainings bleiben unverändert – sie speichern Planname und Übungen selbst.
+- Kein Planarchiv, keine Gültigkeitsdaten, kein Statusmodell.
+- Progression nur als Hinweis („Steigerung möglich“, „+2 kg“), nie automatisch.
+
+### Heute
+
+- Zeigt nur, was jetzt bzw. als Nächstes ansteht: heute geplante Trainings und (am Messtag) „Körperwerte erfassen“, mit „x von y erledigt“.
+- „Als Nächstes“ = erster Tag nach heute (bis 14 Tage) mit Training oder Messtag.
+- „Letztes Training“ entfällt – Verlauf steht im Kalender.
+
+### Körperwerte
+
+- **Standardwerte:** Gewicht, Körperfett, Wasser, Muskel (kg), Knochen, kcal (Waage), BMI, Bauchumfang – aktiv. Muskel (%), Hüfte, Brust, Oberarm, Oberschenkel – vorhanden, aber zunächst aus.
+- **Eigene Messwerte:** Name + freie Einheit + Schrittweite (± 0,1 / 0,5 / 1). Einheit ist nach dem ersten Wert gesperrt; löschen nur, solange es keine Werte gibt. Eigene Werte werden nie umgerechnet.
+- Messwerte lassen sich aktivieren/deaktivieren und sortieren; die Reihenfolge gilt für Erfassung und Fortschritt. Deaktivierte Werte mit vorhandenen Daten bleiben auswertbar.
+- **BMI** ist ein normaler Messwert (z. B. von der Waage), wird nie berechnet.
+- **Muskel kg und Muskel %** sind getrennte Messwerte (nicht umrechenbar).
+- **Einheiten:** gespeichert immer in kg / cm / % / kcal, ungerundet. Metrisch/Imperial ist nur Anzeige (kg ↔ lb, cm ↔ in). Schrittweiten: Gewicht 0,1 kg (0,2 lb), Körperfett/Wasser 0,1 %, Umfänge 0,5 cm (0,25 in), kcal 10.
+- **Schnellerfassung:** letzter Wert erscheint grau als Vorschlag und wird nie automatisch gespeichert. Gespeichert wird nur, was bestätigt (✓), mit −/+ geändert oder eingetippt wurde. Erster Wert eines Messwerts: leeres Feld. Unplausible Werte → Hinweis, negative/ungültige → nicht speicherbar.
+- **Eine Messung pro Tag:** erneutes Erfassen am selben Tag ergänzt/ändert die vorhandene Messung. Lokales Datum (`yyyy-MM-dd`) + optionale Uhrzeit.
+- **Messtage:** frei wählbare Wochentage. Am Messtag zeigt Heute „Körperwerte erfassen“; Messungen und Messtage erscheinen im Kalender.
+
+### Fortschritt
+
+- Drei Kacheln (Standard: Gewicht, Körperfett, Muskel) mit Wert, Einheit, Datum der letzten Messung; Antippen wählt den Messwert für die Analyse.
+- Ein Analysebereich: Messwert-Auswahl, Zeitraum **30 Tage · 365 Tage · Gesamt** (rollierend: heute + 29 bzw. 364 vorherige lokale Tage).
+- Eigenes SVG-Liniendiagramm (keine Chart-Bibliothek), Antippen zeigt Wert und Datum.
+- **Entwicklung** = neuester minus erster Wert im Zeitraum; bei weniger als 2 Werten „Zu wenige Werte“. Dazu Ø · Min · Max.
+- Zugang zur Verwaltung über „Messwerte“.
+
+### Backup-Hinweis
+
+- Mehr → Daten zeigt immer „Letztes Backup: vor X Tagen“ bzw. „Noch kein Backup erstellt“.
+- Heute zeigt unten eine kleine Zeile; hervorgehoben („Backup empfohlen · …“ + „Backup erstellen“), wenn seit dem letzten Backup ≥ 7 Tage vergangen sind **und** seitdem neue Daten entstanden sind (ohne Backup: erste Daten ≥ 7 Tage alt).
+- Kein Popup, kein Modal, keine tägliche Erinnerung. Neues Gerät ohne Daten: kein Hinweis.
+- Das Backup-Datum wird nach erfolgreichem Export gespeichert (nicht bei Abbruch des Teilen-Dialogs). Nach einem Import gilt der Exportzeitpunkt der Datei als letztes Backup.
+
+## Datenmodell
+
+Typen: `src/domain/types.ts`. Jede Zeile gehört zu genau einem Profil (`profileId`).
+
+| Typ | Inhalt |
+| --- | --- |
+| `Profile` | Anzeigename, Sprache |
+| `Settings` | Ton, Haptik, `unitSystem?` (`metric` \| `imperial`, Standard metric) |
+| `Exercise` | eigene Übungen (Built-ins kommen aus `src/data/seed`) |
+| `ExerciseNote` | persönliche Notiz + Video-Links je Übung |
+| `WorkoutPlan` | ein Trainingstag des Plans: Übungen, Wochentage, `templateId?` |
+| `WorkoutSession` | ein Training mit Sätzen/Zeiten; offenes Training inkl. laufender Timer |
+| `BodySettings` | Reihenfolge + aktiv je Messwert (`metrics`), eigene Messwerte (`custom`), `measureWeekdays` |
+| `BodyMeasurement` | `date` (lokal), `time?`, `values: { [messwertSchlüssel]: Zahl in Basiseinheit }` |
+
+Schlüssel der Standardwerte sind fest (`weight`, `body_fat`, `body_water`, `muscle_kg`, `muscle_pct`, `bone`, `scale_kcal`, `bmi`, `waist`, `hip`, `chest`, `upper_arm`, `thigh`); eigene beginnen mit `custom-`.
+
+## Lokale Speicherung
+
+IndexedDB-Datenbank `7moveup` über Dexie (`src/data/local/db.ts`):
+
+| Version | Tabellen |
+| --- | --- |
+| 1 | `meta`, `profiles`, `settings`, `customExercises`, `exerciseNotes`, `plans`, `sessions` |
+| 2 | + `bodySettings`, `measurements` (rein additiv – keine Umwandlung bestehender Daten) |
+
+`meta` enthält das aktuelle Profil und `lastBackupAt`.
+
+**Backup-Datei** (`src/data/backup.ts`, zod): `schemaVersion: 2` mit zusätzlich `bodySettings?`, `measurements` und `settings.unitSystem?`. Dateien mit `schemaVersion: 1` werden weiterhin importiert (fehlende Felder = leer). Import ersetzt alle Daten des Profils – auch Körperwerte. Version 1.2.0 lehnt Dateien mit Version 2 ab („neuere Version“), statt Daten still zu verlieren.
+
+## Tests
+
+- `npm test` – Vitest: Domänenlogik (Kalender, Progression, Körperwerte, Zeiträume, Statistik, Backup-Hinweis), Backup-Round-Trip v1/v2, Dexie-Upgrade v1 → v2 (fake-indexeddb).
+- `npm run build` – Typecheck + Build; `npm run lint` – oxlint.
+- End-to-End-Prüfskripte (Playwright) liegen lokal unter `marketing-video/work/` (nicht eingecheckt).
+
+## Nächste Schritte
+
+1. Preview auf dem Handy testen (Backup aus der Produktion exportieren → in der Preview importieren).
+2. Nach Freigabe: Merge nach `main`, Versionsnummer vergeben, Produktion.
+3. Marketing-Video neu rendern, wenn der Launch vorbereitet wird (Navigation hat sich geändert).
+4. Danach erst weitere Bereiche planen. Bewusst **noch nicht**: Blutdruck, Puls, Ernährung, Barcode, Lebensmitteldatenbank, Fotoanalyse, Blutwerte, Supplemente, Supabase/Accounts/Cloud-Sync, Planarchive, Dashboards.

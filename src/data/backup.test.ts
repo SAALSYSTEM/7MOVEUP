@@ -1,5 +1,6 @@
 import "fake-indexeddb/auto";
 
+import Dexie from "dexie";
 import { describe, expect, it } from "vitest";
 
 import { BACKUP_SCHEMA_VERSION, parseBackup } from "./backup";
@@ -107,5 +108,108 @@ describe("Export/Import", () => {
     expect(last?.sets.map((s) => s.weightPerDumbbellKg)).toEqual([18, 18]);
     expect(last?.sets.map((s) => s.reps)).toEqual([10, 9]);
     expect((await repos.workouts.getActiveSession())?.id).toBe("s3");
+  });
+});
+
+describe("Körperwerte: Datenbank-Version 2 und Backup-Format 2", () => {
+  it("bestehende Datenbank (Version 1) wird ohne Datenverlust auf Version 2 gehoben", async () => {
+    const name = "upgrade-v1";
+    const v1 = new Dexie(name);
+    v1.version(1).stores({
+      meta: "key",
+      profiles: "id",
+      settings: "profileId",
+      customExercises: "id, profileId",
+      exerciseNotes: "[profileId+exerciseId], profileId",
+      plans: "id, profileId",
+      sessions: "id, profileId, [profileId+startedAt]",
+    });
+    await v1.open();
+    await v1.table("meta").put({ key: "currentProfileId", value: "p-old" });
+    await v1.table("profiles").put({ id: "p-old", displayName: "Alt", language: "de", createdAt: "2026-09-01T00:00:00.000Z", updatedAt: "2026-09-01T00:00:00.000Z" });
+    await v1.table("settings").put({ profileId: "p-old", soundEnabled: false, hapticsEnabled: true, updatedAt: "2026-09-01T00:00:00.000Z" });
+    await v1.table("plans").put({ id: "plan-old", profileId: "p-old", name: "Tag 1 – Push", items: [], weekdays: [1], createdAt: "2026-09-01T00:00:00.000Z", updatedAt: "2026-09-01T00:00:00.000Z" });
+    await v1.table("sessions").put({ id: "s-old", profileId: "p-old", planName: "Tag 1 – Push", date: "2026-10-01", startedAt: "2026-10-01T06:00:00.000Z", completedAt: "2026-10-01T06:40:00.000Z", durationSec: 2400, exercises: [] });
+    v1.close();
+
+    const { repos } = freshDb(name);
+    expect((await repos.profiles.getCurrent()).displayName).toBe("Alt");
+    expect((await repos.settings.get()).soundEnabled).toBe(false);
+    expect((await repos.settings.get()).unitSystem).toBeUndefined(); // → metrisch
+    expect((await repos.plans.getAll()).map((p) => p.id)).toEqual(["plan-old"]);
+    expect((await repos.workouts.getCompletedSessions()).map((s) => s.id)).toEqual(["s-old"]);
+    expect(await repos.body.getMeasurements()).toEqual([]);
+    expect((await repos.body.getSettings()).metrics.length).toBeGreaterThan(0);
+  });
+
+  it("ein Backup aus Version 1.2.0 (Format 1) bleibt importierbar", async () => {
+    const v1File = {
+      app: "7MOVEUP",
+      schemaVersion: 1,
+      exportedAt: "2026-10-05T16:00:00.000Z",
+      profile: { id: "x", displayName: "Matthias", language: "de", createdAt: "2026-09-01T00:00:00.000Z", updatedAt: "2026-09-01T00:00:00.000Z" },
+      customExercises: [],
+      exerciseNotes: [],
+      plans: [{ id: "p1", name: "Tag 1", items: [], weekdays: [1, 4], createdAt: "2026-09-01T00:00:00.000Z", updatedAt: "2026-09-01T00:00:00.000Z" }],
+      sessions: [{ id: "s1", planName: "Tag 1", date: "2026-10-01", startedAt: "2026-10-01T06:00:00.000Z", completedAt: "2026-10-01T06:40:00.000Z", exercises: [] }],
+      settings: { soundEnabled: true, hapticsEnabled: false },
+    };
+    const parsed = parseBackup(JSON.stringify(v1File));
+    expect(parsed.ok).toBe(true);
+    if (!parsed.ok) return;
+    expect(parsed.backup.measurements).toEqual([]);
+    const { repos, backup } = freshDb("import-v1");
+    await repos.body.saveMeasurement({ date: "2026-10-02", values: { weight: 70 } });
+    await backup.importReplacingCurrentProfile(parsed.backup);
+    expect((await repos.plans.getAll()).map((p) => p.name)).toEqual(["Tag 1"]);
+    expect((await repos.settings.get()).hapticsEnabled).toBe(false);
+    expect(await repos.body.getMeasurements()).toEqual([]); // ersetzen = auch Körperwerte
+    expect((await backup.getBackupInfo()).lastBackupAt).toBe("2026-10-05T16:00:00.000Z");
+  });
+
+  it("Round-Trip Format 2: Messungen, eigene Messwerte, Messtage, Einheiten", async () => {
+    const source = freshDb("body-source");
+    await source.repos.settings.update({ unitSystem: "imperial" });
+    const settings = await source.repos.body.getSettings();
+    await source.repos.body.saveSettings({
+      measureWeekdays: [7],
+      custom: [{ key: "custom-neck", name: "Hals", unit: "cm", step: 0.5, createdAt: "2026-10-01T00:00:00.000Z" }],
+      metrics: [{ key: "waist", enabled: true }, ...settings.metrics.filter((x) => x.key !== "waist")],
+    });
+    const saved = await source.repos.body.saveMeasurement({ date: "2026-10-04", time: "07:05", values: { weight: 75.0243, "custom-neck": 38.5 } });
+    // Aktualisieren behält ID und Erstellzeit
+    const updated = await source.repos.body.saveMeasurement({ id: saved.id, date: "2026-10-04", time: "07:05", values: { ...saved.values, body_fat: 22.1 } });
+    expect(updated.id).toBe(saved.id);
+    expect(updated.createdAt).toBe(saved.createdAt);
+
+    const exported = await source.backup.exportCurrentProfile();
+    expect(exported.schemaVersion).toBe(BACKUP_SCHEMA_VERSION);
+    const parsed = parseBackup(JSON.stringify(exported));
+    expect(parsed.ok).toBe(true);
+    if (!parsed.ok) return;
+
+    const target = freshDb("body-target");
+    await target.backup.importReplacingCurrentProfile(parsed.backup);
+    const measurements = await target.repos.body.getMeasurements();
+    expect(measurements).toHaveLength(1);
+    expect(measurements[0].values).toEqual({ weight: 75.0243, "custom-neck": 38.5, body_fat: 22.1 });
+    expect(measurements[0].time).toBe("07:05");
+    const body = await target.repos.body.getSettings();
+    expect(body.measureWeekdays).toEqual([7]);
+    expect(body.metrics[0]).toEqual({ key: "waist", enabled: true });
+    expect(body.custom.map((c) => c.name)).toEqual(["Hals"]);
+    expect((await target.repos.settings.get()).unitSystem).toBe("imperial");
+  });
+
+  it("Backup-Infos: Zeitpunkt des letzten Backups und eigener Daten", async () => {
+    const { repos, backup } = freshDb("backup-info");
+    expect(await backup.getBackupInfo()).toEqual({ lastBackupAt: undefined, firstDataAt: undefined, lastDataAt: undefined });
+    await repos.settings.update({ soundEnabled: false }); // zählt nicht als eigene Daten
+    expect((await backup.getBackupInfo()).firstDataAt).toBeUndefined();
+    await repos.body.saveMeasurement({ date: "2026-10-04", values: { weight: 75 } });
+    const info = await backup.getBackupInfo();
+    expect(info.firstDataAt).toBeDefined();
+    await backup.markBackupCreated("2026-10-05T10:00:00.000Z");
+    expect((await backup.getBackupInfo()).lastBackupAt).toBe("2026-10-05T10:00:00.000Z");
   });
 });

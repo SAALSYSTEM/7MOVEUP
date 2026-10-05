@@ -1,0 +1,54 @@
+# Changelog
+
+Alle nennenswerten Änderungen an 7MOVEUP. Neueste oben.
+
+## Unveröffentlicht
+
+Branch `feature-koerperwerte` – Preview-Test, noch keine Versionsnummer.
+
+### Neu
+
+- **Körperwerte erfassen:** Gewicht, Körperfett, Wasser, Muskel (kg), Knochen, kcal (Waage), BMI, Bauchumfang als Standard; Muskel (%), Hüfte, Brust, Oberarm, Oberschenkel zuschaltbar; eigene Messwerte mit Name, Einheit und Schrittweite.
+- **Schnellerfassung:** letzter Wert als grauer Vorschlag (✓ übernimmt), −/+ und direkte Eingabe, Datum und optionale Uhrzeit. Gespeichert wird nur Bestätigtes; erneutes Erfassen am selben Tag ergänzt die vorhandene Messung.
+- **Messwerte verwalten** (Fortschritt → Messwerte): aktivieren/deaktivieren, sortieren, eigene Werte anlegen/bearbeiten, Messtage, Einheiten.
+- **Messtage:** an gewählten Wochentagen zeigt Heute „Körperwerte erfassen“.
+- **Fortschritt:** drei Kacheln (Gewicht, Körperfett, Muskel), Analyse mit 30 Tage · 365 Tage · Gesamt, eigenes Liniendiagramm, Entwicklung (bzw. „Zu wenige Werte“), Ø · Min · Max.
+- **Metrisch/Imperial** (Mehr bzw. Messwerte): Anzeige in kg/cm oder lb/in; gespeichert wird immer metrisch und ungerundet.
+- **Kalender:** Messungen als Punkt im Raster, Tagesdetails mit Körperwerten bzw. Messtag; Antippen öffnet die Erfassung.
+- **Backup-Datum:** Mehr → Daten zeigt „Letztes Backup: vor X Tagen“ / „Noch kein Backup erstellt“; Heute zeigt unten eine kleine Zeile, hervorgehoben mit „Backup erstellen“ ab 7 Tagen und neuen Daten.
+
+### Geändert
+
+- **Navigation:** Heute · Training · Fortschritt · Essen · Mehr. Übungen sind ein Tab in Training; der Kalender öffnet sich über „Kalender öffnen“ auf Heute (eigene Seite `/calendar`).
+- **Ein Plan:** Eine Vorlage zu übernehmen ersetzt nach Rückfrage den aktuellen Plan (alle Trainingstage). Absolvierte Trainings bleiben unverändert.
+- **Heute vereinfacht:** heute fällig (Trainings + Messtag, „x von y erledigt“), „Als Nächstes“, Woche kompakt. „Letztes Training“ entfällt.
+- **Backup-Format Version 2:** enthält Körperwerte, Messwert-Einstellungen und Einheit. Backups der Version 1 lassen sich weiterhin importieren.
+
+### Daten
+
+- IndexedDB Version 2: nur neue Tabellen `bodySettings` und `measurements`. Bestehende Trainingsdaten werden nicht verändert.
+
+## 1.2.0 – 2026-10-05
+
+- Zeit-, Cardio- und Pausen-Timer überstehen Bildschirmsperre und App-Neustart (Endzeit wird im offenen Training gespeichert; abgelaufene Sätze werden mit voller Zeit abgehakt).
+- Start auf Heute springt in ein offenes Training, das vor höchstens 6 Stunden begann.
+- Cardio-Karte mit Timer-Button.
+- Heute: „Erledigt“ erst, wenn alle geplanten Trainings fertig sind, sonst „x von y erledigt“.
+
+## 1.1.2 – 2026-10-05
+
+- i-Button bei jeder Übung im Training: Notiz und Video-Links ansehen/bearbeiten, ohne das Training zu verlassen.
+- iOS: Bottom-Navigation verrutscht nach Tastatur/Seitenwechsel nicht mehr.
+
+## 1.1.1 – 2026-10-05
+
+- iOS: Pausen-Countdown piept zuverlässig nach Sperre/App-Wechsel; Bildschirm bleibt während des Trainings an; Haptik beim Abhaken.
+
+## 1.1.0 – 2026-10-04
+
+- Tagesspruch Wort für Wort, Profil-Chip, Abdeckung über der Navigation.
+- Deployment über Cloudflare Workers.
+
+## 1.0.0 – 2026-10-04
+
+- Erste Version: lokale Fitness-PWA mit Plänen, Vorlagen, Training, Übungsbibliothek, Kalender, Backup (DE/EN).

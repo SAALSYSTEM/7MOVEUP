@@ -8,6 +8,7 @@ import { ExerciseFilters } from "@/components/exercises/exercise-filters";
 import { ExerciseRow } from "@/components/exercises/exercise-row";
 import { AppHeader, PageTitle } from "@/components/layout/app-header";
 import { EmptyState, Page } from "@/components/layout/page";
+import { TrainingTabs } from "@/components/training/training-tabs";
 import { Button } from "@/components/ui/button";
 import { exerciseRepository } from "@/data";
 import { BODY_REGIONS, EQUIPMENT, TRACKING_TYPES, type BodyRegion, type Equipment, type TrackingType } from "@/domain/types";
@@ -50,7 +51,8 @@ export function ExercisesPage() {
 
   return (
     <Page>
-      <AppHeader left={<PageTitle>{t("exercises.title")}</PageTitle>} />
+      <AppHeader left={<PageTitle>{t("training.title")}</PageTitle>} />
+      <TrainingTabs value="exercises" />
 
       <ExerciseFilters filter={filter} onChange={setFilter} />
 

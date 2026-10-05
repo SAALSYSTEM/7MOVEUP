@@ -16,43 +16,13 @@ import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/components/ui/toast";
 import { backupService, profileRepository, settingsRepository } from "@/data";
 import { parseBackup, type BackupFile, type BackupParseError } from "@/data/backup";
-import type { Language } from "@/domain/types";
+import type { Language, UnitSystem } from "@/domain/types";
 import { asset } from "@/lib/asset";
 import { dateLocale } from "@/lib/dates";
 import { isIOS } from "@/lib/device";
+import { useBackupExport, useBackupStatus } from "@/hooks/use-backup";
+import { backupAgeText } from "@/lib/backup-text";
 import { countdownBeep, finishSignal, getHapticsSupport, unlockAudio } from "@/services/feedback";
-
-function slug(text: string) {
-  return text
-    .toLowerCase()
-    .normalize("NFD")
-    .replace(/[̀-ͯ]/g, "")
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-|-$/g, "")
-    .slice(0, 24);
-}
-
-async function deliverFile(file: File) {
-  const nav = navigator as Navigator & { canShare?: (data: ShareData) => boolean };
-  const coarse = window.matchMedia?.("(pointer: coarse)").matches;
-  if (coarse && nav.share && nav.canShare?.({ files: [file] })) {
-    try {
-      await nav.share({ files: [file], title: file.name });
-      return;
-    } catch (error) {
-      if ((error as DOMException)?.name === "AbortError") return;
-      // sonst: Download als Fallback
-    }
-  }
-  const url = URL.createObjectURL(file);
-  const link = document.createElement("a");
-  link.href = url;
-  link.download = file.name;
-  document.body.appendChild(link);
-  link.click();
-  link.remove();
-  window.setTimeout(() => URL.revokeObjectURL(url), 4000);
-}
 
 export function MorePage() {
   const { t, profile, settings, language } = useApp();
@@ -82,19 +52,9 @@ export function MorePage() {
     toast(t("common.saved"));
   };
 
-  const exportData = async () => {
-    setBusy(true);
-    try {
-      const backup = await backupService.exportCurrentProfile();
-      const namePart = backup.profile.displayName ? `-${slug(backup.profile.displayName)}` : "";
-      const fileName = `7moveup${namePart}-backup-${format(new Date(), "yyyy-MM-dd")}.json`;
-      const file = new File([JSON.stringify(backup, null, 2)], fileName, { type: "application/json" });
-      await deliverFile(file);
-      toast(t("more.exported"));
-    } finally {
-      setBusy(false);
-    }
-  };
+  const { exportBackup, busy: exporting } = useBackupExport();
+  const backup = useBackupStatus();
+  const exportData = () => exportBackup();
 
   const onFileChosen = async (file: File | undefined) => {
     if (!file) return;
@@ -191,6 +151,20 @@ export function MorePage() {
                 ]}
               />
             </div>
+            <div className="p-4">
+              <p className="mb-3 text-sm font-bold">{t("metrics.unitsTitle")}</p>
+              <Segmented<UnitSystem>
+                role="radio"
+                ariaLabel={t("metrics.unitsTitle")}
+                layoutId="units-switch"
+                value={settings.unitSystem ?? "metric"}
+                onChange={(unitSystem) => void settingsRepository.update({ unitSystem })}
+                options={[
+                  { value: "metric", label: t("units.metric") },
+                  { value: "imperial", label: t("units.imperial") },
+                ]}
+              />
+            </div>
             <SettingRow
               id="sound"
               title={t("more.sound")}
@@ -240,7 +214,19 @@ export function MorePage() {
           <p className="-mt-1 mb-3 text-sm leading-relaxed text-muted">{t("more.dataHint")}</p>
           <div className="space-y-2">
             <Card className="p-4">
-              <Button className="w-full" onClick={() => void exportData()} disabled={busy}>
+              <p className="mb-3 flex items-center gap-2 text-sm font-semibold" aria-live="polite">
+                <HardDrive size={15} className="shrink-0 text-subtle" aria-hidden />
+                <span>
+                  {backup.reminder ? backupAgeText(t, backup.reminder) : "\u00a0"}
+                  {backup.info?.lastBackupAt && (
+                    <span className="font-normal text-subtle">
+                      {" "}
+                      ({formatExportDate(backup.info.lastBackupAt, language)})
+                    </span>
+                  )}
+                </span>
+              </p>
+              <Button className="w-full" onClick={() => void exportData()} disabled={busy || exporting}>
                 <Download size={18} aria-hidden /> {t("more.export")}
               </Button>
               <FieldHint>{t("more.exportHint")}</FieldHint>
@@ -311,6 +297,7 @@ export function MorePage() {
                 sessions: pendingImport.sessions.length,
                 exercises: pendingImport.customExercises.length,
                 notes: pendingImport.exerciseNotes.length,
+                measurements: pendingImport.measurements.length,
               })}
             </p>
             <p className="mt-1 text-xs text-subtle">

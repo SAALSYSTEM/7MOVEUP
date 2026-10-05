@@ -69,6 +69,24 @@ export function todayProgress(
   return { state: done > 0 ? "partial" : "none", done, total };
 }
 
+/**
+ * Nächstes Ereignis nach heute (ab morgen, bis 14 Tage): Trainingstage und/oder Messtag am selben Tag.
+ * Heute selbst zeigt die Heute-Liste – hier wird nichts von heute wiederholt.
+ */
+export function nextEvent(
+  plans: WorkoutPlan[],
+  measureWeekdays: Weekday[],
+  today = new Date(),
+): { date: Date; trainings: WorkoutPlan[]; measure: boolean } | undefined {
+  for (let i = 1; i <= 14; i += 1) {
+    const date = addDays(today, i);
+    const trainings = plansForDate(plans, date);
+    const measure = measureWeekdays.includes(isoWeekday(date));
+    if (trainings.length > 0 || measure) return { date, trainings, measure };
+  }
+  return undefined;
+}
+
 /** Geplante Pläne für heute, die heute noch nicht abgeschlossen wurden */
 export function openPlansToday(plans: WorkoutPlan[], completed: WorkoutSession[], today = new Date()): WorkoutPlan[] {
   const doneToday = new Set(sessionsForDate(completed, today).map((s) => s.planId));

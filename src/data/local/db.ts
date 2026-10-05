@@ -1,6 +1,15 @@
 import Dexie, { type EntityTable } from "dexie";
 
-import type { Exercise, ExerciseNote, Profile, Settings, WorkoutPlan, WorkoutSession } from "@/domain/types";
+import type {
+  BodyMeasurement,
+  BodySettings,
+  Exercise,
+  ExerciseNote,
+  Profile,
+  Settings,
+  WorkoutPlan,
+  WorkoutSession,
+} from "@/domain/types";
 
 type MetaRow = { key: string; value: string };
 
@@ -12,6 +21,8 @@ export class MoveUpDatabase extends Dexie {
   exerciseNotes!: Dexie.Table<ExerciseNote, [string, string]>;
   plans!: EntityTable<WorkoutPlan, "id">;
   sessions!: EntityTable<WorkoutSession, "id">;
+  bodySettings!: EntityTable<BodySettings, "profileId">;
+  measurements!: EntityTable<BodyMeasurement, "id">;
 
   constructor(name = "7moveup") {
     super(name);
@@ -23,6 +34,11 @@ export class MoveUpDatabase extends Dexie {
       exerciseNotes: "[profileId+exerciseId], profileId",
       plans: "id, profileId",
       sessions: "id, profileId, [profileId+startedAt]",
+    });
+    // Version 2 (Körperwerte): nur neue Tabellen – bestehende Daten bleiben unverändert.
+    this.version(2).stores({
+      bodySettings: "profileId",
+      measurements: "id, profileId, [profileId+date]",
     });
   }
 }

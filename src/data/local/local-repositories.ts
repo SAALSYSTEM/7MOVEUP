@@ -1,4 +1,8 @@
+import { defaultBodySettings, normalizeBodySettings } from "@/domain/body";
+import { sortMeasurements } from "@/domain/body-stats";
 import type {
+  BodyMeasurement,
+  BodySettings,
   Exercise,
   ExerciseNote,
   Language,
@@ -10,6 +14,7 @@ import type {
 } from "@/domain/types";
 import { notifyDataChanged } from "@/data/events";
 import type {
+  BodyRepository,
   ExerciseRepository,
   PlanRepository,
   ProfileRepository,
@@ -188,6 +193,15 @@ export function createLocalRepositories(db: MoveUpDatabase) {
       await db.plans.bulkPut(list.map((p) => ({ ...p, profileId, updatedAt: timestamp })));
       notifyDataChanged();
     },
+    async replaceAll(list) {
+      const profileId = await currentProfileId();
+      const timestamp = now();
+      await db.transaction("rw", db.plans, async () => {
+        await db.plans.where("profileId").equals(profileId).delete();
+        await db.plans.bulkPut(list.map((p) => ({ ...p, profileId, updatedAt: timestamp })));
+      });
+      notifyDataChanged();
+    },
     async delete(id) {
       await db.plans.delete(id);
       notifyDataChanged();
@@ -250,7 +264,53 @@ export function createLocalRepositories(db: MoveUpDatabase) {
     },
   };
 
-  return { currentProfileId, profiles, settings, exercises, plans, workouts };
+  const body: BodyRepository = {
+    async getSettings() {
+      const profileId = await currentProfileId();
+      const stored = await db.bodySettings.get(profileId);
+      return normalizeBodySettings(stored ?? defaultBodySettings(profileId));
+    },
+    async saveSettings(patch) {
+      const current = await body.getSettings();
+      const next: BodySettings = normalizeBodySettings({ ...current, ...patch, updatedAt: now() });
+      await db.bodySettings.put(next);
+      notifyDataChanged();
+      return next;
+    },
+    async getMeasurements() {
+      const profileId = await currentProfileId();
+      return sortMeasurements(await db.measurements.where("profileId").equals(profileId).toArray());
+    },
+    async saveMeasurement(input) {
+      const profileId = await currentProfileId();
+      const timestamp = now();
+      const existing = input.id ? await db.measurements.get(input.id) : undefined;
+      const values = Object.fromEntries(
+        Object.entries(input.values).filter(([, v]) => typeof v === "number" && Number.isFinite(v)),
+      );
+      const next: BodyMeasurement = {
+        id: existing?.profileId === profileId ? existing.id : createId(),
+        profileId,
+        date: input.date,
+        time: input.time || undefined,
+        values,
+        createdAt: existing?.profileId === profileId ? existing.createdAt : timestamp,
+        updatedAt: timestamp,
+      };
+      await db.measurements.put(next);
+      notifyDataChanged();
+      return next;
+    },
+    async deleteMeasurement(id) {
+      const profileId = await currentProfileId();
+      const existing = await db.measurements.get(id);
+      if (existing?.profileId !== profileId) return;
+      await db.measurements.delete(id);
+      notifyDataChanged();
+    },
+  };
+
+  return { currentProfileId, profiles, settings, exercises, plans, workouts, body };
 }
 
 export type LocalRepositories = ReturnType<typeof createLocalRepositories>;
