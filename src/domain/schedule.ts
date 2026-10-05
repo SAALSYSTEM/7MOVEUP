@@ -51,6 +51,24 @@ export function dayStatus(
   return { date, planned, completed: done, kind };
 }
 
+/**
+ * Fortschritt der heute geplanten Trainings für den Hinweis auf der Startseite:
+ * "done" = alle geplanten erledigt (oder an einem freien Tag trainiert), "partial" = x von y.
+ */
+export function todayProgress(
+  plans: WorkoutPlan[],
+  completed: WorkoutSession[],
+  today = new Date(),
+): { state: "none" | "partial" | "done"; done: number; total: number } {
+  const planned = plansForDate(plans, today);
+  const doneIds = new Set(sessionsForDate(completed, today).map((s) => s.planId));
+  const total = planned.length;
+  const done = planned.filter((plan) => doneIds.has(plan.id)).length;
+  if (total === 0) return { state: doneIds.size > 0 ? "done" : "none", done: 0, total: 0 };
+  if (done === total) return { state: "done", done, total };
+  return { state: done > 0 ? "partial" : "none", done, total };
+}
+
 /** Geplante Pläne für heute, die heute noch nicht abgeschlossen wurden */
 export function openPlansToday(plans: WorkoutPlan[], completed: WorkoutSession[], today = new Date()): WorkoutPlan[] {
   const doneToday = new Set(sessionsForDate(completed, today).map((s) => s.planId));

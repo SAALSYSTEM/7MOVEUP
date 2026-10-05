@@ -12,6 +12,10 @@
 - **Ton:** Der AudioContext startet nur in einer echten Interaktion (`touchend`/`click`/`keydown`; `pointerdown` zählt bei Touch nicht). Nach Bildschirmsperre, App-Wechsel oder Anruf steht er auf `interrupted`. Deshalb wird er bei *jeder* Interaktion und bei Rückkehr in die App fortgesetzt, und Töne warten bei Bedarf auf `resume()` (`src/services/feedback.ts`).
 - **Lautlos-Modus:** Web-Audio ist auf dem iPhone im Lautlos-Modus stumm. Bewusst so gelassen: `navigator.audioSession.type = "playback"` würde zwar durchklingen, aber Musik aus anderen Apps unterbrechen.
 - **Hintergrund:** Bei gesperrtem Bildschirm oder in einer anderen App pausiert iOS die Web-App komplett – kein Ton, keine Haptik. Der Countdown rechnet mit einem Endzeitpunkt und zeigt bei Rückkehr die richtige Zeit. Echte Hintergrund-Alarme bräuchten Push-Benachrichtigungen mit Server (nicht in V1).
+- **Neustart durch iOS:** Bei längerer Sperre beendet iOS die App oft und startet sie danach frisch auf der Startseite. Deshalb:
+  - laufende Timer (Zeit-/Cardio-Timer, Pausen-Timer) stehen mit Endzeit im offenen Training (`WorkoutSession.timers`) und werden beim Öffnen fortgesetzt; ist die Zeit inzwischen abgelaufen, wird der Satz mit voller Zeit abgehakt (`src/domain/active-session.ts`),
+  - beim App-Start auf der Startseite geht es direkt in ein offenes Training, das vor höchstens 6 Stunden begann (`ResumeActiveSession`).
+  - Eingaben in Zahlenfeldern werden bewusst erst beim Bestätigen gespeichert.
 - **Bildschirm wach halten:** Während eines offenen Trainings fordert die Session-Seite einen Screen Wake Lock an (Home-Bildschirm-Apps ab iOS 18.4) und erneuert ihn nach Rückkehr bzw. beim nächsten Tippen.
 - **Haptik:** `navigator.vibrate` gibt es auf iOS nicht. Ersatz ist die System-Haptik von `<input type="checkbox" switch>` (ab iOS 18). Seit iOS 26.5 nur noch bei einem echten Fingertipp – darum liegt über den Abhaken-Buttons eine unsichtbare Switch-Fläche (`src/components/ui/haptic-tap.tsx`). Countdown-Signale können auf dem iPhone nicht vibrieren.
 - iOS Safe Areas im Header und in der Bottom Navigation berücksichtigen.

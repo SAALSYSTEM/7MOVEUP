@@ -1,9 +1,11 @@
 import { Check, Pause, Play, RotateCcw } from "lucide-react";
+import { useEffect, useRef } from "react";
 
 import { useApp } from "@/app/app-context";
 import { Button } from "@/components/ui/button";
 import { Sheet } from "@/components/ui/sheet";
-import { useCountdown } from "@/hooks/use-countdown";
+import type { TimerResume } from "@/domain/active-session";
+import { useCountdown, type CountdownSnapshot } from "@/hooks/use-countdown";
 import { formatDuration } from "@/lib/dates";
 import { cn } from "@/lib/utils";
 
@@ -15,6 +17,10 @@ type TimerSheetProps = {
   durationSec: number;
   /** Satz mit tatsächlich gelaufener Zeit abhaken */
   onComplete: (elapsedSec: number) => void;
+  /** gespeicherten Timer fortsetzen (nach Neustart der App) */
+  resume?: TimerResume;
+  /** Zustandswechsel melden, damit das Training den Timer speichern kann */
+  onTimerChange?: (snapshot: CountdownSnapshot) => void;
 };
 
 export function TimerSheet(props: TimerSheetProps) {
@@ -23,11 +29,22 @@ export function TimerSheet(props: TimerSheetProps) {
   return <TimerSheetInner key={`${props.title}-${props.subtitle}-${props.durationSec}`} {...props} />;
 }
 
-function TimerSheetInner({ open, onClose, title, subtitle, durationSec, onComplete }: TimerSheetProps) {
+function TimerSheetInner({ open, onClose, title, subtitle, durationSec, onComplete, resume, onTimerChange }: TimerSheetProps) {
   const { t } = useApp();
   const timer = useCountdown(durationSec, {
     onFinish: () => onComplete(durationSec),
+    onChange: onTimerChange,
   });
+
+  // gespeicherten Stand einmalig übernehmen
+  const resumed = useRef(false);
+  const { start, restorePaused } = timer;
+  useEffect(() => {
+    if (resumed.current || !resume) return;
+    resumed.current = true;
+    if (resume.status === "running") start(Math.max(0, resume.endAt - Date.now()));
+    else restorePaused(resume.remainingMs);
+  }, [resume, start, restorePaused]);
 
   const progress = durationSec > 0 ? timer.remainingMs / (durationSec * 1000) : 0;
   const radius = 108;
@@ -42,7 +59,7 @@ function TimerSheetInner({ open, onClose, title, subtitle, durationSec, onComple
   }[timer.status];
 
   return (
-    <Sheet open={open} onClose={onClose} title={title} description={subtitle}>
+    <Sheet open={open} onClose={onClose} title={title} description={subtitle} dismissible={timer.status !== "running"}>
       <div className="flex flex-col items-center pb-2 pt-2">
         <div className="relative h-[248px] w-[248px]">
           <svg viewBox="0 0 248 248" className="h-full w-full -rotate-90" aria-hidden>

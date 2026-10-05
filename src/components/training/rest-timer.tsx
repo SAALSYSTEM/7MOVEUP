@@ -3,7 +3,7 @@ import { SkipForward, Timer } from "lucide-react";
 import { useEffect } from "react";
 
 import { useApp } from "@/app/app-context";
-import { useCountdown } from "@/hooks/use-countdown";
+import { useCountdown, type CountdownSnapshot } from "@/hooks/use-countdown";
 import { formatDuration } from "@/lib/dates";
 import { cn } from "@/lib/utils";
 
@@ -13,16 +13,20 @@ type RestTimerProps = {
   seconds: number;
   label: string;
   onDone: () => void;
+  /** Endzeitpunkt (ms) eines gespeicherten Timers – nach Neustart der App */
+  endAt?: number;
+  /** Start, Zeit dazu und Ende melden (zum Speichern) */
+  onChange?: (snapshot: CountdownSnapshot) => void;
 };
 
 /** Pausen-Countdown nach einem abgehakten Satz (gleiche Signale wie Zeitübungen). */
-export function RestTimer({ runId, seconds, label, onDone }: RestTimerProps) {
+export function RestTimer({ runId, seconds, label, onDone, endAt, onChange }: RestTimerProps) {
   const { t } = useApp();
-  const timer = useCountdown(seconds, { onFinish: () => window.setTimeout(onDone, 1200) });
+  const timer = useCountdown(seconds, { onFinish: () => window.setTimeout(onDone, 1200), onChange });
   const { start } = timer;
 
   useEffect(() => {
-    start(seconds * 1000);
+    start(endAt ? Math.max(0, endAt - Date.now()) : seconds * 1000);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [runId]);
 

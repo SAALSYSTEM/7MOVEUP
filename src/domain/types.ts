@@ -156,6 +156,29 @@ export type WorkoutSession = {
   durationSec?: number;
   progressionStepKg?: number;
   exercises: SessionExercise[];
+  /** laufende Timer eines offenen Trainings – überstehen so einen Neustart der App (nicht im Backup) */
+  timers?: SessionTimers;
+};
+
+export type SetTimerState = {
+  /** SessionExercise.id */
+  entryId: string;
+  setIndex: number;
+  durationSec: number;
+  status: "running" | "paused";
+  /** Endzeitpunkt (ISO), solange er läuft */
+  endAt?: string;
+  /** Restzeit, solange pausiert */
+  remainingMs?: number;
+};
+
+export type RestTimerState = { endAt: string; seconds: number; label: string };
+
+export type SessionTimers = {
+  /** Zeit-Timer eines Satzes (Zeitübung oder Cardio) */
+  set?: SetTimerState;
+  /** Pause nach einem abgehakten Satz */
+  rest?: RestTimerState;
 };
 
 export type PerformanceSnapshot = {

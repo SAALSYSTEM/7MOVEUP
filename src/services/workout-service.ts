@@ -93,6 +93,7 @@ export function emptySet(exercise: SessionExercise): SetLog {
 export async function finishSession(session: WorkoutSession, durationSec: number): Promise<WorkoutSession> {
   return workoutRepository.saveSession({
     ...session,
+    timers: undefined,
     completedAt: new Date().toISOString(),
     durationSec: Math.max(0, Math.round(durationSec)),
   });

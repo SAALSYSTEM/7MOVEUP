@@ -203,7 +203,13 @@ export function SessionExerciseCard({
         )}
 
         {tracking === "cardio" ? (
-          <CardioInputs entry={entry} onUpdate={(patch) => updateSet(0, patch)} onToggle={() => toggleDone(0)} />
+          <CardioInputs
+            entry={entry}
+            name={name}
+            onUpdate={(patch) => updateSet(0, patch)}
+            onToggle={() => toggleDone(0)}
+            onOpenTimer={() => onOpenTimer(0)}
+          />
         ) : (
           <ol className="space-y-1.5">
             {entry.sets.map((set, setIndex) => (
@@ -295,12 +301,17 @@ export function SessionExerciseCard({
 
 function CardioInputs({
   entry,
+  name,
   onUpdate,
   onToggle,
+  onOpenTimer,
 }: {
   entry: SessionExercise;
+  name: string;
   onUpdate: (patch: Partial<SetLog>) => void;
   onToggle: () => void;
+  /** Countdown über die eingestellten Minuten – wie bei Zeitübungen */
+  onOpenTimer: () => void;
 }) {
   const { t } = useApp();
   const set = entry.sets[0];
@@ -319,14 +330,22 @@ function CardioInputs({
         <Stepper value={set.rpm} onChange={(v) => onUpdate({ rpm: v })} label={t("session.rpm")} unit={t("session.rpm")} max={250} />
         <Stepper value={set.heartRate} onChange={(v) => onUpdate({ heartRate: v })} label={t("session.heartRate")} unit={t("session.heartRate")} max={250} />
       </div>
-      <div className="mt-4">
-        <HapticTap onTap={onToggle}>
+      <div className="mt-4 flex gap-2">
+        <button
+          type="button"
+          onClick={onOpenTimer}
+          className="flex h-12 shrink-0 items-center gap-2 rounded-2xl bg-accent/15 px-4 text-sm font-extrabold text-accent"
+          aria-label={`${t("session.openCardioTimer")} · ${name}`}
+        >
+          <Timer size={18} aria-hidden /> {t("session.timer")}
+        </button>
+        <HapticTap className="min-w-0 flex-1" onTap={onToggle}>
           <button
             type="button"
             onClick={onToggle}
             aria-pressed={set.done}
             className={cn(
-              "flex h-12 w-full items-center justify-center gap-2 rounded-2xl border-2 text-sm font-extrabold transition-colors",
+              "flex h-12 w-full min-w-0 flex-1 items-center justify-center gap-2 rounded-2xl border-2 text-sm font-extrabold transition-colors",
               set.done ? "border-success bg-success text-black" : "border-line text-muted hover:text-fg",
             )}
           >

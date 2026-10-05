@@ -15,6 +15,7 @@ import { MorePage } from "@/pages/more-page";
 import { PlanEditorPage } from "@/pages/plan-editor-page";
 import { SessionPage } from "@/pages/session-page";
 import { TrainingPage } from "@/pages/training-page";
+import { ResumeActiveSession } from "@/components/layout/resume-active-session";
 import { ScrollToTop } from "@/components/layout/scroll-to-top";
 
 /** Routen mit eigener Aktionsleiste unten blenden die Hauptnavigation aus. */
@@ -27,6 +28,7 @@ function Shell() {
   return (
     <>
       <ScrollToTop />
+      <ResumeActiveSession />
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/training" element={<TrainingPage />} />

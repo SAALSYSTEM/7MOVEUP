@@ -12,7 +12,7 @@ import { Card, SectionTitle } from "@/components/ui/card";
 import { exerciseRepository, planRepository, workoutRepository } from "@/data";
 import { getDailyQuote } from "@/domain/motivation";
 import { countImprovements } from "@/domain/progression";
-import { nextPlanned, openPlansToday, plansForDate, sessionsForDate, sessionsThisWeek, weekSummary } from "@/domain/schedule";
+import { nextPlanned, openPlansToday, plansForDate, sessionsForDate, sessionsThisWeek, todayProgress, weekSummary } from "@/domain/schedule";
 import type { WorkoutPlan } from "@/domain/types";
 import { useData } from "@/hooks/use-data";
 import { useToday } from "@/hooks/use-today";
@@ -43,6 +43,7 @@ export function HomePage() {
   const openToday = openPlansToday(plans, completed, today);
   const plannedToday = plansForDate(plans, today);
   const doneToday = sessionsForDate(completed, today);
+  const progress = todayProgress(plans, completed, today);
   const summary = weekSummary(plans, completed, today);
   const improvements = countImprovements(completed, sessionsThisWeek(completed, today));
   const next = nextPlanned(plans, completed, today);
@@ -136,9 +137,14 @@ export function HomePage() {
         <Card className="p-4">
           <div className="mb-2 flex items-center justify-between">
             <span className="text-[11px] font-bold uppercase tracking-[0.16em] text-subtle">{t("home.plannedToday")}</span>
-            {doneToday.length > 0 && (
+            {progress.state === "done" && (
               <span className="inline-flex items-center gap-1 text-xs font-bold text-success">
                 <CircleCheck size={14} aria-hidden /> {t("home.doneBadge")}
+              </span>
+            )}
+            {progress.state === "partial" && (
+              <span className="tabular text-xs font-bold text-muted">
+                {t("home.doneOf", { done: progress.done, total: progress.total })}
               </span>
             )}
           </div>

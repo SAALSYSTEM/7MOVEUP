@@ -15,12 +15,14 @@ import { NumberField } from "@/components/ui/number-field";
 import { Sheet } from "@/components/ui/sheet";
 import { useToast } from "@/components/ui/toast";
 import { exerciseRepository, planRepository, workoutRepository } from "@/data";
-import type { Exercise, ExerciseNote, PerformanceSnapshot, SessionExercise, WorkoutSession } from "@/domain/types";
+import type { Exercise, ExerciseNote, PerformanceSnapshot, SessionExercise, SessionTimers, WorkoutSession } from "@/domain/types";
 import { localized } from "@/i18n";
 import { useWakeLock } from "@/hooks/use-countdown";
 import { formatDuration } from "@/lib/dates";
 import { dismissKeyboard } from "@/lib/viewport";
 import { tick, unlockAudio } from "@/services/feedback";
+import { restoreTimers, type TimerResume } from "@/domain/active-session";
+import type { CountdownSnapshot } from "@/hooks/use-countdown";
 import { finishSession } from "@/services/workout-service";
 
 type Loaded = {
@@ -48,8 +50,8 @@ export function SessionPage() {
   const [session, setSession] = useState<WorkoutSession | null>(null);
   const [context, setContext] = useState<Loaded | null>(null);
   const [notFound, setNotFound] = useState(false);
-  const [timerTarget, setTimerTarget] = useState<{ exerciseIndex: number; setIndex: number } | null>(null);
-  const [rest, setRest] = useState<{ runId: number; seconds: number; label: string } | null>(null);
+  const [timerTarget, setTimerTarget] = useState<{ exerciseIndex: number; setIndex: number; resume?: TimerResume } | null>(null);
+  const [rest, setRest] = useState<{ runId: number; seconds: number; label: string; endAt?: number } | null>(null);
   const [finishOpen, setFinishOpen] = useState(false);
   const [discardOpen, setDiscardOpen] = useState(false);
   const [durationMin, setDurationMin] = useState<number | undefined>();
@@ -59,6 +61,8 @@ export function SessionPage() {
   const saveQueue = useRef<Promise<void>>(Promise.resolve());
   const sessionRef = useRef<WorkoutSession | null>(null);
   const restRunId = useRef(0);
+  /** nach Abschließen/Verwerfen nichts mehr speichern (verspätete Timer-Meldungen) */
+  const closedRef = useRef(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -87,12 +91,31 @@ export function SessionPage() {
         last: new Map(ids.map((id, i) => [id, lasts[i]])),
         planNotes: plan?.notes,
       });
-      sessionRef.current = loaded;
-      setSession(loaded);
+      // laufende Timer aus der Zeit vor einem Neustart übernehmen
+      const restored = restoreTimers(loaded, Date.now());
+      sessionRef.current = restored.session;
+      setSession(restored.session);
+      if (restored.changed) {
+        saveQueue.current = saveQueue.current
+          .then(() => workoutRepository.saveSession(restored.session))
+          .then(() => undefined)
+          .catch(console.error);
+      }
+      if (restored.setTimer) setTimerTarget(restored.setTimer);
+      if (restored.rest) {
+        restRunId.current += 1;
+        setRest({ runId: restRunId.current, ...restored.rest });
+      }
+      if (restored.completedWhileAway) {
+        const entry = restored.session.exercises[restored.completedWhileAway.exerciseIndex];
+        toast(t("session.timerDoneAway", { name: localized(entry.name, language) }));
+      }
     })();
     return () => {
       cancelled = true;
     };
+    // Sprache/Toast sind für das einmalige Laden nicht maßgeblich
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sessionId, navigate]);
 
   const elapsed = useElapsed(session?.startedAt);
@@ -100,10 +123,8 @@ export function SessionPage() {
   useWakeLock(Boolean(session));
 
   /** Jede Änderung sofort lokal speichern → Reload/App-Wechsel verliert nichts. */
-  const updateExercise = useCallback((index: number, entry: SessionExercise) => {
-    const prev = sessionRef.current;
-    if (!prev) return;
-    const next = { ...prev, exercises: prev.exercises.map((e, i) => (i === index ? entry : e)) };
+  const commit = useCallback((next: WorkoutSession) => {
+    if (closedRef.current) return;
     sessionRef.current = next;
     setSession(next);
     saveQueue.current = saveQueue.current
@@ -111,6 +132,28 @@ export function SessionPage() {
       .then(() => undefined)
       .catch(console.error);
   }, []);
+
+  const updateExercise = useCallback(
+    (index: number, entry: SessionExercise) => {
+      const prev = sessionRef.current;
+      if (!prev) return;
+      commit({ ...prev, exercises: prev.exercises.map((e, i) => (i === index ? entry : e)) });
+    },
+    [commit],
+  );
+
+  /** laufende Timer mitspeichern (Endzeit) – so überstehen sie Sperre und Neustart der App */
+  const updateTimers = useCallback(
+    (patch: Partial<SessionTimers>) => {
+      const prev = sessionRef.current;
+      if (!prev) return;
+      const merged = { ...prev.timers, ...patch };
+      const timers = merged.set || merged.rest ? { set: merged.set, rest: merged.rest } : undefined;
+      if (!timers && !prev.timers) return;
+      commit({ ...prev, timers });
+    },
+    [commit],
+  );
 
   /** nach Änderungen im Info-Sheet Notiz/Übung neu laden (Karte zeigt die Notiz direkt an) */
   const refreshExerciseInfo = useCallback(async (exerciseId: string) => {
@@ -142,6 +185,28 @@ export function SessionPage() {
 
   const timerEntry = timerTarget ? session.exercises[timerTarget.exerciseIndex] : undefined;
   const timerSet = timerEntry && timerTarget ? timerEntry.sets[timerTarget.setIndex] : undefined;
+  const timerDurationSec = timerSet?.durationSec ?? timerEntry?.target.durationSec ?? 30;
+
+  const onSetTimerChange = (snapshot: CountdownSnapshot) => {
+    if (!timerTarget || !timerEntry) return;
+    const base = { entryId: timerEntry.id, setIndex: timerTarget.setIndex, durationSec: timerDurationSec };
+    if (snapshot.status === "running" && snapshot.endAt) {
+      updateTimers({ set: { ...base, status: "running", endAt: new Date(snapshot.endAt).toISOString() } });
+    } else if (snapshot.status === "paused") {
+      updateTimers({ set: { ...base, status: "paused", remainingMs: snapshot.remainingMs } });
+    } else {
+      updateTimers({ set: undefined });
+    }
+  };
+
+  const onRestChange = (snapshot: CountdownSnapshot) => {
+    if (!rest) return;
+    if (snapshot.status === "running" && snapshot.endAt) {
+      updateTimers({ rest: { endAt: new Date(snapshot.endAt).toISOString(), seconds: rest.seconds, label: rest.label } });
+    } else if (snapshot.status === "finished") {
+      updateTimers({ rest: undefined });
+    }
+  };
 
   /** läuft synchron im Tap auf den Haken → Ton und Haptik sind auf iOS entsperrt */
   const startRest = (entry: SessionExercise, setIndex: number) => {
@@ -170,14 +235,16 @@ export function SessionPage() {
 
   const confirmFinish = async () => {
     dismissKeyboard();
+    closedRef.current = true;
     await saveQueue.current;
-    await finishSession(session, (durationMin ?? Math.round(elapsed / 60)) * 60);
+    await finishSession(sessionRef.current ?? session, (durationMin ?? Math.round(elapsed / 60)) * 60);
     setFinishOpen(false);
     toast(t("session.finished"));
     leave("/", { replace: true });
   };
 
   const discard = async () => {
+    closedRef.current = true;
     await saveQueue.current;
     await workoutRepository.deleteSession(session.id);
     setDiscardOpen(false);
@@ -268,7 +335,18 @@ export function SessionPage() {
         <div className="mx-auto max-w-2xl">
           <AnimatePresence>
             {rest && (
-              <RestTimer key="rest" runId={rest.runId} seconds={rest.seconds} label={rest.label} onDone={() => setRest(null)} />
+              <RestTimer
+                key="rest"
+                runId={rest.runId}
+                seconds={rest.seconds}
+                label={rest.label}
+                endAt={rest.endAt}
+                onChange={onRestChange}
+                onDone={() => {
+                  setRest(null);
+                  updateTimers({ rest: undefined });
+                }}
+              />
             )}
           </AnimatePresence>
           <Button size="lg" className="w-full" onClick={openFinish}>
@@ -279,10 +357,15 @@ export function SessionPage() {
 
       <TimerSheet
         open={Boolean(timerTarget && timerSet)}
-        onClose={() => setTimerTarget(null)}
+        onClose={() => {
+          setTimerTarget(null);
+          updateTimers({ set: undefined });
+        }}
         title={timerEntry ? localized(timerEntry.name, language) : ""}
-        subtitle={timerTarget ? t("session.set", { n: timerTarget.setIndex + 1 }) : undefined}
-        durationSec={timerSet?.durationSec ?? timerEntry?.target.durationSec ?? 30}
+        subtitle={timerTarget && timerEntry?.trackingType !== "cardio" ? t("session.set", { n: timerTarget.setIndex + 1 }) : undefined}
+        durationSec={timerDurationSec}
+        resume={timerTarget?.resume}
+        onTimerChange={onSetTimerChange}
         onComplete={(elapsedSec) => {
           if (!timerTarget || !timerEntry) return;
           const { exerciseIndex, setIndex } = timerTarget;

@@ -16,25 +16,29 @@ type SheetProps = {
   className?: string;
   /** volle Höhe für Listen (z. B. Übungsauswahl) */
   tall?: boolean;
+  /** false: Tippen auf den Hintergrund und Escape schließen nicht (z. B. laufender Timer) – nur das X */
+  dismissible?: boolean;
 };
 
 /** Bottom Sheet für mobile Dialoge (Bestätigungen, Auswahl, Timer). */
-export function Sheet({ open, onClose, title, description, children, footer, className, tall }: SheetProps) {
+export function Sheet({ open, onClose, title, description, children, footer, className, tall, dismissible = true }: SheetProps) {
   const { t } = useApp();
   const titleId = useId();
   const descriptionId = useId();
   const panelRef = useRef<HTMLDivElement>(null);
   const reduceMotion = useReducedMotion();
   const onCloseRef = useRef(onClose);
+  const dismissibleRef = useRef(dismissible);
   useEffect(() => {
     onCloseRef.current = onClose;
+    dismissibleRef.current = dismissible;
   });
 
   useEffect(() => {
     if (!open) return;
     const previouslyFocused = document.activeElement as HTMLElement | null;
     const onKey = (event: KeyboardEvent) => {
-      if (event.key === "Escape") onCloseRef.current();
+      if (event.key === "Escape" && dismissibleRef.current) onCloseRef.current();
     };
     document.addEventListener("keydown", onKey);
     const { overflow } = document.body.style;
@@ -58,7 +62,7 @@ export function Sheet({ open, onClose, title, description, children, footer, cla
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.18 }}
-            onClick={onClose}
+            onClick={dismissible ? onClose : undefined}
             aria-hidden
           />
           <motion.div
