@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { BODY_REGIONS, EQUIPMENT, TRACKING_TYPES } from "@/domain/types";
+import { BODY_REGIONS, EQUIPMENT, TRACKING_TYPES, type CustomEquipmentKey } from "@/domain/types";
 
 export const BACKUP_APP_ID = "7MOVEUP";
 /**
@@ -11,6 +11,17 @@ export const BACKUP_APP_ID = "7MOVEUP";
 export const BACKUP_SCHEMA_VERSION = 2;
 
 const isoDate = z.string().min(1);
+
+/** eigenes Gerät: "equip-<id>" */
+const customEquipmentKey = z
+  .string()
+  .regex(/^equip-[A-Za-z0-9-]{1,64}$/)
+  .transform((key) => key as CustomEquipmentKey);
+const customEquipmentSchema = z.object({
+  key: customEquipmentKey,
+  name: z.string().trim().min(1).max(40),
+  createdAt: isoDate,
+});
 const localized = z.object({ de: z.string(), en: z.string() });
 const optionalNumber = z.number().finite().nonnegative().optional();
 
@@ -28,7 +39,7 @@ const exerciseSchema = z.object({
   profileId: z.string().optional(),
   name: localized,
   bodyRegions: z.array(z.enum(BODY_REGIONS)),
-  equipment: z.array(z.enum(EQUIPMENT)),
+  equipment: z.array(z.union([z.enum(EQUIPMENT), customEquipmentKey])),
   trackingType: z.enum(TRACKING_TYPES),
   defaultSets: optionalNumber,
   defaultRepMin: optionalNumber,
@@ -158,6 +169,7 @@ export const backupSchema = z.object({
       soundEnabled: z.boolean().default(true),
       hapticsEnabled: z.boolean().default(true),
       unitSystem: z.enum(["metric", "imperial"]).optional(),
+      customEquipment: z.array(customEquipmentSchema).optional(),
     })
     .default({ soundEnabled: true, hapticsEnabled: true }),
   // ab Version 2 – fehlen in Version-1-Dateien

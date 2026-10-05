@@ -14,7 +14,8 @@ Branch `feature-koerperwerte` – Preview-Test, noch keine Versionsnummer.
 - **Messtage:** an gewählten Wochentagen zeigt Heute „Körperwerte erfassen“.
 - **Fortschritt:** drei Kacheln (Gewicht, Körperfett, Muskel), Analyse mit 30 Tage · 365 Tage · Gesamt, eigenes Liniendiagramm, Entwicklung (bzw. „Zu wenige Werte“), Ø · Min · Max.
 - **Metrisch/Imperial** (Mehr bzw. Messwerte): Anzeige in kg/cm oder lb/in; gespeichert wird immer metrisch und ungerundet.
-- **Kalender:** Messungen als Punkt im Raster, Tagesdetails mit Körperwerten bzw. Messtag; Antippen öffnet die Erfassung.
+- **Kalender:** Messungen als Punkt, kommende Messtage als Ring im Raster. In den Tagesdetails steht ein Messtag unter „Geplant“ (heute/vergangen mit „Erfassen“), eine erfasste Messung unter „Abgeschlossen“; Antippen öffnet die Erfassung.
+- **Geräte:** neue Standardgeräte Langhantel, Kraftmaschine, Kabelzug, Klimmzugstange, Widerstandsband. Eigene Geräte lassen sich bei eigenen Übungen einmal anlegen und sind danach überall wählbar und im Übungsfilter; gleiche Namen (auch zu Standardgeräten) werden erkannt.
 - **Backup-Datum:** Mehr → Daten zeigt „Letztes Backup: vor X Tagen“ / „Noch kein Backup erstellt“; Heute zeigt unten eine kleine Zeile, hervorgehoben mit „Backup erstellen“ ab 7 Tagen und neuen Daten.
 
 ### Geändert
@@ -22,7 +23,9 @@ Branch `feature-koerperwerte` – Preview-Test, noch keine Versionsnummer.
 - **Navigation:** Heute · Training · Fortschritt · Essen · Mehr. Übungen sind ein Tab in Training; der Kalender öffnet sich über „Kalender öffnen“ auf Heute (eigene Seite `/calendar`).
 - **Ein Plan:** Eine Vorlage zu übernehmen ersetzt nach Rückfrage den aktuellen Plan (alle Trainingstage). Absolvierte Trainings bleiben unverändert.
 - **Heute vereinfacht:** heute fällig (Trainings + Messtag, „x von y erledigt“), „Als Nächstes“, Woche kompakt. „Letztes Training“ entfällt.
-- **Backup-Format Version 2:** enthält Körperwerte, Messwert-Einstellungen und Einheit. Backups der Version 1 lassen sich weiterhin importieren.
+- **Schnellerfassung ohne Vorwert:** Eingabefeld deutlich sichtbar („Wert eingeben“), − / + setzen den Cursor ins Feld; Fortschritt-Kacheln ohne Wert öffnen direkt die Erfassung.
+- **Übungsfilter:** zeigt nur Geräte, für die es Übungen gibt (inkl. eigener Geräte).
+- **Backup-Format Version 2:** enthält Körperwerte, Messwert-Einstellungen, Einheit und eigene Geräte. Backups der Version 1 lassen sich weiterhin importieren.
 
 ### Daten
 

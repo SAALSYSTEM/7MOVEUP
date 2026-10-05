@@ -1,7 +1,9 @@
+import { Plus } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
 import { useApp } from "@/app/app-context";
+import { EquipmentSheet } from "@/components/exercises/equipment-sheet";
 import { EmptyState, Page } from "@/components/layout/page";
 import { SubHeader } from "@/components/layout/sub-header";
 import { Button } from "@/components/ui/button";
@@ -11,15 +13,8 @@ import { FieldError, Label } from "@/components/ui/label";
 import { NumberField } from "@/components/ui/number-field";
 import { useToast } from "@/components/ui/toast";
 import { exerciseRepository } from "@/data";
-import {
-  BODY_REGIONS,
-  EQUIPMENT,
-  TRACKING_TYPES,
-  type BodyRegion,
-  type Equipment,
-  type Exercise,
-  type TrackingType,
-} from "@/domain/types";
+import { BODY_REGIONS, TRACKING_TYPES, type BodyRegion, type EquipmentKey, type Exercise, type TrackingType } from "@/domain/types";
+import { allEquipmentKeys, equipmentLabel } from "@/lib/equipment";
 import { createId } from "@/lib/id";
 import { isSafeHttpUrl } from "@/lib/video";
 
@@ -27,7 +22,7 @@ type FormState = {
   nameDe: string;
   nameEn: string;
   bodyRegions: BodyRegion[];
-  equipment: Equipment[];
+  equipment: EquipmentKey[];
   trackingType: TrackingType;
   videoUrl: string;
   defaultSets?: number;
@@ -61,7 +56,9 @@ function toggle<T>(list: T[], value: T): T[] {
 export function ExerciseFormPage() {
   const { exerciseId } = useParams();
   const isEdit = Boolean(exerciseId);
-  const { t, language } = useApp();
+  const { t, language, settings } = useApp();
+  const customEquipment = settings.customEquipment ?? [];
+  const [equipmentSheet, setEquipmentSheet] = useState(false);
   const navigate = useNavigate();
   const toast = useToast();
   const [form, setForm] = useState<FormState>(EMPTY);
@@ -202,11 +199,14 @@ export function ExerciseFormPage() {
         <fieldset>
           <legend className="mb-2 text-xs font-semibold uppercase tracking-[0.12em] text-muted">{t("exerciseForm.equipment")}</legend>
           <div className="flex flex-wrap gap-2">
-            {EQUIPMENT.map((equipment) => (
+            {allEquipmentKeys(customEquipment).map((equipment) => (
               <Chip key={equipment} active={form.equipment.includes(equipment)} onClick={() => set({ equipment: toggle(form.equipment, equipment) })}>
-                {t(`equipment.${equipment}`)}
+                {equipmentLabel(equipment, t, customEquipment)}
               </Chip>
             ))}
+            <Chip className="border-dashed" onClick={() => setEquipmentSheet(true)}>
+              <Plus size={15} aria-hidden /> {t("equipment.addOwn")}
+            </Chip>
           </div>
           <FieldError>{errors.equipment}</FieldError>
         </fieldset>
@@ -302,6 +302,14 @@ export function ExerciseFormPage() {
           </div>
         </div>
       </form>
+
+      {/* außerhalb des Formulars: eigenes Absenden, darf die Übung nicht speichern */}
+      <EquipmentSheet
+        open={equipmentSheet}
+        onClose={() => setEquipmentSheet(false)}
+        onPick={(key) => setForm((prev) => (prev.equipment.includes(key) ? prev : { ...prev, equipment: [...prev.equipment, key] }))}
+        onDeleted={(key) => setForm((prev) => ({ ...prev, equipment: prev.equipment.filter((e) => e !== key) }))}
+      />
     </Page>
   );
 }

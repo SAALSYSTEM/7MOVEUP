@@ -21,16 +21,27 @@ export const BODY_REGIONS = [
 ] as const;
 export type BodyRegion = (typeof BODY_REGIONS)[number];
 
+/** Standardgeräte – Reihenfolge = Anzeige. Schlüssel nie ändern, neue einfach ergänzen. */
 export const EQUIPMENT = [
   "bodyweight",
   "dumbbells",
-  "bench",
+  "barbell",
   "kettlebell",
+  "bench",
+  "machine",
+  "cable",
+  "pullup_bar",
+  "resistance_band",
   "ab_wheel",
   "step",
   "cardio_machine",
 ] as const;
 export type Equipment = (typeof EQUIPMENT)[number];
+
+/** Eigenes Gerät (lokal je Profil, wiederverwendbar) – Schlüssel beginnt mit "equip-" */
+export type CustomEquipmentKey = `equip-${string}`;
+export type EquipmentKey = Equipment | CustomEquipmentKey;
+export type CustomEquipment = { key: CustomEquipmentKey; name: string; createdAt: string };
 
 export const TRACKING_TYPES = ["weight_reps", "reps", "duration", "cardio"] as const;
 
@@ -53,6 +64,8 @@ export type Settings = {
   hapticsEnabled: boolean;
   /** fehlt bei älteren Daten → metrisch */
   unitSystem?: UnitSystem;
+  /** eigene Geräte – stehen bei allen eigenen Übungen und im Filter zur Auswahl */
+  customEquipment?: CustomEquipment[];
   updatedAt: string;
 };
 
@@ -63,7 +76,7 @@ export type Exercise = {
   profileId?: string;
   name: LocalizedText;
   bodyRegions: BodyRegion[];
-  equipment: Equipment[];
+  equipment: EquipmentKey[];
   trackingType: TrackingType;
   defaultSets?: number;
   defaultRepMin?: number;

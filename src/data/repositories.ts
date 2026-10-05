@@ -25,7 +25,7 @@ export interface ProfileRepository {
 
 export interface SettingsRepository {
   get(): Promise<Settings>;
-  update(patch: Partial<Pick<Settings, "soundEnabled" | "hapticsEnabled" | "unitSystem">>): Promise<Settings>;
+  update(patch: Partial<Pick<Settings, "soundEnabled" | "hapticsEnabled" | "unitSystem" | "customEquipment">>): Promise<Settings>;
 }
 
 export interface ExerciseRepository {

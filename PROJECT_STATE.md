@@ -33,6 +33,8 @@ Der Kalender hat keinen eigenen Navigationspunkt; er öffnet sich über „Kalen
 - **Vorlage übernehmen ersetzt den Plan** nach Rückfrage (nennt die Anzahl der Trainingstage). Absolvierte Trainings bleiben unverändert – sie speichern Planname und Übungen selbst.
 - Kein Planarchiv, keine Gültigkeitsdaten, kein Statusmodell.
 - Progression nur als Hinweis („Steigerung möglich“, „+2 kg“), nie automatisch.
+- **Geräte:** feste Standardliste (Körpergewicht, Kurzhanteln, Langhantel, Kettlebell, Hantelbank, Kraftmaschine, Kabelzug, Klimmzugstange, Widerstandsband, Bauchrolle, Step, Ergometer/Cardio) plus **eigene Geräte**: einmal anlegen (Übung → „Eigenes Gerät“), lokal gespeichert, danach bei allen eigenen Übungen wählbar. Gleiche Namen – auch zu Standardgeräten, deutsch/englisch, Groß-/Kleinschreibung, Umlaute – werden erkannt und das vorhandene Gerät gewählt. Löschen nur, solange keine Übung das Gerät nutzt; Umbenennen gibt es (noch) nicht.
+- Der Übungsfilter zeigt nur Geräte, für die es mindestens eine Übung gibt.
 
 ### Heute
 
@@ -50,7 +52,8 @@ Der Kalender hat keinen eigenen Navigationspunkt; er öffnet sich über „Kalen
 - **Einheiten:** gespeichert immer in kg / cm / % / kcal, ungerundet. Metrisch/Imperial ist nur Anzeige (kg ↔ lb, cm ↔ in). Schrittweiten: Gewicht 0,1 kg (0,2 lb), Körperfett/Wasser 0,1 %, Umfänge 0,5 cm (0,25 in), kcal 10.
 - **Schnellerfassung:** letzter Wert erscheint grau als Vorschlag und wird nie automatisch gespeichert. Gespeichert wird nur, was bestätigt (✓), mit −/+ geändert oder eingetippt wurde. Erster Wert eines Messwerts: leeres Feld. Unplausible Werte → Hinweis, negative/ungültige → nicht speicherbar.
 - **Eine Messung pro Tag:** erneutes Erfassen am selben Tag ergänzt/ändert die vorhandene Messung. Lokales Datum (`yyyy-MM-dd`) + optionale Uhrzeit.
-- **Messtage:** frei wählbare Wochentage. Am Messtag zeigt Heute „Körperwerte erfassen“; Messungen und Messtage erscheinen im Kalender.
+- **Messtage:** frei wählbare Wochentage (Standard: keine). Am Messtag zeigt Heute „Körperwerte erfassen“. Im Kalender: Messtag ohne Messung unter „Geplant“ (kommende als Ring im Raster), erfasste Messung unter „Abgeschlossen“ (Punkt im Raster).
+- Ohne Vorwert ist das Eingabefeld sichtbar leer („Wert eingeben“); − / + setzen dann den Cursor ins Feld. Fortschritt-Kacheln ohne Wert öffnen direkt die Erfassung.
 
 ### Fortschritt
 
@@ -74,8 +77,8 @@ Typen: `src/domain/types.ts`. Jede Zeile gehört zu genau einem Profil (`profile
 | Typ | Inhalt |
 | --- | --- |
 | `Profile` | Anzeigename, Sprache |
-| `Settings` | Ton, Haptik, `unitSystem?` (`metric` \| `imperial`, Standard metric) |
-| `Exercise` | eigene Übungen (Built-ins kommen aus `src/data/seed`) |
+| `Settings` | Ton, Haptik, `unitSystem?` (`metric` \| `imperial`, Standard metric), `customEquipment?` (eigene Geräte: `key` = `equip-…`, `name`) |
+| `Exercise` | eigene Übungen (Built-ins kommen aus `src/data/seed`); `equipment` = Standard-Schlüssel oder `equip-…` |
 | `ExerciseNote` | persönliche Notiz + Video-Links je Übung |
 | `WorkoutPlan` | ein Trainingstag des Plans: Übungen, Wochentage, `templateId?` |
 | `WorkoutSession` | ein Training mit Sätzen/Zeiten; offenes Training inkl. laufender Timer |
@@ -95,7 +98,7 @@ IndexedDB-Datenbank `7moveup` über Dexie (`src/data/local/db.ts`):
 
 `meta` enthält das aktuelle Profil und `lastBackupAt`.
 
-**Backup-Datei** (`src/data/backup.ts`, zod): `schemaVersion: 2` mit zusätzlich `bodySettings?`, `measurements` und `settings.unitSystem?`. Dateien mit `schemaVersion: 1` werden weiterhin importiert (fehlende Felder = leer). Import ersetzt alle Daten des Profils – auch Körperwerte. Version 1.2.0 lehnt Dateien mit Version 2 ab („neuere Version“), statt Daten still zu verlieren.
+**Backup-Datei** (`src/data/backup.ts`, zod): `schemaVersion: 2` mit zusätzlich `bodySettings?`, `measurements`, `settings.unitSystem?` und `settings.customEquipment?` (Geräte-Schlüssel an Übungen: Standard oder `equip-…`). Dateien mit `schemaVersion: 1` werden weiterhin importiert (fehlende Felder = leer). Import ersetzt alle Daten des Profils – auch Körperwerte. Version 1.2.0 lehnt Dateien mit Version 2 ab („neuere Version“), statt Daten still zu verlieren.
 
 ## Tests
 

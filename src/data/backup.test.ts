@@ -201,6 +201,35 @@ describe("Körperwerte: Datenbank-Version 2 und Backup-Format 2", () => {
     expect((await target.repos.settings.get()).unitSystem).toBe("imperial");
   });
 
+  it("Round-Trip: eigene Geräte und neue Standardgeräte an eigenen Übungen", async () => {
+    const source = freshDb("equip-source");
+    await source.repos.settings.update({
+      customEquipment: [{ key: "equip-rower-1", name: "Rudergerät", createdAt: "2026-10-05T18:00:00.000Z" }],
+    });
+    await source.repos.exercises.saveCustom({
+      id: "custom-row",
+      builtIn: false,
+      name: { de: "Rudern", en: "Rowing" },
+      bodyRegions: ["back"],
+      equipment: ["equip-rower-1", "barbell"],
+      trackingType: "cardio",
+    });
+    const exported = await source.backup.exportCurrentProfile();
+    const parsed = parseBackup(JSON.stringify(exported));
+    expect(parsed.ok).toBe(true);
+    if (!parsed.ok) return;
+
+    const target = freshDb("equip-target");
+    await target.backup.importReplacingCurrentProfile(parsed.backup);
+    expect((await target.repos.settings.get()).customEquipment?.map((c) => c.name)).toEqual(["Rudergerät"]);
+    expect((await target.repos.exercises.getById("custom-row"))?.equipment).toEqual(["equip-rower-1", "barbell"]);
+
+    // ungültige Geräte-Schlüssel werden abgelehnt
+    const broken = JSON.parse(JSON.stringify(exported));
+    broken.customExercises[0].equipment = ["<script>"];
+    expect(parseBackup(JSON.stringify(broken)).ok).toBe(false);
+  });
+
   it("Backup-Infos: Zeitpunkt des letzten Backups und eigener Daten", async () => {
     const { repos, backup } = freshDb("backup-info");
     expect(await backup.getBackupInfo()).toEqual({ lastBackupAt: undefined, firstDataAt: undefined, lastDataAt: undefined });

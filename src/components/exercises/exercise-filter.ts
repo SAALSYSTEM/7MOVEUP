@@ -1,10 +1,10 @@
-import type { BodyRegion, Equipment, Exercise, Language, TrackingType } from "@/domain/types";
+import type { BodyRegion, EquipmentKey, Exercise, Language, TrackingType } from "@/domain/types";
 import { exerciseName } from "@/i18n";
 
 export type ExerciseFilter = {
   query: string;
   region?: BodyRegion;
-  equipment?: Equipment;
+  equipment?: EquipmentKey;
   tracking?: TrackingType;
 };
 

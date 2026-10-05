@@ -1,5 +1,5 @@
 import { Check, Minus, Plus, X } from "lucide-react";
-import { useId, useState } from "react";
+import { useId, useRef, useState } from "react";
 
 import { useApp } from "@/app/app-context";
 import { parseDisplayInput, roundTo, type MetricView, type ValueCheck } from "@/domain/body";
@@ -32,6 +32,7 @@ export function MetricInput({ metric, value, suggestion, hint, check = "ok", onC
   const id = useId();
   const [draft, setDraft] = useState<string | null>(null);
   const [typed, setTyped] = useState(false);
+  const inputRef = useRef<HTMLInputElement>(null);
   const confirmed = value !== undefined;
   const base = value ?? suggestion;
   const comma = language === "de";
@@ -40,7 +41,8 @@ export function MetricInput({ metric, value, suggestion, hint, check = "ok", onC
     draft ?? (base !== undefined ? toInputText(roundTo(base, metric.decimals), metric.decimals, comma) : "");
 
   const bump = (direction: 1 | -1) => {
-    if (base === undefined) return;
+    // noch kein Wert (erste Erfassung): − / + öffnen direkt die Eingabe
+    if (base === undefined) return inputRef.current?.focus();
     onChange(Math.max(0, roundTo(base + direction * metric.step, metric.decimals)));
   };
 
@@ -69,19 +71,19 @@ export function MetricInput({ metric, value, suggestion, hint, check = "ok", onC
           type="button"
           className={buttonClass}
           onClick={() => bump(-1)}
-          disabled={base === undefined}
           aria-label={t("common.decrease", { label: metric.name })}
         >
           <Minus size={18} strokeWidth={2.5} aria-hidden />
         </button>
         <div className="relative min-w-0 flex-1">
           <input
+            ref={inputRef}
             id={id}
             inputMode="decimal"
             enterKeyHint="done"
             autoComplete="off"
             value={shown}
-            placeholder="–"
+            placeholder={t("body.enterValue")}
             onFocus={(e) => {
               setDraft(shown);
               setTyped(false);
@@ -99,7 +101,7 @@ export function MetricInput({ metric, value, suggestion, hint, check = "ok", onC
             }}
             aria-describedby={`${id}-state`}
             className={cn(
-              "tabular h-12 w-full rounded-xl bg-transparent text-center text-2xl font-black outline-none focus:bg-elevated",
+              "tabular h-12 w-full rounded-xl bg-white/[0.04] text-center text-2xl font-black outline-none ring-1 ring-inset ring-line placeholder:text-sm placeholder:font-semibold placeholder:text-subtle focus:bg-elevated focus:ring-accent/50",
               confirmed || draft !== null ? "text-fg" : "text-subtle",
             )}
           />
@@ -113,7 +115,6 @@ export function MetricInput({ metric, value, suggestion, hint, check = "ok", onC
           type="button"
           className={buttonClass}
           onClick={() => bump(1)}
-          disabled={base === undefined}
           aria-label={t("common.increase", { label: metric.name })}
         >
           <Plus size={18} strokeWidth={2.5} aria-hidden />

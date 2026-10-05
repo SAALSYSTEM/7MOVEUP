@@ -14,13 +14,14 @@ import { ConfirmSheet } from "@/components/ui/confirm-sheet";
 import { exerciseRepository, workoutRepository } from "@/data";
 import { exerciseName } from "@/i18n";
 import { dateLocale, parseDateKey } from "@/lib/dates";
+import { equipmentLabel } from "@/lib/equipment";
 import { exerciseDefaultsSummary, formatSeconds } from "@/lib/exercise-format";
 import { formatPerformance } from "@/lib/performance-format";
 import { useData } from "@/hooks/use-data";
 
 export function ExerciseDetailPage() {
   const { exerciseId = "" } = useParams();
-  const { t, language } = useApp();
+  const { t, language, settings } = useApp();
   const navigate = useNavigate();
 
   const { data, loading } = useData(async () => {
@@ -83,11 +84,14 @@ export function ExerciseDetailPage() {
         {exercise.bodyRegions.map((r) => (
           <Badge key={r}>{t(`region.${r}`)}</Badge>
         ))}
-        {exercise.equipment.map((e) => (
-          <Badge key={e} className="border-accent/25 text-accent-light">
-            {t(`equipment.${e}`)}
-          </Badge>
-        ))}
+        {exercise.equipment.map((e) => {
+          const label = equipmentLabel(e, t, settings.customEquipment);
+          return label ? (
+            <Badge key={e} className="border-accent/25 text-accent-light">
+              {label}
+            </Badge>
+          ) : null;
+        })}
       </div>
 
       <div className="mt-5 grid grid-cols-2 gap-2">

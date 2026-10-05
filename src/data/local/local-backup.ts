@@ -54,6 +54,7 @@ export function createLocalBackupService(db: MoveUpDatabase, repos: LocalReposit
           soundEnabled: settings.soundEnabled,
           hapticsEnabled: settings.hapticsEnabled,
           unitSystem: settings.unitSystem,
+          customEquipment: settings.customEquipment,
         },
         bodySettings,
         measurements,

@@ -92,6 +92,7 @@ export function ProgressPage() {
             latest={latestPoint(body.measurements, kpi.key)}
             selected={metric?.key === kpi.key}
             onSelect={() => setParam("metric", kpi.key)}
+            onCapture={() => setCaptureOpen(true)}
             dateLabel={shortDate}
           />
         ))}
@@ -133,12 +134,15 @@ function KpiTile({
   latest,
   selected,
   onSelect,
+  onCapture,
   dateLabel,
 }: {
   metric: MetricView;
   latest: SeriesPoint | undefined;
   selected: boolean;
   onSelect: () => void;
+  /** Kachel ohne Wert: Antippen öffnet direkt die Erfassung */
+  onCapture: () => void;
   dateLabel: (key: string) => string;
 }) {
   const { t, language } = useApp();
@@ -146,8 +150,9 @@ function KpiTile({
   return (
     <button
       type="button"
-      onClick={onSelect}
-      aria-pressed={selected}
+      onClick={latest ? onSelect : onCapture}
+      aria-pressed={latest ? selected : undefined}
+      aria-label={latest ? undefined : `${metric.name}: ${t("progress.capture")}`}
       className={`min-w-0 rounded-[18px] border p-3 text-left transition-colors ${selected ? "border-accent/60 bg-accent/[0.07]" : "border-line bg-card"}`}
     >
       <span className="block truncate text-[11px] font-bold uppercase tracking-[0.1em] text-subtle">{metric.name}</span>
@@ -155,7 +160,13 @@ function KpiTile({
         <span className="truncate text-[22px] font-black leading-none tracking-tight">{value}</span>
         {latest && metric.unit && <span className="shrink-0 text-xs font-bold text-muted">{metric.unit}</span>}
       </span>
-      <span className="mt-1.5 block truncate text-[11px] text-subtle">{latest ? dateLabel(latest.date) : t("progress.noValue")}</span>
+      <span className="mt-1.5 block truncate text-[11px] text-subtle">{latest ? (
+          dateLabel(latest.date)
+        ) : (
+          <span className="inline-flex items-center gap-0.5 font-bold text-accent-light">
+            <Plus size={11} strokeWidth={3} aria-hidden /> {t("progress.capture")}
+          </span>
+        )}</span>
     </button>
   );
 }

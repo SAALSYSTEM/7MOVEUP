@@ -296,7 +296,7 @@ export function PlanEditorPage() {
       </div>
 
       <Sheet open={pickerOpen} onClose={() => setPickerOpen(false)} title={t("plan.pickTitle")} tall>
-        <ExerciseFilters filter={pickerFilter} onChange={setPickerFilter} />
+        <ExerciseFilters filter={pickerFilter} onChange={setPickerFilter} exercises={exercises} />
         <ul className="mt-4 space-y-2">
           {pickerResults.map((exercise) => (
             <li key={exercise.id}>

@@ -11,15 +11,20 @@ import { EmptyState, Page } from "@/components/layout/page";
 import { TrainingTabs } from "@/components/training/training-tabs";
 import { Button } from "@/components/ui/button";
 import { exerciseRepository } from "@/data";
-import { BODY_REGIONS, EQUIPMENT, TRACKING_TYPES, type BodyRegion, type Equipment, type TrackingType } from "@/domain/types";
+import { BODY_REGIONS, TRACKING_TYPES, type BodyRegion, type EquipmentKey, type Exercise, type TrackingType } from "@/domain/types";
+import { allEquipmentKeys } from "@/lib/equipment";
 import { useData } from "@/hooks/use-data";
+import { exerciseCountLabel } from "@/lib/weekdays";
 
 function pick<T extends string>(value: string | null, allowed: readonly T[]): T | undefined {
   return value && (allowed as readonly string[]).includes(value) ? (value as T) : undefined;
 }
 
+const EMPTY: Exercise[] = [];
+
 export function ExercisesPage() {
-  const { t, language } = useApp();
+  const { t, language, settings } = useApp();
+  const customEquipment = settings.customEquipment ?? [];
   const navigate = useNavigate();
   const [params, setParams] = useSearchParams();
 
@@ -27,7 +32,7 @@ export function ExercisesPage() {
   const filter: ExerciseFilter = {
     query: params.get("q") ?? "",
     region: pick<BodyRegion>(params.get("region"), BODY_REGIONS),
-    equipment: pick<Equipment>(params.get("equipment"), EQUIPMENT),
+    equipment: pick<EquipmentKey>(params.get("equipment"), allEquipmentKeys(customEquipment)),
     tracking: pick<TrackingType>(params.get("tracking"), TRACKING_TYPES),
   };
 
@@ -54,11 +59,11 @@ export function ExercisesPage() {
       <AppHeader left={<PageTitle>{t("training.title")}</PageTitle>} />
       <TrainingTabs value="exercises" />
 
-      <ExerciseFilters filter={filter} onChange={setFilter} />
+      <ExerciseFilters filter={filter} onChange={setFilter} exercises={data?.exercises ?? EMPTY} />
 
       <div className="mb-3 mt-6 flex items-center justify-between gap-3">
         <p className="text-sm font-semibold text-muted" aria-live="polite">
-          {t("exercises.count", { count: filtered.length })}
+          {exerciseCountLabel(t, filtered.length)}
         </p>
         <Button size="sm" variant="secondary" onClick={() => navigate("/exercises/new")}>
           <Plus size={16} aria-hidden /> {t("exercises.new")}

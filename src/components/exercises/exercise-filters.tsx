@@ -1,15 +1,18 @@
 import { Search, X } from "lucide-react";
-import type { ReactNode } from "react";
+import { useMemo, type ReactNode } from "react";
 
 import { useApp } from "@/app/app-context";
 import { Chip } from "@/components/ui/chip";
-import { BODY_REGIONS, EQUIPMENT, TRACKING_TYPES, type BodyRegion, type Equipment, type TrackingType } from "@/domain/types";
+import { BODY_REGIONS, TRACKING_TYPES, type BodyRegion, type EquipmentKey, type Exercise, type TrackingType } from "@/domain/types";
+import { allEquipmentKeys, equipmentLabel } from "@/lib/equipment";
 
 import type { ExerciseFilter } from "./exercise-filter";
 
 type Props = {
   filter: ExerciseFilter;
   onChange: (filter: ExerciseFilter) => void;
+  /** alle Übungen: Als Geräte-Filter erscheinen nur Geräte, die mindestens eine Übung nutzt (auch eigene) */
+  exercises: Exercise[];
 };
 
 function ChipRow({ label, children }: { label: string; children: ReactNode }) {
@@ -21,8 +24,10 @@ function ChipRow({ label, children }: { label: string; children: ReactNode }) {
   );
 }
 
-export function ExerciseFilters({ filter, onChange }: Props) {
-  const { t } = useApp();
+export function ExerciseFilters({ filter, onChange, exercises }: Props) {
+  const { t, settings } = useApp();
+  const customEquipment = settings.customEquipment ?? [];
+  const usedEquipment = useMemo(() => new Set<EquipmentKey>(exercises.flatMap((e) => e.equipment)), [exercises]);
   const set = (patch: Partial<ExerciseFilter>) => onChange({ ...filter, ...patch });
 
   return (
@@ -67,15 +72,17 @@ export function ExerciseFilters({ filter, onChange }: Props) {
         <Chip active={!filter.equipment} onClick={() => set({ equipment: undefined })}>
           {t("common.all")}
         </Chip>
-        {EQUIPMENT.map((equipment: Equipment) => (
-          <Chip
-            key={equipment}
-            active={filter.equipment === equipment}
-            onClick={() => set({ equipment: filter.equipment === equipment ? undefined : equipment })}
-          >
-            {t(`equipment.${equipment}`)}
-          </Chip>
-        ))}
+        {allEquipmentKeys(customEquipment)
+          .filter((equipment) => usedEquipment.has(equipment) || filter.equipment === equipment)
+          .map((equipment: EquipmentKey) => (
+            <Chip
+              key={equipment}
+              active={filter.equipment === equipment}
+              onClick={() => set({ equipment: filter.equipment === equipment ? undefined : equipment })}
+            >
+              {equipmentLabel(equipment, t, customEquipment)}
+            </Chip>
+          ))}
       </ChipRow>
 
       <ChipRow label={t("exercises.tracking")}>
