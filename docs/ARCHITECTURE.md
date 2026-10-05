@@ -25,7 +25,7 @@ Lokale mobile-first PWA ohne Backend. Daten zuerst in IndexedDB. UI greift über
 IndexedDB speichert:
 
 - Profil
-- Einstellungen
+- Einstellungen (inkl. Einheit und eigene Geräte)
 - Built-in-/Custom-Übungen
 - persönliche Übungsnotizen
 - Pläne
@@ -70,7 +70,7 @@ Built-in-Übungen liegen nicht in der DB, sondern kommen aus den Seed-Dateien �
 
 ### Entscheidungen
 
-- **Körperregionen/Equipment als stabile Schlüssel** (`chest`, `dumbbells` …) statt deutscher Labels; `Trizeps`/`Bizeps` aus dem Seed werden auf `Arme` gemappt.
+- **Körperregionen/Equipment als stabile Schlüssel** (`chest`, `dumbbells` …) statt deutscher Labels; `Trizeps`/`Bizeps` aus dem Seed werden auf `Arme` gemappt. Eigene Geräte haben Schlüssel `equip-…` und stehen in `settings.customEquipment`; doppelte Namen (auch zu Standardgeräten) werden erkannt (`src/lib/equipment.ts`).
 - **Ergometer** als 41. Built-in-Übung (`id: ergometer`, Tracking `cardio`): Die 6-Tage-Vorlage hat zwei Ergometer-Tage, die 40 Seed-Übungen enthalten aber keine Cardio-Übung.
 - **Ein Plan, Vorlagen ersetzen ihn:** Der persönliche Plan besteht aus Trainingstagen (`plans`) mit Wochentagen. Eine Vorlage zu übernehmen ersetzt nach Rückfrage alle Trainingstage (4-Tage: Mo/Di/Do/Fr, 6-Tage: Mo–Sa); absolvierte Trainings bleiben unverändert. Planung gilt ab dem Anlagetag, nicht rückwirkend.
 - **Körperwerte:** gespeichert in Basiseinheit (kg, cm, %, kcal) und ungerundet; Imperial ist nur Anzeige. Details und weitere Entscheidungen: `PROJECT_STATE.md`.

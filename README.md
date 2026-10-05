@@ -81,7 +81,7 @@ Details zu Schichten, Datenmodell und Entscheidungen: [`docs/ARCHITECTURE.md`](d
 }
 ```
 
-Import wird mit zod validiert, verlangt eine Bestätigung und ersetzt dann die lokalen Daten (inkl. Körperwerte). Dateien mit `schemaVersion: 1` werden weiterhin importiert; neuere Schema-Versionen werden abgelehnt.
+`settings` enthält Ton/Haptik, Einheit (`unitSystem`) und eigene Geräte (`customEquipment`). Import wird mit zod validiert, verlangt eine Bestätigung und ersetzt dann die lokalen Daten (inkl. Körperwerte). Dateien mit `schemaVersion: 1` werden weiterhin importiert; neuere Schema-Versionen werden abgelehnt.
 
 ## Deployment
 
@@ -92,6 +92,13 @@ Import wird mit zod validiert, verlangt eine Bestätigung und ersetzt dann die l
 - Node-Version für den Cloudflare-Build: `.node-version` (22).
 - Lokal mit der Cloudflare-Laufzeit testen: `npx wrangler dev`.
 - Feature-Branches: Cloudflare baut sie als Preview-Version (eigene `*.workers.dev`-Adresse), die Produktion bleibt unberührt. Die Preview hat einen eigenen lokalen Speicher – Daten per Backup-Datei mitnehmen.
+
+### Ablauf für eine neue Version
+
+1. Entwicklung auf einem Feature-Branch → Cloudflare baut eine Preview.
+2. Test auf dem Handy (Backup aus der Produktion in die Preview importieren).
+3. Nach Freigabe: Feature-Branch per Fast-Forward nach `main`, Push → Cloudflare baut die Produktion.
+4. Danach eigener Commit „release: x.y.z“: Versionsnummer in `package.json` (erscheint unter Mehr) und CHANGELOG-Eintrag statt „Unveröffentlicht“.
 
 Die GitHub-Pages-Vorschau (`.github/workflows/deploy-pages.yml`) baut mit `BASE_PATH=/<repo>/` und ist nur eine Test-Spielwiese.
 
