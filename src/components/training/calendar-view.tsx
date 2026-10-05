@@ -9,16 +9,16 @@ import {
   startOfDay,
   startOfMonth,
 } from "date-fns";
-import { Check, ChevronLeft, ChevronRight, Moon, Play, Weight } from "lucide-react";
-import { useMemo, useState } from "react";
+import { ArrowRight, Check, ChevronLeft, ChevronRight, Moon, Play } from "lucide-react";
+import { useMemo, useState, type ReactNode } from "react";
 
 import { useApp } from "@/app/app-context";
 import { Card } from "@/components/ui/card";
 import { formatMetric, type MetricView } from "@/domain/body";
 import { dayStatus, planKind, type DayStatus } from "@/domain/schedule";
-import type { BodyMeasurement, Exercise, WorkoutPlan, WorkoutSession } from "@/domain/types";
+import type { BodyMeasurement, Exercise, Weekday, WorkoutPlan, WorkoutSession } from "@/domain/types";
 import { useToday } from "@/hooks/use-today";
-import { dateLocale, localDateKey } from "@/lib/dates";
+import { dateLocale, isoWeekday, localDateKey } from "@/lib/dates";
 import { cn } from "@/lib/utils";
 
 import { exerciseCountLabel, WEEKDAYS } from "@/lib/weekdays";
@@ -32,6 +32,7 @@ type Props = {
   /** Körperwerte: erfasste Messungen und geplante Messtage */
   measurements?: BodyMeasurement[];
   metrics?: MetricView[];
+  measureWeekdays?: Weekday[];
   onOpenMeasurement?: (date: string) => void;
 };
 
@@ -44,6 +45,7 @@ export function CalendarView({
   canStart,
   measurements = [],
   metrics = [],
+  measureWeekdays = [],
   onOpenMeasurement,
 }: Props) {
   const { t, language } = useApp();
@@ -64,13 +66,75 @@ export function CalendarView({
   const measuredDays = useMemo(() => new Set(measurements.map((m) => m.date)), [measurements]);
   const selectedKey = localDateKey(selected);
   const selectedMeasurement = measurements.filter((m) => m.date === selectedKey).at(-1);
-  /** Messtag ohne Messung → steht unter „Geplant“ wie ein Training */
   const measurementSummary = (m: BodyMeasurement) =>
     metrics
       .filter((metric) => typeof m.values[metric.key] === "number")
       .slice(0, 3)
       .map((metric) => `${metric.name} ${formatMetric(metric, m.values[metric.key], language)}`)
       .join(" · ");
+
+  const sessionSummary = (session: WorkoutSession) => {
+    const doneSets = session.exercises.reduce((acc, e) => acc + e.sets.filter((x) => x.done).length, 0);
+    const minutes = session.durationSec ? `${t("home.minutesShort", { count: Math.round(session.durationSec / 60) })} · ` : "";
+    return `${minutes}${doneSets} ${t("common.sets")}`;
+  };
+
+  const selectedIsFuture = isAfter(startOfDay(selected), startOfDay(today));
+  const isMeasureDay = Boolean(onOpenMeasurement) && measureWeekdays.includes(isoWeekday(selected));
+
+  /** Eine Liste pro Tag: offen oben, erledigt darunter – Training und Körperwerte gleich behandelt */
+  type Entry = { key: string; done: boolean; title: string; subtitle: string; action?: ReactNode };
+  const entries: Entry[] = [];
+  const unmatched = [...selectedStatus.completed];
+  for (const plan of selectedStatus.planned) {
+    const kind = planKind(plan, exercisesById);
+    const at = unmatched.findIndex((s) => s.planId === plan.id);
+    const session = at >= 0 ? unmatched.splice(at, 1)[0] : undefined;
+    if (session) {
+      entries.push({ key: `plan-${plan.id}`, done: true, title: plan.name, subtitle: sessionSummary(session) });
+    } else {
+      entries.push({
+        key: `plan-${plan.id}`,
+        done: false,
+        title: plan.name,
+        subtitle: `${kind === "cardio" ? t("calendar.legendCardio") : t("calendar.legendStrength")} · ${exerciseCountLabel(t, plan.items.length)}`,
+        action: !selectedIsFuture && (
+          <button
+            type="button"
+            disabled={!canStart || plan.items.length === 0}
+            onClick={() => onStart(plan, selected)}
+            className="inline-flex h-11 shrink-0 items-center gap-1.5 rounded-xl bg-accent px-3.5 text-sm font-extrabold text-black disabled:opacity-40"
+          >
+            <Play size={15} fill="currentColor" aria-hidden /> {t("calendar.start")}
+          </button>
+        ),
+      });
+    }
+  }
+  // absolvierte Trainings, deren Plantag es nicht mehr gibt
+  for (const session of unmatched) {
+    entries.push({ key: `session-${session.id}`, done: true, title: session.planName, subtitle: sessionSummary(session) });
+  }
+  if (onOpenMeasurement && (selectedMeasurement || isMeasureDay)) {
+    const open = () => onOpenMeasurement(selectedKey);
+    entries.push({
+      key: "body",
+      done: Boolean(selectedMeasurement),
+      title: selectedMeasurement ? t("calendar.bodyLogged") + (selectedMeasurement.time ? ` · ${selectedMeasurement.time}` : "") : t("body.captureTitle"),
+      subtitle: selectedMeasurement ? measurementSummary(selectedMeasurement) : t("calendar.measureDay"),
+      action: !selectedIsFuture && (
+        <button
+          type="button"
+          onClick={open}
+          className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl text-accent hover:bg-white/5"
+          aria-label={`${t("body.captureTitle")} – ${format(selected, "d. MMMM", { locale })}`}
+        >
+          <ArrowRight size={18} aria-hidden />
+        </button>
+      ),
+    });
+  }
+  entries.sort((x, y) => Number(x.done) - Number(y.done));
 
   const statusLabel = (status: DayStatus) => {
     switch (status.kind) {
@@ -138,13 +202,14 @@ export function CalendarView({
             const isTodayCell = isSameDay(status.date, today);
             const isSelected = isSameDay(status.date, selected);
             const measured = measuredDays.has(localDateKey(status.date));
+            const bodyDay = Boolean(onOpenMeasurement) && (measured || measureWeekdays.includes(isoWeekday(status.date)));
             return (
               <button
                 key={status.date.toISOString()}
                 type="button"
                 onClick={() => setSelected(status.date)}
                 aria-pressed={isSelected}
-                aria-label={`${format(status.date, language === "de" ? "EEEE, d. MMMM" : "EEEE, MMMM d", { locale })} – ${statusLabel(status)}${measured ? ` · ${t("calendar.bodyLogged")}` : ""}`}
+                aria-label={`${format(status.date, language === "de" ? "EEEE, d. MMMM" : "EEEE, MMMM d", { locale })} – ${statusLabel(status)}${bodyDay ? ` · ${t("calendar.bodyLogged")}` : ""}`}
                 className={cn(
                   "relative flex h-12 items-center justify-center rounded-2xl transition-colors",
                   isSelected ? "bg-elevated" : "hover:bg-white/[0.03]",
@@ -167,7 +232,7 @@ export function CalendarView({
                     </span>
                   )}
                 </span>
-                {measured && <span className="absolute bottom-0.5 left-1/2 h-1.5 w-1.5 -translate-x-1/2 rounded-full bg-fg" aria-hidden />}
+                {bodyDay && <span className="absolute bottom-0.5 left-1/2 h-1.5 w-1.5 -translate-x-1/2 rounded-full bg-fg" aria-hidden />}
               </button>
             );
           })}
@@ -205,103 +270,35 @@ export function CalendarView({
           {format(selected, language === "de" ? "EEEE, d. MMMM" : "EEEE, MMMM d", { locale })}
         </h3>
 
-        {selectedStatus.completed.length === 0 && selectedStatus.planned.length === 0 && !selectedMeasurement && (
+        {entries.length === 0 ? (
           <Card className="flex items-center gap-3 p-4 text-sm text-muted">
             <Moon size={18} className="shrink-0 text-subtle" aria-hidden />
             {t("calendar.rest")}
           </Card>
-        )}
-
-        {(selectedStatus.completed.length > 0 || selectedMeasurement) && (
-          <div className="mb-3">
-            <p className="mb-2 px-1 text-[11px] font-bold uppercase tracking-[0.16em] text-subtle">{t("calendar.completed")}</p>
-            <ul className="space-y-2">
-              {selectedStatus.completed.map((session) => {
-                const doneSets = session.exercises.reduce((acc, e) => acc + e.sets.filter((s) => s.done).length, 0);
-                return (
-                  <li key={session.id}>
-                    <Card className="flex items-center gap-3 p-4">
-                      <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-success/15 text-success">
-                        <Check size={18} strokeWidth={3} aria-hidden />
-                      </span>
-                      <div className="min-w-0">
-                        <p className="truncate font-bold">{session.planName}</p>
-                        <p className="text-xs text-subtle">
-                          {session.durationSec ? t("home.minutesShort", { count: Math.round(session.durationSec / 60) }) : ""}
-                          {session.durationSec ? " · " : ""}
-                          {doneSets} {t("common.sets")}
-                        </p>
-                      </div>
-                    </Card>
-                  </li>
-                );
-              })}
-              {selectedMeasurement && (
-                <li>
-                  <button
-                    type="button"
-                    onClick={() => onOpenMeasurement?.(selectedKey)}
-                    disabled={!onOpenMeasurement}
-                    className="flex w-full items-center gap-3 rounded-[20px] border border-line bg-card p-4 text-left hover:bg-elevated"
+        ) : (
+          <ul className="space-y-2">
+            {entries.map((entry) => (
+              <li key={entry.key}>
+                <Card className="flex items-center gap-3 p-4">
+                  <span
+                    className={cn(
+                      "flex h-9 w-9 shrink-0 items-center justify-center rounded-full",
+                      entry.done ? "bg-success/15 text-success" : "border-2 border-warning/80",
+                    )}
+                    role="img"
+                    aria-label={entry.done ? t("calendar.legendDone") : t("calendar.open")}
                   >
-                    <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-success/15 text-success">
-                      <Weight size={17} aria-hidden />
-                    </span>
-                    <span className="min-w-0">
-                      <span className="block truncate font-bold">
-                        {t("calendar.bodyLogged")}
-                        {selectedMeasurement.time ? ` · ${selectedMeasurement.time}` : ""}
-                      </span>
-                      <span className="block truncate text-xs text-subtle">{measurementSummary(selectedMeasurement)}</span>
-                    </span>
-                  </button>
-                </li>
-              )}
-            </ul>
-          </div>
-        )}
-
-        {selectedStatus.planned.length > 0 && (
-          <div>
-            <p className="mb-2 px-1 text-[11px] font-bold uppercase tracking-[0.16em] text-subtle">{t("calendar.planned")}</p>
-            <ul className="space-y-2">
-              {selectedStatus.planned.map((plan) => {
-                const kind = planKind(plan, exercisesById);
-                const done = selectedStatus.completed.some((s) => s.planId === plan.id);
-                const startable = !done && !isAfter(startOfDay(selected), startOfDay(today));
-                return (
-                  <li key={plan.id}>
-                    <Card className="flex items-center gap-3 p-4">
-                      <span
-                        className={cn(
-                          "h-9 w-1.5 shrink-0 rounded-full",
-                          kind === "cardio" ? "bg-cardio" : "bg-accent",
-                          done && "bg-success",
-                        )}
-                        aria-hidden
-                      />
-                      <div className="min-w-0 flex-1">
-                        <p className={cn("truncate font-bold", done && "text-muted line-through")}>{plan.name}</p>
-                        <p className="text-xs text-subtle">
-                          {kind === "cardio" ? t("calendar.legendCardio") : t("calendar.legendStrength")} · {exerciseCountLabel(t, plan.items.length)}
-                        </p>
-                      </div>
-                      {startable && (
-                        <button
-                          type="button"
-                          disabled={!canStart || plan.items.length === 0}
-                          onClick={() => onStart(plan, selected)}
-                          className="inline-flex h-11 shrink-0 items-center gap-1.5 rounded-xl bg-accent px-3.5 text-sm font-extrabold text-black disabled:opacity-40"
-                        >
-                          <Play size={15} fill="currentColor" aria-hidden /> {t("calendar.start")}
-                        </button>
-                      )}
-                    </Card>
-                  </li>
-                );
-              })}
-            </ul>
-          </div>
+                    {entry.done && <Check size={18} strokeWidth={3} aria-hidden />}
+                  </span>
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate font-bold">{entry.title}</p>
+                    <p className="truncate text-xs text-subtle">{entry.subtitle}</p>
+                  </div>
+                  {entry.action}
+                </Card>
+              </li>
+            ))}
+          </ul>
         )}
       </section>
     </div>

@@ -39,6 +39,7 @@ export function CalendarPage() {
           canStart={!busy}
           measurements={body.measurements}
           metrics={body.metrics}
+          measureWeekdays={body.bodySettings?.measureWeekdays ?? []}
           onOpenMeasurement={setCaptureDate}
         />
       )}
