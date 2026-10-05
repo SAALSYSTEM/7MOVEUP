@@ -38,7 +38,6 @@ export function CalendarPage() {
           onStart={(plan, date) => void start(plan, date)}
           canStart={!busy}
           measurements={body.measurements}
-          measureWeekdays={body.bodySettings?.measureWeekdays ?? []}
           metrics={body.metrics}
           onOpenMeasurement={setCaptureDate}
         />

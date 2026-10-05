@@ -52,7 +52,7 @@ Der Kalender hat keinen eigenen Navigationspunkt; er öffnet sich über „Kalen
 - **Einheiten:** gespeichert immer in kg / cm / % / kcal, ungerundet. Metrisch/Imperial ist nur Anzeige (kg ↔ lb, cm ↔ in). Schrittweiten: Gewicht 0,1 kg (0,2 lb), Körperfett/Wasser 0,1 %, Umfänge 0,5 cm (0,25 in), kcal 10.
 - **Schnellerfassung:** letzter Wert erscheint grau als Vorschlag und wird nie automatisch gespeichert. Gespeichert wird nur, was bestätigt (✓), mit −/+ geändert oder eingetippt wurde. Erster Wert eines Messwerts: leeres Feld. Unplausible Werte → Hinweis, negative/ungültige → nicht speicherbar.
 - **Eine Messung pro Tag:** erneutes Erfassen am selben Tag ergänzt/ändert die vorhandene Messung. Lokales Datum (`yyyy-MM-dd`) + optionale Uhrzeit.
-- **Messtage:** frei wählbare Wochentage (Standard: keine). Am Messtag zeigt Heute „Körperwerte erfassen“. Im Kalender: Messtag ohne Messung unter „Geplant“ (kommende als Ring im Raster), erfasste Messung unter „Abgeschlossen“ (Punkt im Raster).
+- **Messtage:** frei wählbare Wochentage (Standard: keine). Am Messtag zeigt Heute „Körperwerte erfassen“. Im Kalender erscheinen Körperwerte nur, wenn am Tag erfasst wurde: Punkt im Raster, Karte „Körperwerte“ unter „Abgeschlossen“. Kein „Geplant“, kein Ring für Messtage.
 - Ohne Vorwert ist das Eingabefeld sichtbar leer („Wert eingeben“); − / + setzen dann den Cursor ins Feld. Fortschritt-Kacheln ohne Wert öffnen direkt die Erfassung.
 
 ### Fortschritt
