@@ -51,7 +51,7 @@ Die UI soll von lokalen Details entkoppelt sein. Später können Repository-Impl
 | --- | --- |
 | UI – Seiten | `src/pages/*` |
 | UI – Komponenten | `src/components/{ui,layout,home,training,exercises}` (shadcn-Struktur: `src/components/ui`) |
-| Application Services | `src/services/workout-service.ts` (Session starten/abschließen), `src/services/feedback.ts` (Web Audio + Vibration), `src/hooks/use-countdown.ts` (Timer) |
+| Application Services | `src/services/workout-service.ts` (Session starten/abschließen), `src/services/feedback.ts` (Web Audio + Vibration/iOS-Haptik), `src/hooks/use-countdown.ts` (Timer, Wake Lock) |
 | Domänenlogik (rein, getestet) | `src/domain/*` – Typen, Tagesspruch, Progression, Kalender/Wochenstatistik |
 | Repository-Verträge | `src/data/repositories.ts` |
 | Local Adapter (Dexie) | `src/data/local/*` |

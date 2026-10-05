@@ -50,7 +50,7 @@ src/
   hooks/          useData, useCountdown, useToday
   i18n/           de.ts / en.ts
   pages/          Heute, Training, Plan-Editor, Session, Übungen, Essen, Mehr
-  services/       Session starten/abschließen, Töne/Vibration
+  services/       Session starten/abschließen, Töne/Vibration (iPhone-Besonderheiten: docs/PWA_NOTES.md)
 public/icons/     App-Icon, Favicon, Header-Icon (aus brand/)
 brand/            verbindliche Logo-Vorlage (1:1, nicht verändern)
 docs/             Architektur- und PWA-Notizen

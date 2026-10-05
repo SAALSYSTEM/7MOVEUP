@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 
 import { useApp } from "@/app/app-context";
 import { Card } from "@/components/ui/card";
+import { HapticTap } from "@/components/ui/haptic-tap";
 import { Stepper } from "@/components/ui/stepper";
 import { isProgressionReady, progressionStepKg } from "@/domain/progression";
 import type { Exercise, PerformanceSnapshot, SessionExercise, SetLog } from "@/domain/types";
@@ -238,18 +239,20 @@ export function SessionExerciseCard({
                     max={500}
                   />
                 )}
-                <button
-                  type="button"
-                  onClick={() => toggleDone(setIndex)}
-                  aria-pressed={set.done}
-                  aria-label={`${set.done ? t("session.markUndone", { n: setIndex + 1 }) : t("session.markDone", { n: setIndex + 1 })} · ${name}`}
-                  className={cn(
-                    "flex h-11 w-11 shrink-0 items-center justify-center rounded-full border-2 transition-colors",
-                    set.done ? "border-success bg-success text-black" : "border-line text-subtle hover:border-muted",
-                  )}
-                >
-                  <Check size={20} strokeWidth={3} aria-hidden />
-                </button>
+                <HapticTap className="shrink-0" onTap={() => toggleDone(setIndex)}>
+                  <button
+                    type="button"
+                    onClick={() => toggleDone(setIndex)}
+                    aria-pressed={set.done}
+                    aria-label={`${set.done ? t("session.markUndone", { n: setIndex + 1 }) : t("session.markDone", { n: setIndex + 1 })} · ${name}`}
+                    className={cn(
+                      "flex h-11 w-11 shrink-0 items-center justify-center rounded-full border-2 transition-colors",
+                      set.done ? "border-success bg-success text-black" : "border-line text-subtle hover:border-muted",
+                    )}
+                  >
+                    <Check size={20} strokeWidth={3} aria-hidden />
+                  </button>
+                </HapticTap>
               </li>
             ))}
           </ol>
@@ -305,18 +308,22 @@ function CardioInputs({
         <Stepper value={set.rpm} onChange={(v) => onUpdate({ rpm: v })} label={t("session.rpm")} unit={t("session.rpm")} max={250} />
         <Stepper value={set.heartRate} onChange={(v) => onUpdate({ heartRate: v })} label={t("session.heartRate")} unit={t("session.heartRate")} max={250} />
       </div>
-      <button
-        type="button"
-        onClick={onToggle}
-        aria-pressed={set.done}
-        className={cn(
-          "mt-4 flex h-12 w-full items-center justify-center gap-2 rounded-2xl border-2 text-sm font-extrabold transition-colors",
-          set.done ? "border-success bg-success text-black" : "border-line text-muted hover:text-fg",
-        )}
-      >
-        <Check size={18} strokeWidth={3} aria-hidden />
-        {set.done ? t("session.cardioUndone") : t("session.cardioDone")}
-      </button>
+      <div className="mt-4">
+        <HapticTap onTap={onToggle}>
+          <button
+            type="button"
+            onClick={onToggle}
+            aria-pressed={set.done}
+            className={cn(
+              "flex h-12 w-full items-center justify-center gap-2 rounded-2xl border-2 text-sm font-extrabold transition-colors",
+              set.done ? "border-success bg-success text-black" : "border-line text-muted hover:text-fg",
+            )}
+          >
+            <Check size={18} strokeWidth={3} aria-hidden />
+            {set.done ? t("session.cardioUndone") : t("session.cardioDone")}
+          </button>
+        </HapticTap>
+      </div>
     </div>
   );
 }

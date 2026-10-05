@@ -4,7 +4,7 @@ import { profileRepository, requestPersistentStorage, settingsRepository } from 
 import { subscribeDataChanges } from "@/data/events";
 import type { Language, Profile, Settings } from "@/domain/types";
 import { createTranslator, type Translate } from "@/i18n";
-import { configureFeedback, unlockAudio } from "@/services/feedback";
+import { configureFeedback, resumeAudio, unlockAudio } from "@/services/feedback";
 
 type AppContextValue = {
   profile: Profile;
@@ -45,14 +45,20 @@ export function AppProvider({ children, fallback }: { children: ReactNode; fallb
     };
   }, []);
 
-  // Audio erst nach der ersten Nutzerinteraktion initialisieren (iOS).
+  // Audio nur aus Nutzerinteraktionen starten (iOS) – bei jeder Interaktion erneut, weil iOS den
+  // Ton nach Bildschirmsperre oder App-Wechsel unterbricht. touchend statt pointerdown: nur
+  // touchend/click/keydown zählen auf iOS als Nutzeraktivierung.
   useEffect(() => {
     const unlock = () => unlockAudio();
-    window.addEventListener("pointerdown", unlock, { once: true, capture: true });
-    window.addEventListener("keydown", unlock, { once: true, capture: true });
+    const onVisible = () => {
+      if (document.visibilityState === "visible") resumeAudio();
+    };
+    const events = ["touchend", "click", "keydown"] as const;
+    for (const type of events) window.addEventListener(type, unlock, { capture: true, passive: true });
+    document.addEventListener("visibilitychange", onVisible);
     return () => {
-      window.removeEventListener("pointerdown", unlock, { capture: true });
-      window.removeEventListener("keydown", unlock, { capture: true });
+      for (const type of events) window.removeEventListener(type, unlock, { capture: true });
+      document.removeEventListener("visibilitychange", onVisible);
     };
   }, []);
 

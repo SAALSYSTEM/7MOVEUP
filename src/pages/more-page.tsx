@@ -19,7 +19,7 @@ import { parseBackup, type BackupFile, type BackupParseError } from "@/data/back
 import type { Language } from "@/domain/types";
 import { asset } from "@/lib/asset";
 import { dateLocale } from "@/lib/dates";
-import { countdownBeep, finishSignal, isVibrationSupported, unlockAudio } from "@/services/feedback";
+import { countdownBeep, finishSignal, getHapticsSupport, isIOS, unlockAudio } from "@/services/feedback";
 
 function slug(text: string) {
   return text
@@ -138,7 +138,14 @@ export function MorePage() {
     }
   })();
 
-  const vibrationSupported = isVibrationSupported();
+  const hapticsSupport = getHapticsSupport();
+  const hapticsHint =
+    hapticsSupport === "vibrate"
+      ? t("more.hapticsHint")
+      : hapticsSupport === "ios"
+        ? t("more.hapticsHintIos")
+        : `${t("more.hapticsHint")} – ${t("more.hapticsUnsupported")}`;
+  const soundHint = isIOS() ? `${t("more.soundHint")}. ${t("more.soundHintIos")}` : t("more.soundHint");
 
   return (
     <Page>
@@ -186,7 +193,7 @@ export function MorePage() {
             <SettingRow
               id="sound"
               title={t("more.sound")}
-              hint={t("more.soundHint")}
+              hint={soundHint}
               control={
                 <Switch
                   id="sound"
@@ -215,7 +222,7 @@ export function MorePage() {
             <SettingRow
               id="haptics"
               title={t("more.haptics")}
-              hint={vibrationSupported ? t("more.hapticsHint") : `${t("more.hapticsHint")} – ${t("more.hapticsUnsupported")}`}
+              hint={hapticsHint}
               control={
                 <Switch
                   id="haptics"

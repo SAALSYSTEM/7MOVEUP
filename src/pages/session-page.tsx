@@ -16,8 +16,9 @@ import { useToast } from "@/components/ui/toast";
 import { exerciseRepository, planRepository, workoutRepository } from "@/data";
 import type { Exercise, ExerciseNote, PerformanceSnapshot, SessionExercise, WorkoutSession } from "@/domain/types";
 import { localized } from "@/i18n";
+import { useWakeLock } from "@/hooks/use-countdown";
 import { formatDuration } from "@/lib/dates";
-import { tick } from "@/services/feedback";
+import { tick, unlockAudio } from "@/services/feedback";
 import { finishSession } from "@/services/workout-service";
 
 type Loaded = {
@@ -91,6 +92,8 @@ export function SessionPage() {
   }, [sessionId, navigate]);
 
   const elapsed = useElapsed(session?.startedAt);
+  // Während des Trainings nicht automatisch sperren – sonst pausiert iOS die App samt Pausen-Timer.
+  useWakeLock(Boolean(session));
 
   /** Jede Änderung sofort lokal speichern → Reload/App-Wechsel verliert nichts. */
   const updateExercise = useCallback((index: number, entry: SessionExercise) => {
@@ -122,7 +125,9 @@ export function SessionPage() {
   const timerEntry = timerTarget ? session.exercises[timerTarget.exerciseIndex] : undefined;
   const timerSet = timerEntry && timerTarget ? timerEntry.sets[timerTarget.setIndex] : undefined;
 
+  /** läuft synchron im Tap auf den Haken → Ton und Haptik sind auf iOS entsperrt */
   const startRest = (entry: SessionExercise, setIndex: number) => {
+    unlockAudio();
     tick();
     const isLastSetOfExercise = setIndex >= entry.sets.length - 1;
     const isLastExercise = session.exercises.at(-1)?.id === entry.id;

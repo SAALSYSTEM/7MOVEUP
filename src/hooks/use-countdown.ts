@@ -92,23 +92,40 @@ export function useCountdown(totalSec: number, { onFinish, signals = true }: Opt
   return { status, remainingMs, remainingSec: Math.ceil(remainingMs / 1000), elapsedSec, start, pause, reset, addSeconds };
 }
 
-/** Bildschirm während eines laufenden Timers wach halten (sofern unterstützt). */
+/**
+ * Bildschirm wach halten, solange `active` (sofern unterstützt; iPhone-Home-Bildschirm-App ab iOS 18.4).
+ * Der Browser gibt die Sperre beim Verlassen der App frei – sie wird bei Rückkehr bzw. beim
+ * nächsten Tippen erneut angefordert.
+ */
 export function useWakeLock(active: boolean) {
   useEffect(() => {
-    if (!active) return;
-    type WakeLockSentinelLike = { release: () => Promise<void> };
-    const nav = navigator as Navigator & { wakeLock?: { request: (type: "screen") => Promise<WakeLockSentinelLike> } };
-    let sentinel: WakeLockSentinelLike | undefined;
-    let released = false;
-    nav.wakeLock
-      ?.request("screen")
-      .then((lock) => {
-        if (released) void lock.release();
-        else sentinel = lock;
-      })
-      .catch(() => {});
+    if (!active || typeof navigator === "undefined" || !("wakeLock" in navigator)) return;
+    let sentinel: WakeLockSentinel | null = null;
+    let pending = false;
+    let disposed = false;
+
+    const acquire = () => {
+      if (disposed || pending || (sentinel && !sentinel.released) || document.visibilityState !== "visible") return;
+      pending = true;
+      navigator.wakeLock
+        .request("screen")
+        .then((lock) => {
+          if (disposed) void lock.release().catch(() => {});
+          else sentinel = lock;
+        })
+        .catch(() => {})
+        .finally(() => {
+          pending = false;
+        });
+    };
+
+    acquire();
+    document.addEventListener("visibilitychange", acquire);
+    window.addEventListener("click", acquire, { capture: true, passive: true });
     return () => {
-      released = true;
+      disposed = true;
+      document.removeEventListener("visibilitychange", acquire);
+      window.removeEventListener("click", acquire, { capture: true });
       void sentinel?.release().catch(() => {});
     };
   }, [active]);

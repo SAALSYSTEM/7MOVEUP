@@ -3,7 +3,7 @@ import { Check, Pause, Play, RotateCcw } from "lucide-react";
 import { useApp } from "@/app/app-context";
 import { Button } from "@/components/ui/button";
 import { Sheet } from "@/components/ui/sheet";
-import { useCountdown, useWakeLock } from "@/hooks/use-countdown";
+import { useCountdown } from "@/hooks/use-countdown";
 import { formatDuration } from "@/lib/dates";
 import { cn } from "@/lib/utils";
 
@@ -28,7 +28,6 @@ function TimerSheetInner({ open, onClose, title, subtitle, durationSec, onComple
   const timer = useCountdown(durationSec, {
     onFinish: () => onComplete(durationSec),
   });
-  useWakeLock(timer.status === "running");
 
   const progress = durationSec > 0 ? timer.remainingMs / (durationSec * 1000) : 0;
   const radius = 108;
