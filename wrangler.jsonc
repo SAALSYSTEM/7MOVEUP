@@ -11,5 +11,7 @@
     "directory": "./dist",
     // SPA: unbekannte Pfade wie /training liefern index.html
     "not_found_handling": "single-page-application"
-  }
+  },
+  // Pflicht für `wrangler preview` (Preview-Builds auf Nicht-Production-Branches); leer genügt
+  "previews": {}
 }
