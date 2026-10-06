@@ -24,9 +24,10 @@ export function dismissKeyboard() {
 /** iOS zwingen, fixierte Elemente neu zu positionieren (1 px hin und zurück). */
 function nudgeViewport() {
   if (editableFocused()) return; // Tastatur offen → nicht eingreifen
-  const y = window.scrollY;
-  window.scrollTo(0, y > 0 ? y - 1 : y + 1);
-  window.scrollTo(0, y);
+  // Wer schon scrollt, hat die Neuberechnung ohnehin ausgelöst – und ein scrollTo würde das Wischen ruckeln lassen
+  if (window.scrollY > 0) return;
+  window.scrollTo(0, 1);
+  window.scrollTo(0, 0);
 }
 
 /** Reparatur kurz nach einem Seitenwechsel bzw. Schließen der Tastatur; liefert eine Aufräumfunktion. */

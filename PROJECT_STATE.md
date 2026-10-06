@@ -66,8 +66,10 @@ Der Kalender hat keinen eigenen Navigationspunkt; er öffnet sich über „Kalen
 
 ### Neu hier?
 
-- Seite `/welcome`: Start in vier Schritten, **Daten liegen nur auf dem Gerät → Backup-Knopf**, Home-Bildschirm (iOS/andere), Tipps.
+- Seite `/welcome`: Start in vier Schritten, **Daten liegen nur auf dem Gerät → Backup-Knopf**, Installationsanleitung iPhone (Safari) und Android (Chrome), Tipps.
 - Einstieg: einmalige Karte auf Heute für Nutzer ohne Training (verschwindet nach Besuch oder Wegtippen; Merker `localStorage` `7moveup.welcomeSeen`, nicht im Backup) und dauerhaft unter Mehr → Über.
+
+- `nudgeViewport()` (`src/lib/viewport.ts`) überspringt den Scroll-Impuls, wenn `scrollY > 0`.
 
 ### Backup-Hinweis
 

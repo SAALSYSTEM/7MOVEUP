@@ -1,5 +1,5 @@
 import { ArrowRight, Download, HardDrive, Lightbulb, Smartphone } from "lucide-react";
-import { useEffect, type ReactNode } from "react";
+import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { useApp } from "@/app/app-context";
@@ -8,7 +8,6 @@ import { SubHeader } from "@/components/layout/sub-header";
 import { Button } from "@/components/ui/button";
 import { Card, SectionTitle } from "@/components/ui/card";
 import { useBackupExport } from "@/hooks/use-backup";
-import { isIOS } from "@/lib/device";
 import { markWelcomeSeen } from "@/lib/welcome";
 
 const STEPS = ["step1", "step2", "step3", "step4"] as const;
@@ -58,9 +57,24 @@ export function WelcomePage() {
         </div>
       </section>
 
-      <Block icon={<Smartphone size={18} aria-hidden />} title={t("welcome.installTitle")}>
-        {isIOS() ? t("welcome.installIos") : t("welcome.installOther")}
-      </Block>
+      <section className="mb-6" aria-labelledby="welcome-install">
+        <Card className="p-4">
+          <h2 id="welcome-install" className="flex items-center gap-2 font-black">
+            <Smartphone size={18} className="shrink-0 text-accent" aria-hidden /> {t("welcome.installTitle")}
+          </h2>
+          <dl className="mt-3 space-y-3 text-sm leading-relaxed">
+            <div>
+              <dt className="font-bold">{t("welcome.installIphone")}</dt>
+              <dd className="text-muted">{t("welcome.installIos")}</dd>
+            </div>
+            <div>
+              <dt className="font-bold">{t("welcome.installAndroidLabel")}</dt>
+              <dd className="text-muted">{t("welcome.installAndroid")}</dd>
+            </div>
+          </dl>
+          <p className="mt-3 text-sm text-muted">{t("welcome.installDone")}</p>
+        </Card>
+      </section>
 
       <section className="mb-6" aria-labelledby="welcome-tips">
         <SectionTitle id="welcome-tips">{t("welcome.tipsTitle")}</SectionTitle>
@@ -78,18 +92,5 @@ export function WelcomePage() {
         {t("welcome.go")} <ArrowRight size={18} aria-hidden />
       </Button>
     </Page>
-  );
-}
-
-function Block({ icon, title, children }: { icon: ReactNode; title: string; children: ReactNode }) {
-  return (
-    <section className="mb-6">
-      <Card className="p-4">
-        <h2 className="flex items-center gap-2 font-black">
-          <span className="text-accent">{icon}</span> {title}
-        </h2>
-        <p className="mt-2 text-sm leading-relaxed text-muted">{children}</p>
-      </Card>
-    </section>
   );
 }

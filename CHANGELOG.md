@@ -6,7 +6,8 @@ Alle nennenswerten Änderungen an 7MOVEUP. Neueste oben.
 
 Branch `feature-neu-hier` – Preview-Test, noch keine Versionsnummer.
 
-- **„Neu hier?“-Seite:** kurze Erklärung in vier Schritten, der Hinweis „Deine Daten liegen nur auf diesem Handy“ mit Backup-Knopf (Tipp: einmal pro Woche, in iCloud Drive ablegen), Anleitung für den Home-Bildschirm und Tipps. Auf Heute erscheint für neue Nutzer (noch kein Training) eine einmalige, wegtippbare Karte; dauerhaft erreichbar unter Mehr → „Neu hier? Kurz erklärt“.
+- **„Neu hier?“-Seite:** kurze Erklärung in vier Schritten, der Hinweis „Deine Daten liegen nur auf diesem Handy“ mit Backup-Knopf (Tipp: einmal pro Woche, in iCloud Drive ablegen), Anleitung zum Installieren für iPhone (Safari) **und Android (Chrome)** und Tipps. Auf Heute erscheint für neue Nutzer (noch kein Training) eine einmalige, wegtippbare Karte; dauerhaft erreichbar unter Mehr → „Neu hier? Kurz erklärt“.
+- **Scrollen auf iOS:** Die Viewport-Reparatur (kleiner 1-px-Scroll nach Seitenwechsel) greift nicht mehr ein, wenn man schon scrollt – das konnte das Wischen ruckeln lassen.
 
 ## 1.5.0 – 2026-10-06
 
