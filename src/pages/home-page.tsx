@@ -5,6 +5,7 @@ import { Link, useNavigate } from "react-router-dom";
 
 import { useApp } from "@/app/app-context";
 import { MeasurementSheet } from "@/components/body/measurement-sheet";
+import { WelcomeCard } from "@/components/home/welcome-card";
 import { BackupLine } from "@/components/home/backup-line";
 import { MotivationLoop } from "@/components/home/motivation-loop";
 import { AppHeader } from "@/components/layout/app-header";
@@ -120,6 +121,9 @@ export function HomePage() {
         </button>
         {active && <p className="relative mt-3 truncate text-center text-xs font-semibold text-muted">{active.planName}</p>}
       </section>
+
+      {/* Neu hier? – nur solange es noch kein Training gibt */}
+      {data && !hasHistory && <WelcomeCard />}
 
       {/* Heute fällig */}
       <section className="mb-3" aria-labelledby="today-title">

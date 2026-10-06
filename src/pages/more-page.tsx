@@ -1,7 +1,7 @@
 import { format } from "date-fns";
-import { Download, HardDrive, Upload, Volume2 } from "lucide-react";
+import { ChevronRight, Download, HardDrive, Upload, Volume2 } from "lucide-react";
 import { useEffect, useRef, useState, type ReactNode } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 
 import { useApp } from "@/app/app-context";
 import { AppHeader, PageTitle } from "@/components/layout/app-header";
@@ -275,6 +275,9 @@ export function MorePage() {
             <p className="mt-3 flex items-center gap-2 text-xs text-subtle">
               <HardDrive size={14} aria-hidden /> {t("more.storage")}
             </p>
+            <Link to="/welcome" className="mt-4 flex min-h-11 items-center justify-between rounded-xl bg-elevated px-4 text-sm font-bold">
+              {t("welcome.more")} <ChevronRight size={16} className="text-subtle" aria-hidden />
+            </Link>
           </Card>
         </Section>
       </div>

@@ -18,6 +18,7 @@ import { PlanEditorPage } from "@/pages/plan-editor-page";
 import { ProgressPage } from "@/pages/progress-page";
 import { SessionPage } from "@/pages/session-page";
 import { TrainingPage } from "@/pages/training-page";
+import { WelcomePage } from "@/pages/welcome-page";
 import { ResumeActiveSession } from "@/components/layout/resume-active-session";
 import { ScrollToTop } from "@/components/layout/scroll-to-top";
 
@@ -46,6 +47,7 @@ function Shell() {
         <Route path="/calendar" element={<CalendarPage />} />
         <Route path="/food" element={<FoodPage />} />
         <Route path="/more" element={<MorePage />} />
+        <Route path="/welcome" element={<WelcomePage />} />
         <Route path="*" element={<HomePage />} />
       </Routes>
       {!hideNav && <BottomNavBar />}

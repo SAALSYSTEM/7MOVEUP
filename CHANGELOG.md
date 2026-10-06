@@ -2,6 +2,12 @@
 
 Alle nennenswerten Änderungen an 7MOVEUP. Neueste oben.
 
+## Unveröffentlicht
+
+Branch `feature-neu-hier` – Preview-Test, noch keine Versionsnummer.
+
+- **„Neu hier?“-Seite:** kurze Erklärung in vier Schritten, der Hinweis „Deine Daten liegen nur auf diesem Handy“ mit Backup-Knopf (Tipp: einmal pro Woche, in iCloud Drive ablegen), Anleitung für den Home-Bildschirm und Tipps. Auf Heute erscheint für neue Nutzer (noch kein Training) eine einmalige, wegtippbare Karte; dauerhaft erreichbar unter Mehr → „Neu hier? Kurz erklärt“.
+
 ## 1.5.0 – 2026-10-06
 
 - **Equipment sichtbar:** Das Equipment der Übung steht jetzt in der grauen Zeile unter dem Namen – in „Training bearbeiten“, in der Übungsliste und im Training („Kurzhanteln, Hantelbank“, bei mehr als zwei Geräten „+1“). „Körpergewicht“ allein wird nicht angezeigt.

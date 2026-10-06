@@ -64,6 +64,11 @@ Der Kalender hat keinen eigenen Navigationspunkt; er öffnet sich über „Kalen
 - **Entwicklung** = neuester minus erster Wert im Zeitraum; bei weniger als 2 Werten „Zu wenige Werte“. Dazu Ø · Min · Max.
 - Zugang zur Verwaltung über „Messwerte“.
 
+### Neu hier?
+
+- Seite `/welcome`: Start in vier Schritten, **Daten liegen nur auf dem Gerät → Backup-Knopf**, Home-Bildschirm (iOS/andere), Tipps.
+- Einstieg: einmalige Karte auf Heute für Nutzer ohne Training (verschwindet nach Besuch oder Wegtippen; Merker `localStorage` `7moveup.welcomeSeen`, nicht im Backup) und dauerhaft unter Mehr → Über.
+
 ### Backup-Hinweis
 
 - Mehr → Daten zeigt immer „Letztes Backup: vor X Tagen“ bzw. „Noch kein Backup erstellt“.
