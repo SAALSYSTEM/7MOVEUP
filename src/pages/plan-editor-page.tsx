@@ -176,11 +176,6 @@ export function PlanEditorPage() {
                         </span>
                         <div className="min-w-0 flex-1">
                           <p className="font-bold leading-snug">{exercise ? exerciseName(exercise, language) : item.exerciseId}</p>
-                          <p className="text-xs text-subtle">
-                            {[t(`tracking.${tracking}`), exercise ? equipmentSummary(exercise.equipment, t, settings.customEquipment) : undefined]
-                              .filter(Boolean)
-                              .join(" · ")}
-                          </p>
                         </div>
                         <div className="-mr-2 -mt-2 flex shrink-0">
                           {exercise && (
@@ -218,6 +213,12 @@ export function PlanEditorPage() {
                           </Button>
                         </div>
                       </div>
+
+                      <p className="-mt-1.5 mb-3 pl-8 text-xs text-subtle">
+                        {[t(`tracking.${tracking}`), exercise ? equipmentSummary(exercise.equipment, t, settings.customEquipment) : undefined]
+                          .filter(Boolean)
+                          .join(" · ")}
+                      </p>
 
                       <div className="grid grid-cols-2 gap-2.5 min-[400px]:grid-cols-4">
                         {tracking !== "cardio" && (
