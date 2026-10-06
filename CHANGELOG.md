@@ -2,6 +2,12 @@
 
 Alle nennenswerten Änderungen an 7MOVEUP. Neueste oben.
 
+## Unveröffentlicht
+
+Branch `feature-plan-info` – Preview-Test, noch keine Versionsnummer.
+
+- **Notizen & Videos im Plan-Editor:** Jede Übung in „Training bearbeiten“ hat den i-Button wie im Training. Notiz und Video-Links lassen sich schon am Vortag ansehen und bearbeiten, ohne das Training zu starten. Die Notiz gilt weiter für die Übung in allen Plänen und Trainings.
+
 ## 1.3.1 – 2026-10-06
 
 - **Ton iPhone:** Pieptöne (Pause, Zeitübung, „Ton testen“) sind auch bei Lautlos-Schalter hörbar (`navigator.audioSession = playback`); Musik anderer Apps pausiert dabei kurz.

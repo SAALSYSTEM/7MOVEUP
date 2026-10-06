@@ -31,6 +31,7 @@ Der Kalender hat keinen eigenen Navigationspunkt; er öffnet sich über „Kalen
 - **Genau ein persönlicher Plan** (= alle Trainingstage des Profils, auch selbst angelegte). Dazu beliebig viele Vorlagen.
 - **Vorlage übernehmen ersetzt den Plan** nach Rückfrage (nennt die Anzahl der Trainingstage). Absolvierte Trainings bleiben unverändert – sie speichern Planname und Übungen selbst.
 - Kein Planarchiv, keine Gültigkeitsdaten, kein Statusmodell.
+- **Notizen & Videos** (persönlich, je Übung) sind an drei Stellen erreichbar: Übungsdetail, im Training (i-Button) und im Plan-Editor (i-Button) – überall dasselbe Fenster, dieselbe Notiz.
 - Progression nur als Hinweis („Steigerung möglich“, „+2 kg“), nie automatisch.
 - **Geräte:** feste Standardliste (Körpergewicht, Kurzhanteln, Langhantel, Kettlebell, Hantelbank, Kraftmaschine, Kabelzug, Klimmzugstange, Widerstandsband, Bauchrolle, Step, Ergometer/Cardio) plus **eigene Geräte**: einmal anlegen (Übung → „Eigenes Gerät“), lokal gespeichert, danach bei allen eigenen Übungen wählbar. Gleiche Namen – auch zu Standardgeräten, deutsch/englisch, Groß-/Kleinschreibung, Umlaute – werden erkannt und das vorhandene Gerät gewählt. Löschen nur, solange keine Übung das Gerät nutzt; Umbenennen gibt es (noch) nicht.
 - Der Übungsfilter zeigt nur Geräte, für die es mindestens eine Übung gibt.

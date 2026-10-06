@@ -1,4 +1,4 @@
-import { ArrowDown, ArrowUp, Plus, Trash2 } from "lucide-react";
+import { ArrowDown, ArrowUp, Info, Plus, Trash2 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
@@ -8,6 +8,7 @@ import { ExerciseFilters } from "@/components/exercises/exercise-filters";
 import { ExerciseRow } from "@/components/exercises/exercise-row";
 import { EmptyState, Page } from "@/components/layout/page";
 import { SubHeader } from "@/components/layout/sub-header";
+import { ExerciseInfoSheet } from "@/components/training/exercise-info-sheet";
 import { WeekdayPicker } from "@/components/training/weekday-picker";
 import { Button } from "@/components/ui/button";
 import { Card, SectionTitle } from "@/components/ui/card";
@@ -46,6 +47,10 @@ export function PlanEditorPage() {
 
   const { data: exercises = [] } = useData(() => exerciseRepository.getAll());
   const exercisesById = useMemo(() => new Map(exercises.map((e) => [e.id, e])), [exercises]);
+  // persönliche Notizen + Videos: auch vorab (am Vortag) ansehen und bearbeiten, nicht nur im Training
+  const { data: notes = [], reload: reloadNotes } = useData(() => exerciseRepository.getNotes());
+  const notesById = useMemo(() => new Map(notes.map((n) => [n.exerciseId, n])), [notes]);
+  const [info, setInfo] = useState<{ exerciseId: string; open: boolean } | null>(null);
 
   const [plan, setPlan] = useState<WorkoutPlan | null>(null);
   const [missing, setMissing] = useState(false);
@@ -158,6 +163,8 @@ export function PlanEditorPage() {
               {plan.items.map((item, index) => {
                 const exercise = exercisesById.get(item.exerciseId);
                 const tracking = exercise?.trackingType ?? "reps";
+                const note = notesById.get(item.exerciseId);
+                const hasInfo = Boolean(note?.note?.trim() || note?.videoUrls?.length || exercise?.videoUrls?.length);
                 const showSteps = tracking === "weight_reps" || (tracking === "duration" && usesPerDumbbellWeight(exercise));
                 return (
                   <li key={item.id}>
@@ -171,6 +178,18 @@ export function PlanEditorPage() {
                           <p className="text-xs text-subtle">{t(`tracking.${tracking}`)}</p>
                         </div>
                         <div className="-mr-2 -mt-2 flex shrink-0">
+                          {exercise && (
+                            <Button
+                              size="icon"
+                              variant="ghost"
+                              className={hasInfo ? "relative text-accent" : "relative"}
+                              onClick={() => setInfo({ exerciseId: exercise.id, open: true })}
+                              aria-label={`${t("session.info")}: ${exerciseName(exercise, language)}`}
+                            >
+                              <Info size={18} aria-hidden />
+                              {hasInfo && <span className="absolute right-2 top-2 h-2 w-2 rounded-full bg-accent ring-2 ring-card" aria-hidden />}
+                            </Button>
+                          )}
                           <Button size="icon" variant="ghost" disabled={index === 0} onClick={() => moveItem(index, -1)} aria-label={t("plan.moveUp")}>
                             <ArrowUp size={17} aria-hidden />
                           </Button>
@@ -322,6 +341,14 @@ export function PlanEditorPage() {
         confirmLabel={t("common.delete")}
         destructive
         onConfirm={() => void remove()}
+      />
+
+      <ExerciseInfoSheet
+        open={Boolean(info?.open)}
+        onClose={() => setInfo((prev) => (prev ? { ...prev, open: false } : prev))}
+        exercise={info ? exercisesById.get(info.exerciseId) : undefined}
+        note={info ? notesById.get(info.exerciseId) : undefined}
+        onChanged={() => void reloadNotes()}
       />
     </Page>
   );
