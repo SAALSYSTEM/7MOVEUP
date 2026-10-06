@@ -1,6 +1,6 @@
 # 7MOVEUP – Projektstand
 
-Stand: Version 1.5.0 (`main`, Cloudflare-Produktion), freigegeben nach dem Test der Preview auf dem Handy. Änderungen: [`CHANGELOG.md`](CHANGELOG.md).
+Stand: Version 1.6.0 (`main`, Cloudflare-Produktion), freigegeben nach dem Test der Preview auf dem Handy. Änderungen: [`CHANGELOG.md`](CHANGELOG.md).
 
 ## Grundsätze
 
