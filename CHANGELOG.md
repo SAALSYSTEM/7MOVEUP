@@ -2,9 +2,7 @@
 
 Alle nennenswerten Änderungen an 7MOVEUP. Neueste oben.
 
-## Unveröffentlicht
-
-Branch `feature-plan-info` – Preview-Test, noch keine Versionsnummer.
+## 1.4.0 – 2026-10-06
 
 - **Notizen & Videos im Plan-Editor:** Jede Übung in „Training bearbeiten“ hat den i-Button wie im Training. Notiz und Video-Links lassen sich schon am Vortag ansehen und bearbeiten, ohne das Training zu starten. Die Notiz gilt weiter für die Übung in allen Plänen und Trainings.
 
