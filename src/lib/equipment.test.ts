@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import type { CustomEquipment } from "@/domain/types";
 import { createTranslator } from "@/i18n";
 
-import { allEquipmentKeys, cleanEquipmentName, equipmentLabel, findExistingEquipment } from "./equipment";
+import { allEquipmentKeys, cleanEquipmentName, equipmentLabel, equipmentSummary, findExistingEquipment } from "./equipment";
 
 const custom: CustomEquipment[] = [{ key: "equip-a", name: "Rudergerät", createdAt: "2026-10-05T18:00:00.000Z" }];
 
@@ -26,5 +26,22 @@ describe("Geräte", () => {
     expect(equipmentLabel("equip-a", t, custom)).toBe("Rudergerät");
     expect(equipmentLabel("equip-gone", t, custom)).toBeUndefined();
     expect(allEquipmentKeys(custom).at(-1)).toBe("equip-a");
+  });
+});
+
+describe("equipmentSummary", () => {
+  const t = createTranslator("de");
+  it("zeigt bis zu zwei Geräte und zählt den Rest", () => {
+    expect(equipmentSummary(["dumbbells", "bench"], t)).toBe("Kurzhanteln, Hantelbank");
+    expect(equipmentSummary(["dumbbells", "bench", "cable"], t)).toBe("Kurzhanteln, Hantelbank +1");
+  });
+  it("blendet Körpergewicht allein aus, nennt es aber bei mehreren Geräten", () => {
+    expect(equipmentSummary(["bodyweight"], t)).toBeUndefined();
+    expect(equipmentSummary(["bodyweight", "pullup_bar"], t)).toBe("Körpergewicht, Klimmzugstange");
+    expect(equipmentSummary([], t)).toBeUndefined();
+  });
+  it("kennt eigene Geräte und überspringt gelöschte", () => {
+    expect(equipmentSummary(["equip-a"], t, custom)).toBe("Rudergerät");
+    expect(equipmentSummary(["equip-weg"], t, custom)).toBeUndefined();
   });
 });

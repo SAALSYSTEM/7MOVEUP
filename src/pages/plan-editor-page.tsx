@@ -23,6 +23,7 @@ import type { Exercise, WorkoutPlan, WorkoutPlanItem } from "@/domain/types";
 import { useData } from "@/hooks/use-data";
 import { exerciseName } from "@/i18n";
 import { createId } from "@/lib/id";
+import { equipmentSummary } from "@/lib/equipment";
 import { usesPerDumbbellWeight } from "@/lib/exercise-format";
 import { parseSteps } from "@/lib/weight-steps";
 
@@ -41,7 +42,7 @@ function newItem(exercise: Exercise): WorkoutPlanItem {
 export function PlanEditorPage() {
   const { planId = "new" } = useParams();
   const isNew = planId === "new";
-  const { t, language } = useApp();
+  const { t, language, settings } = useApp();
   const navigate = useNavigate();
   const toast = useToast();
 
@@ -175,7 +176,11 @@ export function PlanEditorPage() {
                         </span>
                         <div className="min-w-0 flex-1">
                           <p className="font-bold leading-snug">{exercise ? exerciseName(exercise, language) : item.exerciseId}</p>
-                          <p className="text-xs text-subtle">{t(`tracking.${tracking}`)}</p>
+                          <p className="text-xs text-subtle">
+                            {[t(`tracking.${tracking}`), exercise ? equipmentSummary(exercise.equipment, t, settings.customEquipment) : undefined]
+                              .filter(Boolean)
+                              .join(" · ")}
+                          </p>
                         </div>
                         <div className="-mr-2 -mt-2 flex shrink-0">
                           {exercise && (

@@ -9,6 +9,7 @@ import { isProgressionReady, progressionStepKg } from "@/domain/progression";
 import type { Exercise, PerformanceSnapshot, SessionExercise, SetLog } from "@/domain/types";
 import { localized } from "@/i18n";
 import { dateLocale, parseDateKey } from "@/lib/dates";
+import { equipmentSummary } from "@/lib/equipment";
 import { formatKg, targetSummary, usesPerDumbbellWeight, weightUnitLabel } from "@/lib/exercise-format";
 import { formatPerformance } from "@/lib/performance-format";
 import { cn } from "@/lib/utils";
@@ -42,7 +43,8 @@ export function SessionExerciseCard({
   onOpenTimer,
   onOpenInfo,
 }: Props) {
-  const { t, language } = useApp();
+  const { t, language, settings } = useApp();
+  const equipment = exercise ? equipmentSummary(exercise.equipment, t, settings.customEquipment) : undefined;
   const name = localized(entry.name, language);
   const tracking = entry.trackingType;
   const weightLabel = weightUnitLabel(exercise, t);
@@ -104,6 +106,7 @@ export function SessionExerciseCard({
                 <span className="font-medium text-subtle"> · {t("session.restHint", { sec: entry.target.restSec })}</span>
               ) : null}
             </p>
+            {equipment && <p className="mt-0.5 text-xs text-subtle">{equipment}</p>}
           </div>
           {exercise && (
             <button

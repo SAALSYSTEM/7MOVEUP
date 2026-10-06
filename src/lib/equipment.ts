@@ -60,3 +60,22 @@ export function findExistingEquipment(name: string, custom: CustomEquipment[]): 
 export function allEquipmentKeys(custom: CustomEquipment[] = []): EquipmentKey[] {
   return [...EQUIPMENT, ...custom.map((c) => c.key)];
 }
+
+/**
+ * Kurzform fürs Anzeigen unter dem Übungsnamen („Kurzhanteln, Hantelbank +1“).
+ * „Körpergewicht“ allein wird nicht angezeigt (steht sonst unter jeder zweiten Übung).
+ */
+export function equipmentSummary(
+  keys: EquipmentKey[],
+  t: Translate,
+  custom: CustomEquipment[] = [],
+  max = 2,
+): string | undefined {
+  const labels = keys
+    .filter((key) => !(keys.length === 1 && key === "bodyweight"))
+    .map((key) => equipmentLabel(key, t, custom))
+    .filter((label): label is string => Boolean(label));
+  if (labels.length === 0) return undefined;
+  const shown = labels.slice(0, max).join(", ");
+  return labels.length > max ? `${shown} +${labels.length - max}` : shown;
+}

@@ -4,6 +4,7 @@ import type { ReactNode } from "react";
 import { useApp } from "@/app/app-context";
 import type { Exercise } from "@/domain/types";
 import { exerciseName } from "@/i18n";
+import { equipmentSummary } from "@/lib/equipment";
 import { cn } from "@/lib/utils";
 
 type Props = {
@@ -16,9 +17,12 @@ type Props = {
 };
 
 export function ExerciseRow({ exercise, hasNote, hasVideo, trailing = "chevron", onClick, className }: Props) {
-  const { t, language } = useApp();
+  const { t, language, settings } = useApp();
+  const equipment = equipmentSummary(exercise.equipment, t, settings.customEquipment);
   const meta: ReactNode[] = [
     exercise.bodyRegions.slice(0, 2).map((r) => t(`region.${r}`)).join(" · "),
+    // Equipment vor der Art: bei langen Zeilen wird eher die Art abgeschnitten
+    ...(equipment ? [equipment] : []),
     t(`tracking.${exercise.trackingType}`),
   ];
 
