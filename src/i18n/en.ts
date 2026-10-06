@@ -279,7 +279,7 @@ export const en: Record<TranslationKey, string> = {
   "more.sound": "Sound",
   "more.soundHint": "Countdown beeps and finish signal",
   "more.haptics": "Haptics",
-  "more.soundHintIos": "On iPhone only audible with silent mode off – and only while the app is open",
+  "more.soundHintIos": "On iPhone also audible in silent mode – music from other apps pauses briefly. Only while the app is open",
   "more.hapticsHint": "Vibration when ticking off sets and during the countdown",
   "more.hapticsHintIos": "On iPhone: a haptic tap when ticking off a set (iOS 18 or later). iOS does not allow vibration during the countdown",
   "more.hapticsUnsupported": "This browser does not support vibration.",

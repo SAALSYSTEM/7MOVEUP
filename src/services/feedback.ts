@@ -6,7 +6,9 @@
  * - Nach Bildschirmsperre, App-Wechsel oder Anruf steht er auf „interrupted“ bzw. „suspended“.
  *   Deshalb ist `unlockAudio()` idempotent und wird bei jeder Interaktion aufgerufen, und
  *   Töne warten bei Bedarf auf `resume()`.
- * - Im Lautlos-Modus bleibt Web-Audio auf dem iPhone stumm (Musik anderer Apps läuft weiter).
+ * - Im Lautlos-Modus bleibt Web-Audio auf dem iPhone stumm – außer die Audio-Sitzung steht auf
+ *   „playback“ (`navigator.audioSession`, ab iOS 16.4/17). Das setzen wir; dafür pausiert iOS
+ *   Musik anderer Apps, solange die Töne laufen.
  * - `navigator.vibrate` gibt es auf iOS nicht. Ersatz: Safari löst beim Umschalten eines
  *   `<input type="checkbox" switch>` (ab iOS 18) eine kurze Haptik aus – seit iOS 26.5 nur
  *   noch bei einem echten Fingertipp (siehe `HapticTap`). Der Skript-Impuls unten wirkt nur
@@ -37,7 +39,18 @@ function getContextCtor(): AudioContextCtor | undefined {
   return window.AudioContext ?? (window as unknown as { webkitAudioContext?: AudioContextCtor }).webkitAudioContext;
 }
 
+/** iOS: Töne auch bei Lautlos-Schalter hörbar machen (Web-Audio respektiert ihn sonst) */
+function enablePlaybackSession() {
+  try {
+    const session = (navigator as unknown as { audioSession?: { type: string } }).audioSession;
+    if (session && session.type !== "playback") session.type = "playback";
+  } catch {
+    // ältere iOS-Versionen: Ton bleibt vom Schalter abhängig
+  }
+}
+
 function getContext(): AudioContext | null {
+  enablePlaybackSession();
   if (context && context.state !== "closed") return context;
   const Ctor = getContextCtor();
   if (!Ctor) return null;

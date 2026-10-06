@@ -294,7 +294,7 @@ export const de = {
   "more.sound": "Ton",
   "more.soundHint": "Countdown-Pieptöne und Abschlusssignal",
   "more.haptics": "Haptik",
-  "more.soundHintIos": "Auf dem iPhone nur hörbar, wenn der Lautlos-Modus aus ist – und nur, solange die App offen ist",
+  "more.soundHintIos": "Auf dem iPhone auch im Lautlos-Modus hörbar – Musik anderer Apps pausiert dabei kurz. Nur solange die App offen ist",
   "more.hapticsHint": "Vibration beim Abhaken und im Countdown",
   "more.hapticsHintIos": "Auf dem iPhone: spürbares Klopfen beim Abhaken eines Satzes (ab iOS 18). Im Countdown lässt iOS keine Vibration zu",
   "more.hapticsUnsupported": "Dieser Browser unterstützt keine Vibration.",

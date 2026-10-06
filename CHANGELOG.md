@@ -2,6 +2,12 @@
 
 Alle nennenswerten Änderungen an 7MOVEUP. Neueste oben.
 
+## Unveröffentlicht
+
+Branch `fix-ton-lautlos` – Preview-Test.
+
+- **Ton iPhone:** Pieptöne (Pause, Zeitübung, „Ton testen“) sind auch bei Lautlos-Schalter hörbar (`navigator.audioSession = playback`); Musik anderer Apps pausiert dabei kurz.
+
 ## 1.3.0 – 2026-10-05
 
 Körperwerte, neue Navigation, eigene Geräte. Auf dem Handy getestet (Preview `feature-koerperwerte`).
