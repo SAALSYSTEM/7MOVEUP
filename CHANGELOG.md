@@ -2,9 +2,7 @@
 
 Alle nennenswerten Änderungen an 7MOVEUP. Neueste oben.
 
-## Unveröffentlicht
-
-Branch `feature-equipment-anzeige` – Preview-Test, noch keine Versionsnummer.
+## 1.5.0 – 2026-10-06
 
 - **Equipment sichtbar:** Das Equipment der Übung steht jetzt in der grauen Zeile unter dem Namen – in „Training bearbeiten“, in der Übungsliste und im Training („Kurzhanteln, Hantelbank“, bei mehr als zwei Geräten „+1“). „Körpergewicht“ allein wird nicht angezeigt.
 
