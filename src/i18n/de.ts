@@ -426,7 +426,6 @@ export const de = {
   "backup.recommended": "Backup empfohlen",
   "backup.create": "Backup erstellen",
   "backup.on": "am {date}",
-  "home.bodyDone": "Körperwerte erfasst",
   "home.bodyEdit": "Antippen zum Ergänzen",
   "home.bodyHint": "Heute ist Messtag",
   "home.openCalendar": "Kalender öffnen",

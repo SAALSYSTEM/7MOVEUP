@@ -2,6 +2,12 @@
 
 Alle nennenswerten Änderungen an 7MOVEUP. Neueste oben.
 
+## Unveröffentlicht
+
+Branch `fix-messkarte-layout` – Preview-Test, noch keine Versionsnummer.
+
+- **Messkarte wie die Trainingszeile:** Ist die geplante Anzahl erfasst, steht der Name durchgestrichen mit grünem Haken rechts – ohne „Erfassen“-Knopf, genau wie ein erledigtes Training. Offene Karten behalten den Knopf. Ein Tipp auf die erledigte Zeile erlaubt weiterhin eine zusätzliche Messung.
+
 ## 1.7.0 – 2026-10-07
 
 - **Fortschritt neu geordnet:** Oben stehen **Messwerte | Plan | Erfassen**, direkt darunter der Link „Meine erfassten Werte“. Die Fortschrittsanalyse (3 Kacheln, Messwert, 30 Tage / 365 Tage / Gesamt, Linienchart, Entwicklung, Ø / Min / Max) bleibt, wo sie war. Solange noch keine Messung existiert, steht dort die kurze Erklärung „So funktioniert’s“.

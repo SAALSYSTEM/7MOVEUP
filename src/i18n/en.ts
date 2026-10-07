@@ -410,7 +410,6 @@ export const en: Record<TranslationKey, string> = {
   "backup.recommended": "Backup recommended",
   "backup.create": "Create backup",
   "backup.on": "on {date}",
-  "home.bodyDone": "Body measurements logged",
   "home.bodyEdit": "Tap to add more",
   "home.bodyHint": "Today is measurement day",
   "home.openCalendar": "Open calendar",
