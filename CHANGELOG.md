@@ -2,6 +2,12 @@
 
 Alle nennenswerten Änderungen an 7MOVEUP. Neueste oben.
 
+## Unveröffentlicht
+
+Branch `feature-video-hinweis` – Preview-Test, noch keine Versionsnummer.
+
+- **Video-Hinweis:** Vor dem Abspielen steht jetzt ausdrücklich, dass der YouTube-Player (Google) erst beim Tippen geladen wird und dabei Daten an YouTube übertragen werden.
+
 ## 1.6.0 – 2026-10-06
 
 - **„Neu hier?“-Seite:** kurze Erklärung in vier Schritten, der Hinweis „Deine Daten liegen nur auf diesem Handy“ mit Backup-Knopf (Tipp: einmal pro Woche, in iCloud Drive ablegen), Anleitung zum Installieren für iPhone (Safari) **und Android (Chrome)** und Tipps. Auf Heute erscheint für neue Nutzer (noch kein Training) eine einmalige, wegtippbare Karte; dauerhaft erreichbar unter Mehr → „Neu hier? Kurz erklärt“.

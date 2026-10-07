@@ -211,7 +211,7 @@ export const de = {
   "exercise.videoPlaceholder": "https://youtube.com/shorts/…",
   "exercise.openVideo": "Video öffnen",
   "exercise.playVideo": "Video abspielen",
-  "exercise.videoPrivacy": "Wird erst beim Tippen von YouTube geladen.",
+  "exercise.videoPrivacy": "Erst beim Tippen wird der Player von YouTube (Google) geladen – dabei werden Daten an YouTube übertragen.",
   "exercise.removeVideo": "Video-Link entfernen",
   "exercise.invalidUrl": "Bitte eine gültige http(s)-Adresse eingeben.",
   "exercise.notFound": "Übung nicht gefunden.",

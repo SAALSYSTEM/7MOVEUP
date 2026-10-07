@@ -202,7 +202,7 @@ export const en: Record<TranslationKey, string> = {
   "exercise.videoPlaceholder": "https://youtube.com/shorts/…",
   "exercise.openVideo": "Open video",
   "exercise.playVideo": "Play video",
-  "exercise.videoPrivacy": "Loaded from YouTube only when you tap.",
+  "exercise.videoPrivacy": "The YouTube (Google) player loads only when you tap – this sends data to YouTube.",
   "exercise.removeVideo": "Remove video link",
   "exercise.invalidUrl": "Please enter a valid http(s) address.",
   "exercise.notFound": "Exercise not found.",
