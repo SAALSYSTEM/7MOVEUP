@@ -104,5 +104,5 @@ Die GitHub-Pages-Vorschau (`.github/workflows/deploy-pages.yml`) baut mit `BASE_
 
 ## Status
 
-- Veröffentlicht: 1.7.0 (Cloudflare Workers, `main`) – Messpläne, siehe `CHANGELOG.md`.
+- Veröffentlicht: 1.7.1 (Cloudflare Workers, `main`) – Messkarte wie Trainingszeile, siehe `CHANGELOG.md`.
 - Supabase ist bewusst nicht angebunden; die Repository-Schicht ist dafür vorbereitet.

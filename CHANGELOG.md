@@ -2,9 +2,7 @@
 
 Alle nennenswerten Änderungen an 7MOVEUP. Neueste oben.
 
-## Unveröffentlicht
-
-Branch `fix-messkarte-layout` – Preview-Test, noch keine Versionsnummer.
+## 1.7.1 – 2026-10-07
 
 - **Messkarte wie die Trainingszeile:** Ist die geplante Anzahl erfasst, steht der Name durchgestrichen mit grünem Haken rechts – ohne „Erfassen“-Knopf, genau wie ein erledigtes Training. Offene Karten behalten den Knopf. Ein Tipp auf die erledigte Zeile erlaubt weiterhin eine zusätzliche Messung.
 
