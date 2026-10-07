@@ -2,9 +2,7 @@
 
 Alle nennenswerten Änderungen an 7MOVEUP. Neueste oben.
 
-## Unveröffentlicht
-
-Branch `feature-messplaene` – Preview-Test, noch keine Versionsnummer.
+## 1.7.0 – 2026-10-07
 
 - **Fortschritt neu geordnet:** Oben stehen **Messwerte | Plan | Erfassen**, direkt darunter der Link „Meine erfassten Werte“. Die Fortschrittsanalyse (3 Kacheln, Messwert, 30 Tage / 365 Tage / Gesamt, Linienchart, Entwicklung, Ø / Min / Max) bleibt, wo sie war. Solange noch keine Messung existiert, steht dort die kurze Erklärung „So funktioniert’s“.
 - **Messwerte** (Katalog, Reihenfolge, eigene Werte, Einheiten) und **Plan** (Messpläne) sind eigene Seiten mit Zurück-Knopf. **Erfassen** zeigt oben die für heute geplanten Messungen und darunter „Freie Messung“.
