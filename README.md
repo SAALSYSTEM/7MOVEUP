@@ -104,5 +104,5 @@ Die GitHub-Pages-Vorschau (`.github/workflows/deploy-pages.yml`) baut mit `BASE_
 
 ## Status
 
-- Veröffentlicht: 1.6.0 (Cloudflare Workers, `main`) – „Neu hier?“-Seite, siehe `CHANGELOG.md`.
+- Veröffentlicht: 1.6.1 (Cloudflare Workers, `main`) – Video-Hinweis, siehe `CHANGELOG.md`.
 - Supabase ist bewusst nicht angebunden; die Repository-Schicht ist dafür vorbereitet.

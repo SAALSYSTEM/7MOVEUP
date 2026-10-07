@@ -2,9 +2,7 @@
 
 Alle nennenswerten Änderungen an 7MOVEUP. Neueste oben.
 
-## Unveröffentlicht
-
-Branch `feature-video-hinweis` – Preview-Test, noch keine Versionsnummer.
+## 1.6.1 – 2026-10-07
 
 - **Video-Hinweis:** Vor dem Abspielen steht jetzt ausdrücklich, dass der YouTube-Player (Google) erst beim Tippen geladen wird und dabei Daten an YouTube übertragen werden.
 
