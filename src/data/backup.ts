@@ -134,11 +134,20 @@ const customMetricSchema = z.object({
   createdAt: isoDate,
 });
 
+const measurePlanSchema = z.object({
+  id: z.string().min(1),
+  name: z.string().max(60),
+  metricKeys: z.array(z.string().min(1)).optional(),
+  weekdays: z.array(z.number().int().min(1).max(7)),
+  perDay: z.number().int().min(1).max(5),
+});
+
 const bodySettingsSchema = z.object({
   profileId: z.string().optional(),
   metrics: z.array(z.object({ key: z.string().min(1), enabled: z.boolean() })),
   custom: z.array(customMetricSchema).default([]),
   measureWeekdays: z.array(z.number().int().min(1).max(7)).default([]),
+  plans: z.array(measurePlanSchema).optional(),
   updatedAt: isoDate,
 });
 
@@ -151,6 +160,8 @@ const measurementSchema = z.object({
     .regex(/^\d{2}:\d{2}$/)
     .optional(),
   values: z.record(z.string(), z.number().finite()),
+  planId: z.string().optional(),
+  slot: z.number().int().min(0).max(4).optional(),
   createdAt: isoDate,
   updatedAt: isoDate,
 });

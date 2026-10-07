@@ -2,6 +2,14 @@
 
 Alle nennenswerten Änderungen an 7MOVEUP. Neueste oben.
 
+## Unveröffentlicht
+
+Branch `feature-messplaene` – Preview-Test, noch keine Versionsnummer.
+
+- **Messpläne:** Unter Fortschritt → Messwerte legst du beliebig viele Messpläne an – mit eigenem Namen, eigenen Messwerten, Wochentagen und 1–5 Messungen pro Tag (z. B. „Blutdruck“ So 3×, „Wiegen“ Mi nur Gewicht, „Vollmessung“ Sa alle Werte). Auf Heute und im Kalender erscheint jede Messung einzeln („Blutdruck 2/3“), offen oben, erledigt unten; im Kalenderraster bleibt es ein Punkt pro Tag. Die Erfassung zeigt nur die Werte des Plans. „Erfassen“ (Fortschritt) bleibt die freie Messung mit allen aktiven Werten und legt eine zusätzliche Messung an.
+- **Blutdruck und Puls im Katalog:** Blutdruck oben (sys.), Blutdruck unten (dia.) in mmHg und Puls in bpm – zunächst inaktiv. Keine Bewertung, nur Anzeige und Verlauf.
+- **Bisherige Messtage:** werden automatisch zum Plan „Körperwerte“ (1× täglich, bisherige Werte). Neue Messwerte gehören erst dazu, wenn du sie im Plan anhakst. Messungen, Messtage und Backups bleiben erhalten; ältere Backups lassen sich importieren.
+
 ## 1.6.1 – 2026-10-07
 
 - **Video-Hinweis:** Vor dem Abspielen steht jetzt ausdrücklich, dass der YouTube-Player (Google) erst beim Tippen geladen wird und dabei Daten an YouTube übertragen werden.

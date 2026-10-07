@@ -1,6 +1,6 @@
 import { format, isTomorrow } from "date-fns";
 import { ArrowRight, CalendarClock, CalendarDays, CircleCheck, Dumbbell, Play, Weight } from "lucide-react";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
 import { useApp } from "@/app/app-context";
@@ -12,6 +12,7 @@ import { AppHeader } from "@/components/layout/app-header";
 import { Page } from "@/components/layout/page";
 import { Card, SectionTitle } from "@/components/ui/card";
 import { planRepository, workoutRepository } from "@/data";
+import { entryTitle, measureEntriesForDate, planWeekdays, type MeasureEntry } from "@/domain/measure-plans";
 import { getDailyQuote } from "@/domain/motivation";
 import { countImprovements } from "@/domain/progression";
 import { nextEvent, openPlansToday, plansForDate, sessionsForDate, sessionsThisWeek, todayProgress, weekSummary } from "@/domain/schedule";
@@ -20,7 +21,7 @@ import { useBackupExport, useBackupStatus } from "@/hooks/use-backup";
 import { useBodyData } from "@/hooks/use-body-data";
 import { useData } from "@/hooks/use-data";
 import { useToday } from "@/hooks/use-today";
-import { dateLocale, isoWeekday, localDateKey } from "@/lib/dates";
+import { dateLocale } from "@/lib/dates";
 import { exerciseCountLabel } from "@/lib/weekdays";
 import { startSessionFromPlan } from "@/services/workout-service";
 
@@ -60,20 +61,21 @@ export function HomePage() {
   const improvements = countImprovements(completed, sessionsThisWeek(completed, today));
   const hasHistory = completed.length > 0;
 
-  // Körperwerte heute: geplanter Messtag und/oder bereits erfasst
-  const measureWeekdays = body.bodySettings?.measureWeekdays ?? [];
-  const measureDay = measureWeekdays.includes(isoWeekday(today));
-  const measuredToday = body.measurements.some((m) => m.date === localDateKey(today));
-  const showMeasure = measureDay || measuredToday;
+  // Körperwerte heute: Einträge der Messpläne (offen/erledigt) plus freie Messungen
+  const measurePlans = useMemo(() => body.bodySettings?.plans ?? [], [body.bodySettings]);
+  const measureEntries = useMemo(
+    () => (body.loaded ? measureEntriesForDate(measurePlans, body.measurements, today) : []),
+    [body.loaded, measurePlans, body.measurements, today],
+  );
+  const [captureEntry, setCaptureEntry] = useState<MeasureEntry | undefined>();
 
-  // Fortschritt des Tages über Trainings + Messtag
+  // Fortschritt des Tages über Trainings + Messeinträge
   const training = todayProgress(plans, completed, today);
-  const total = training.total + (measureDay ? 1 : 0);
-  const done = training.done + (measureDay && measuredToday ? 1 : 0);
-  const dayState =
-    total === 0 ? (training.state === "done" || measuredToday ? "done" : "none") : done === total ? "done" : done > 0 ? "partial" : "none";
+  const total = training.total + measureEntries.length;
+  const done = training.done + measureEntries.filter((e) => e.measurement).length;
+  const dayState = total === 0 ? (training.state === "done" ? "done" : "none") : done === total ? "done" : done > 0 ? "partial" : "none";
 
-  const next = nextEvent(plans, measureWeekdays, today);
+  const next = nextEvent(plans, planWeekdays(measurePlans), today);
 
   const startPlan = async (plan: WorkoutPlan) => {
     if (starting) return;
@@ -93,7 +95,7 @@ export function HomePage() {
   };
 
   const relativeDay = (date: Date) => (isTomorrow(date) ? t("home.tomorrow") : format(date, "EEEE", { locale }));
-  const hasTodayItems = plannedToday.length > 0 || showMeasure;
+  const hasTodayItems = plannedToday.length > 0 || measureEntries.length > 0;
 
   return (
     <Page>
@@ -168,30 +170,41 @@ export function HomePage() {
                   </li>
                 );
               })}
-              {showMeasure && (
-                <li>
-                  <button
-                    type="button"
-                    onClick={() => setCaptureOpen(true)}
-                    className="flex min-h-12 w-full items-center justify-between gap-3 rounded-2xl bg-elevated px-4 py-3 text-left"
-                  >
-                    <span className="flex min-w-0 items-center gap-3">
-                      <Weight size={18} className={measuredToday ? "shrink-0 text-muted" : "shrink-0 text-fg"} aria-hidden />
-                      <span className="min-w-0">
-                        <span className={measuredToday ? "block truncate font-bold text-muted" : "block truncate font-bold"}>
-                          {measuredToday ? t("home.bodyDone") : t("body.captureTitle")}
+              {measureEntries.map((entry) => {
+                const isDone = Boolean(entry.measurement);
+                const names = entry.metricKeys
+                  ? body.metrics.filter((m) => m.enabled && entry.metricKeys?.includes(m.key)).map((m) => m.name)
+                  : [];
+                return (
+                  <li key={entry.key}>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setCaptureEntry(entry);
+                        setCaptureOpen(true);
+                      }}
+                      className="flex min-h-12 w-full items-center justify-between gap-3 rounded-2xl bg-elevated px-4 py-3 text-left"
+                    >
+                      <span className="flex min-w-0 items-center gap-3">
+                        <Weight size={18} className={isDone ? "shrink-0 text-muted" : "shrink-0 text-fg"} aria-hidden />
+                        <span className="min-w-0">
+                          <span className={isDone ? "block truncate font-bold text-muted" : "block truncate font-bold"}>
+                            {entryTitle(entry, isDone ? t("home.bodyDone") : t("body.captureTitle"))}
+                          </span>
+                          <span className="block truncate text-xs text-subtle">
+                            {isDone ? t("home.bodyEdit") : names.length > 0 ? names.join(" · ") : t("home.bodyHint")}
+                          </span>
                         </span>
-                        <span className="block text-xs text-subtle">{measuredToday ? t("home.bodyEdit") : t("home.bodyHint")}</span>
                       </span>
-                    </span>
-                    {measuredToday ? (
-                      <CircleCheck size={20} className="shrink-0 text-success" aria-label={t("home.doneBadge")} />
-                    ) : (
-                      <ArrowRight size={18} className="shrink-0 text-accent" aria-hidden />
-                    )}
-                  </button>
-                </li>
-              )}
+                      {isDone ? (
+                        <CircleCheck size={20} className="shrink-0 text-success" aria-label={t("home.doneBadge")} />
+                      ) : (
+                        <ArrowRight size={18} className="shrink-0 text-accent" aria-hidden />
+                      )}
+                    </button>
+                  </li>
+                );
+              })}
             </ul>
           ) : (
             <p className="text-sm text-muted">{plans.length === 0 ? t("home.noPlans") : t("home.noPlanToday")}</p>
@@ -243,7 +256,7 @@ export function HomePage() {
 
       {backup.reminder && <BackupLine reminder={backup.reminder} onBackup={() => void exportBackup()} busy={backupBusy} />}
 
-      <MeasurementSheet open={captureOpen} onClose={() => setCaptureOpen(false)} />
+      <MeasurementSheet open={captureOpen} entry={captureEntry} onClose={() => setCaptureOpen(false)} />
     </Page>
   );
 }

@@ -11,6 +11,7 @@ import { useToast } from "@/components/ui/toast";
 import { bodyRepository } from "@/data";
 import { checkValue, formatMetric, fromDisplay, roundTo, toDisplay, type MetricView } from "@/domain/body";
 import { latestPoint } from "@/domain/body-stats";
+import { entryTitle, type MeasureEntry } from "@/domain/measure-plans";
 import type { BodyMeasurement } from "@/domain/types";
 import { useBodyData } from "@/hooks/use-body-data";
 import { useToday } from "@/hooks/use-today";
@@ -22,10 +23,12 @@ type Props = {
   onClose: () => void;
   /** Tag der Messung (yyyy-MM-dd), Standard: heute */
   date?: string;
+  /** Eintrag eines Messplans: nur dessen Messwerte, Tag fest. Ohne Eintrag: freie Messung mit allen aktiven Werten. */
+  entry?: MeasureEntry;
 };
 
-/** Schnellerfassung der Körperwerte. Pro Tag eine Messung – ein vorhandener Eintrag wird ergänzt. */
-export function MeasurementSheet({ open, onClose, date }: Props) {
+/** Erfassung der Körperwerte – für einen Messplan-Eintrag oder frei („Jetzt messen“). */
+export function MeasurementSheet({ open, onClose, date, entry }: Props) {
   const { t } = useApp();
   const today = localDateKey(useToday());
   const [day, setDay] = useState(date ?? today);
@@ -39,8 +42,11 @@ export function MeasurementSheet({ open, onClose, date }: Props) {
 
   const body = useBodyData();
   const existing = useMemo(
-    () => body.measurements.filter((m) => m.date === day).at(-1),
-    [body.measurements, day],
+    () =>
+      entry
+        ? body.measurements.find((m) => m.id === entry.measurement?.id)
+        : body.measurements.filter((m) => m.date === day && !m.planId).at(-1),
+    [body.measurements, day, entry],
   );
 
   const close = () => {
@@ -49,11 +55,15 @@ export function MeasurementSheet({ open, onClose, date }: Props) {
   };
 
   return (
-    <Sheet open={open} onClose={close} title={t("body.captureTitle")} description={t("body.captureHint")} tall>
+    <Sheet open={open} onClose={close} title={entry ? entryTitle(entry, t("calendar.legendBody")) : t("body.captureTitle")}
+      description={t("body.captureHint")}
+      tall
+    >
       {body.loaded && (
         <MeasurementForm
-          key={`${day}-${existing?.id ?? "new"}`}
+          key={`${day}-${existing?.id ?? "new"}-${entry?.key ?? "free"}`}
           day={day}
+          entry={entry}
           today={today}
           onDayChange={setDay}
           existing={existing}
@@ -70,6 +80,7 @@ type Entry = { base: number; display: number };
 
 function MeasurementForm({
   day,
+  entry,
   today,
   onDayChange,
   existing,
@@ -78,6 +89,7 @@ function MeasurementForm({
   onDone,
 }: {
   day: string;
+  entry?: MeasureEntry;
   today: string;
   onDayChange: (day: string) => void;
   existing: BodyMeasurement | undefined;
@@ -104,7 +116,10 @@ function MeasurementForm({
   const [confirmDelete, setConfirmDelete] = useState(false);
 
   // aktive Messwerte + inaktive, die in dieser Messung schon einen Wert haben
-  const shown = metrics.filter((m) => m.enabled || existing?.values[m.key] !== undefined);
+  const planKeys = entry?.metricKeys;
+  const shown = metrics.filter(
+    (m) => (m.enabled && (!planKeys || planKeys.includes(m.key))) || existing?.values[m.key] !== undefined,
+  );
 
   const suggestions = useMemo(
     () =>
@@ -139,7 +154,9 @@ function MeasurementForm({
           id: existing?.id,
           date: day,
           time: time || undefined,
-          values: Object.fromEntries(Object.entries(entries).map(([key, entry]) => [key, entry.base])),
+          values: Object.fromEntries(Object.entries(entries).map(([key, e]) => [key, e.base])),
+          planId: entry?.planId ?? existing?.planId,
+          slot: entry?.planId ? entry.slot : existing?.slot,
         });
         // kleine Rückmeldung zur Veränderung beim ersten erfassten Wert mit Vorwert
         const first = shown.find((m) => entries[m.key] && suggestions.get(m.key));
@@ -180,6 +197,7 @@ function MeasurementForm({
             type="date"
             value={day}
             max={today}
+            disabled={Boolean(entry)}
             onChange={(e) => e.target.value && onDayChange(e.target.value)}
             className="h-11 w-full rounded-xl border border-line bg-elevated px-3 text-[16px] font-semibold text-fg outline-none focus:border-accent/70"
           />

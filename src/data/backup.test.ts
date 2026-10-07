@@ -201,6 +201,24 @@ describe("Körperwerte: Datenbank-Version 2 und Backup-Format 2", () => {
     expect((await target.repos.settings.get()).unitSystem).toBe("imperial");
   });
 
+  it("Round-Trip: Messpläne und Zeitfenster der Messungen", async () => {
+    const source = freshDb("plans-source");
+    const plan = { id: "bp", name: "Blutdruck", metricKeys: ["bp_sys", "bp_dia"], weekdays: [7] as (1 | 2 | 3 | 4 | 5 | 6 | 7)[], perDay: 3 };
+    const saved = await source.repos.body.saveSettings({ plans: [plan] });
+    expect(saved.measureWeekdays).toEqual([7]);
+    await source.repos.body.saveMeasurement({ date: "2026-10-04", values: { bp_sys: 120, bp_dia: 80 }, planId: "bp", slot: 2 });
+
+    const parsed = parseBackup(JSON.stringify(await source.backup.exportCurrentProfile()));
+    expect(parsed.ok).toBe(true);
+    if (!parsed.ok) return;
+    const target = freshDb("plans-target");
+    await target.backup.importReplacingCurrentProfile(parsed.backup);
+    expect((await target.repos.body.getSettings()).plans).toEqual([plan]);
+    const [m] = await target.repos.body.getMeasurements();
+    expect(m.planId).toBe("bp");
+    expect(m.slot).toBe(2);
+  });
+
   it("Round-Trip: eigene Geräte und neue Standardgeräte an eigenen Übungen", async () => {
     const source = freshDb("equip-source");
     await source.repos.settings.update({

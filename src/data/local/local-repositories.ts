@@ -1,3 +1,4 @@
+import { planWeekdays } from "@/domain/measure-plans";
 import { defaultBodySettings, normalizeBodySettings } from "@/domain/body";
 import { sortMeasurements } from "@/domain/body-stats";
 import type {
@@ -272,7 +273,10 @@ export function createLocalRepositories(db: MoveUpDatabase) {
     },
     async saveSettings(patch) {
       const current = await body.getSettings();
-      const next: BodySettings = normalizeBodySettings({ ...current, ...patch, updatedAt: now() });
+      const merged: BodySettings = { ...current, ...patch, updatedAt: now() };
+      // ältere App-Versionen kennen nur Messtage: alle Plan-Tage mitschreiben
+      if (patch.plans) merged.measureWeekdays = planWeekdays(patch.plans);
+      const next: BodySettings = normalizeBodySettings(merged);
       await db.bodySettings.put(next);
       notifyDataChanged();
       return next;
@@ -294,6 +298,8 @@ export function createLocalRepositories(db: MoveUpDatabase) {
         date: input.date,
         time: input.time || undefined,
         values,
+        planId: input.planId,
+        slot: input.planId ? input.slot : undefined,
         createdAt: existing?.profileId === profileId ? existing.createdAt : timestamp,
         updatedAt: timestamp,
       };

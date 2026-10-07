@@ -8,7 +8,7 @@
  */
 import type { BodySettings, CustomBodyMetric, Language, LocalizedText, UnitSystem } from "@/domain/types";
 
-export type BodyDimension = "mass" | "length" | "percent" | "energy" | "index";
+export type BodyDimension = "mass" | "length" | "percent" | "energy" | "index" | "pressure" | "rate";
 
 type BuiltInMetric = {
   key: string;
@@ -36,6 +36,9 @@ export const BUILT_IN_BODY_METRICS: readonly BuiltInMetric[] = [
   { key: "chest", name: { de: "Brust", en: "Chest" }, dimension: "length", min: 50, max: 200, defaultEnabled: false },
   { key: "upper_arm", name: { de: "Oberarm", en: "Upper arm" }, dimension: "length", min: 15, max: 70, defaultEnabled: false },
   { key: "thigh", name: { de: "Oberschenkel", en: "Thigh" }, dimension: "length", min: 30, max: 110, defaultEnabled: false },
+  { key: "bp_sys", name: { de: "Blutdruck oben (sys.)", en: "Blood pressure high (sys.)" }, dimension: "pressure", min: 60, max: 260, defaultEnabled: false },
+  { key: "bp_dia", name: { de: "Blutdruck unten (dia.)", en: "Blood pressure low (dia.)" }, dimension: "pressure", min: 30, max: 160, defaultEnabled: false },
+  { key: "pulse", name: { de: "Puls", en: "Pulse" }, dimension: "rate", min: 30, max: 220, defaultEnabled: false },
 ];
 
 /** Fortschritt: Standard-Kacheln (Muskel: die aktive Variante) */
@@ -66,6 +69,10 @@ function unitSpec(dimension: BodyDimension, system: UnitSystem): UnitSpec {
       return { unit: "kcal", decimals: 0, step: 10, factor: 1 };
     case "index":
       return { unit: "", decimals: 1, step: 0.1, factor: 1 };
+    case "pressure":
+      return { unit: "mmHg", decimals: 0, step: 1, factor: 1 };
+    case "rate":
+      return { unit: "bpm", decimals: 0, step: 1, factor: 1 };
   }
 }
 
@@ -126,7 +133,13 @@ export function normalizeBodySettings(settings: BodySettings): BodySettings {
   });
   for (const m of BUILT_IN_BODY_METRICS) if (!seen.has(m.key)) metrics.push({ key: m.key, enabled: false });
   for (const c of settings.custom) if (!seen.has(c.key)) metrics.push({ key: c.key, enabled: true });
-  return { ...settings, metrics };
+  // älterer Stand ohne Messpläne: der Messtage-Satz wird zu einem Plan „Körperwerte“ (alle aktiven Werte, 1× täglich)
+  const plans =
+    settings.plans ??
+    (settings.measureWeekdays.length > 0
+      ? [{ id: "legacy", name: "", weekdays: settings.measureWeekdays, perDay: 1 }]
+      : []);
+  return { ...settings, metrics, plans };
 }
 
 function customView(custom: CustomBodyMetric, enabled: boolean): MetricView {

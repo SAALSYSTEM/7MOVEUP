@@ -15,8 +15,9 @@ import { useMemo, useState, type ReactNode } from "react";
 import { useApp } from "@/app/app-context";
 import { Card } from "@/components/ui/card";
 import { formatMetric, type MetricView } from "@/domain/body";
+import { entryTitle, measureEntriesForDate, planWeekdays, type MeasureEntry } from "@/domain/measure-plans";
 import { dayStatus, planKind, type DayStatus } from "@/domain/schedule";
-import type { BodyMeasurement, Exercise, Weekday, WorkoutPlan, WorkoutSession } from "@/domain/types";
+import type { BodyMeasurement, Exercise, MeasurePlan, WorkoutPlan, WorkoutSession } from "@/domain/types";
 import { useToday } from "@/hooks/use-today";
 import { dateLocale, isoWeekday, localDateKey } from "@/lib/dates";
 import { cn } from "@/lib/utils";
@@ -32,8 +33,8 @@ type Props = {
   /** Körperwerte: erfasste Messungen und geplante Messtage */
   measurements?: BodyMeasurement[];
   metrics?: MetricView[];
-  measureWeekdays?: Weekday[];
-  onOpenMeasurement?: (date: string) => void;
+  measurePlans?: MeasurePlan[];
+  onOpenMeasurement?: (date: string, entry: MeasureEntry) => void;
 };
 
 /** Monatskalender (Dark/Orange): Plan- und Erledigt-Status pro Tag, Tap zeigt Details. */
@@ -45,7 +46,7 @@ export function CalendarView({
   canStart,
   measurements = [],
   metrics = [],
-  measureWeekdays = [],
+  measurePlans = [],
   onOpenMeasurement,
 }: Props) {
   const { t, language } = useApp();
@@ -65,7 +66,7 @@ export function CalendarView({
   const selectedStatus = dayStatus(selected, plans, completed, exercisesById);
   const measuredDays = useMemo(() => new Set(measurements.map((m) => m.date)), [measurements]);
   const selectedKey = localDateKey(selected);
-  const selectedMeasurement = measurements.filter((m) => m.date === selectedKey).at(-1);
+  const measureDays = useMemo(() => planWeekdays(measurePlans), [measurePlans]);
   const measurementSummary = (m: BodyMeasurement) =>
     metrics
       .filter((metric) => typeof m.values[metric.key] === "number")
@@ -80,7 +81,6 @@ export function CalendarView({
   };
 
   const selectedIsFuture = isAfter(startOfDay(selected), startOfDay(today));
-  const isMeasureDay = Boolean(onOpenMeasurement) && measureWeekdays.includes(isoWeekday(selected));
 
   /** Eine Liste pro Tag: offen oben, erledigt darunter – Training und Körperwerte gleich behandelt */
   type Entry = { key: string; done: boolean; title: string; subtitle: string; action?: ReactNode };
@@ -115,24 +115,34 @@ export function CalendarView({
   for (const session of unmatched) {
     entries.push({ key: `session-${session.id}`, done: true, title: session.planName, subtitle: sessionSummary(session) });
   }
-  if (onOpenMeasurement && (selectedMeasurement || isMeasureDay)) {
-    const open = () => onOpenMeasurement(selectedKey);
-    entries.push({
-      key: "body",
-      done: Boolean(selectedMeasurement),
-      title: selectedMeasurement ? t("calendar.bodyLogged") + (selectedMeasurement.time ? ` · ${selectedMeasurement.time}` : "") : t("body.captureTitle"),
-      subtitle: selectedMeasurement ? measurementSummary(selectedMeasurement) : t("calendar.measureDay"),
-      action: !selectedIsFuture && (
-        <button
-          type="button"
-          onClick={open}
-          className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl text-accent hover:bg-white/5"
-          aria-label={`${t("body.captureTitle")} – ${format(selected, "d. MMMM", { locale })}`}
-        >
-          <ArrowRight size={18} aria-hidden />
-        </button>
-      ),
-    });
+  if (onOpenMeasurement) {
+    for (const entry of measureEntriesForDate(measurePlans, measurements, selected)) {
+      const m = entry.measurement;
+      const title = entryTitle(entry, m ? t("calendar.bodyLogged") : t("body.captureTitle"));
+      entries.push({
+        key: `body-${entry.key}`,
+        done: Boolean(m),
+        title,
+        subtitle: m
+          ? [m.time, measurementSummary(m)].filter(Boolean).join(" · ")
+          : entry.metricKeys
+            ? metrics
+                .filter((metric) => metric.enabled && entry.metricKeys?.includes(metric.key))
+                .map((metric) => metric.name)
+                .join(" · ")
+            : t("calendar.measureDay"),
+        action: !selectedIsFuture && (
+          <button
+            type="button"
+            onClick={() => onOpenMeasurement(selectedKey, entry)}
+            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl text-accent hover:bg-white/5"
+            aria-label={`${title} – ${format(selected, "d. MMMM", { locale })}`}
+          >
+            <ArrowRight size={18} aria-hidden />
+          </button>
+        ),
+      });
+    }
   }
   entries.sort((x, y) => Number(x.done) - Number(y.done));
 
@@ -202,7 +212,7 @@ export function CalendarView({
             const isTodayCell = isSameDay(status.date, today);
             const isSelected = isSameDay(status.date, selected);
             const measured = measuredDays.has(localDateKey(status.date));
-            const bodyDay = Boolean(onOpenMeasurement) && (measured || measureWeekdays.includes(isoWeekday(status.date)));
+            const bodyDay = Boolean(onOpenMeasurement) && (measured || measureDays.includes(isoWeekday(status.date)));
             return (
               <button
                 key={status.date.toISOString()}

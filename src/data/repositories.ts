@@ -65,12 +65,14 @@ export type MeasurementInput = {
   time?: string;
   /** nur bestätigte Werte, in Basiseinheit */
   values: Record<string, number>;
+  planId?: string;
+  slot?: number;
 };
 
 export interface BodyRepository {
   /** Auswahl, Reihenfolge, eigene Messwerte, Messtage (Standardvorlage, solange nichts gespeichert ist) */
   getSettings(): Promise<BodySettings>;
-  saveSettings(patch: Partial<Pick<BodySettings, "metrics" | "custom" | "measureWeekdays">>): Promise<BodySettings>;
+  saveSettings(patch: Partial<Pick<BodySettings, "metrics" | "custom" | "measureWeekdays" | "plans">>): Promise<BodySettings>;
   /** alle Messungen, älteste zuerst */
   getMeasurements(): Promise<BodyMeasurement[]>;
   saveMeasurement(input: MeasurementInput): Promise<BodyMeasurement>;

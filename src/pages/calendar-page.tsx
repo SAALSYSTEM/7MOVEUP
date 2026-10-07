@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 
+
 import { useApp } from "@/app/app-context";
 import { MeasurementSheet } from "@/components/body/measurement-sheet";
 import { Page } from "@/components/layout/page";
@@ -8,13 +9,14 @@ import { CalendarView } from "@/components/training/calendar-view";
 import { exerciseRepository, planRepository, workoutRepository } from "@/data";
 import { useBodyData } from "@/hooks/use-body-data";
 import { useData } from "@/hooks/use-data";
+import type { MeasureEntry } from "@/domain/measure-plans";
 import { useStartPlan } from "@/hooks/use-start-plan";
 
 /** Kalender ohne eigenen Navigationspunkt (Einstieg über Heute): Trainings und Körperwerte. */
 export function CalendarPage() {
   const { t } = useApp();
   const body = useBodyData();
-  const [captureDate, setCaptureDate] = useState<string | null>(null);
+  const [capture, setCapture] = useState<{ date: string; entry: MeasureEntry } | null>(null);
   const { data } = useData(async () => {
     const [plans, completed, active, exercises] = await Promise.all([
       planRepository.getAll(),
@@ -39,11 +41,11 @@ export function CalendarPage() {
           canStart={!busy}
           measurements={body.measurements}
           metrics={body.metrics}
-          measureWeekdays={body.bodySettings?.measureWeekdays ?? []}
-          onOpenMeasurement={setCaptureDate}
+          measurePlans={body.bodySettings?.plans ?? []}
+          onOpenMeasurement={(date, entry) => setCapture({ date, entry })}
         />
       )}
-      <MeasurementSheet open={captureDate !== null} date={captureDate ?? undefined} onClose={() => setCaptureDate(null)} />
+      <MeasurementSheet open={capture !== null} date={capture?.date} entry={capture?.entry} onClose={() => setCapture(null)} />
     </Page>
   );
 }

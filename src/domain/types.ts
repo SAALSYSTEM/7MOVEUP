@@ -220,6 +220,18 @@ export type CustomBodyMetric = {
   createdAt: string;
 };
 
+/** Messplan: welche Messwerte an welchen Wochentagen wie oft pro Tag erfasst werden. */
+export type MeasurePlan = {
+  id: string;
+  /** leer = „Körperwerte“ (übernommener alter Messtage-Satz) */
+  name: string;
+  /** Schlüssel der Messwerte; fehlt = alle aktiven */
+  metricKeys?: string[];
+  weekdays: Weekday[];
+  /** Messungen pro Tag (1–5) */
+  perDay: number;
+};
+
 /** Auswahl und Reihenfolge der Messwerte, eigene Messwerte, Messtage – je Profil ein Datensatz. */
 export type BodySettings = {
   profileId: string;
@@ -228,6 +240,8 @@ export type BodySettings = {
   custom: CustomBodyMetric[];
   /** Wochentage, an denen gemessen werden soll */
   measureWeekdays: Weekday[];
+  /** Messpläne; fehlt in älteren Daten → wird aus `measureWeekdays` abgeleitet */
+  plans?: MeasurePlan[];
   updatedAt: string;
 };
 
@@ -241,6 +255,9 @@ export type BodyMeasurement = {
   time?: string;
   /** Messwert-Schlüssel → Zahl; nur bestätigte Werte */
   values: Record<string, number>;
+  /** Messplan und laufende Nummer des Zeitfensters (0-basiert), falls aus einem Plan erfasst */
+  planId?: string;
+  slot?: number;
   createdAt: string;
   updatedAt: string;
 };

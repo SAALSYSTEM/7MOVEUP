@@ -110,6 +110,7 @@ export function createLocalBackupService(db: MoveUpDatabase, repos: LocalReposit
               ...backup.bodySettings,
               profileId,
               measureWeekdays: backup.bodySettings.measureWeekdays as Weekday[],
+              plans: backup.bodySettings.plans?.map((p) => ({ ...p, weekdays: p.weekdays as Weekday[] })),
             });
             await db.bodySettings.put(settings);
           }
