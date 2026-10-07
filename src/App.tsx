@@ -15,6 +15,9 @@ import { MorePage } from "@/pages/more-page";
 import { CalendarPage } from "@/pages/calendar-page";
 import { MetricsPage } from "@/pages/metrics-page";
 import { PlanEditorPage } from "@/pages/plan-editor-page";
+import { CapturePage } from "@/pages/capture-page";
+import { HistoryPage } from "@/pages/history-page";
+import { PlansPage } from "@/pages/plans-page";
 import { ProgressPage } from "@/pages/progress-page";
 import { SessionPage } from "@/pages/session-page";
 import { TrainingPage } from "@/pages/training-page";
@@ -44,6 +47,9 @@ function Shell() {
         <Route path="/exercises/:exerciseId/edit" element={<ExerciseFormPage />} />
         <Route path="/progress" element={<ProgressPage />} />
         <Route path="/progress/metrics" element={<MetricsPage />} />
+        <Route path="/progress/plan" element={<PlansPage />} />
+        <Route path="/progress/capture" element={<CapturePage />} />
+        <Route path="/progress/values" element={<HistoryPage />} />
         <Route path="/calendar" element={<CalendarPage />} />
         <Route path="/food" element={<FoodPage />} />
         <Route path="/more" element={<MorePage />} />

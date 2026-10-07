@@ -1,9 +1,10 @@
 import { format, isTomorrow } from "date-fns";
-import { ArrowRight, CalendarClock, CalendarDays, CircleCheck, Dumbbell, Play, Weight } from "lucide-react";
+import { ArrowRight, CalendarClock, CalendarDays, CircleCheck, Dumbbell, Play } from "lucide-react";
 import { useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
 import { useApp } from "@/app/app-context";
+import { MeasureCardRow } from "@/components/body/measure-card";
 import { MeasurementSheet } from "@/components/body/measurement-sheet";
 import { WelcomeCard } from "@/components/home/welcome-card";
 import { BackupLine } from "@/components/home/backup-line";
@@ -12,11 +13,11 @@ import { AppHeader } from "@/components/layout/app-header";
 import { Page } from "@/components/layout/page";
 import { Card, SectionTitle } from "@/components/ui/card";
 import { planRepository, workoutRepository } from "@/data";
-import { entryTitle, measureEntriesForDate, planWeekdays, type MeasureEntry } from "@/domain/measure-plans";
+import { measureCardsForDate, plannedPerDay, planWeekdays } from "@/domain/measure-plans";
 import { getDailyQuote } from "@/domain/motivation";
 import { countImprovements } from "@/domain/progression";
 import { nextEvent, openPlansToday, plansForDate, sessionsForDate, sessionsThisWeek, todayProgress, weekSummary } from "@/domain/schedule";
-import type { WorkoutPlan } from "@/domain/types";
+import type { MeasurePlan, WorkoutPlan } from "@/domain/types";
 import { useBackupExport, useBackupStatus } from "@/hooks/use-backup";
 import { useBodyData } from "@/hooks/use-body-data";
 import { useData } from "@/hooks/use-data";
@@ -61,18 +62,18 @@ export function HomePage() {
   const improvements = countImprovements(completed, sessionsThisWeek(completed, today));
   const hasHistory = completed.length > 0;
 
-  // Körperwerte heute: Einträge der Messpläne (offen/erledigt) plus freie Messungen
+  // Körperwerte heute: eine Karte pro geplantem Messplan (Information, kein Abhaken-Zwang)
   const measurePlans = useMemo(() => body.bodySettings?.plans ?? [], [body.bodySettings]);
-  const measureEntries = useMemo(
-    () => (body.loaded ? measureEntriesForDate(measurePlans, body.measurements, today) : []),
+  const measureCards = useMemo(
+    () => (body.loaded ? measureCardsForDate(measurePlans, body.measurements, today).cards : []),
     [body.loaded, measurePlans, body.measurements, today],
   );
-  const [captureEntry, setCaptureEntry] = useState<MeasureEntry | undefined>();
+  const [capturePlan, setCapturePlan] = useState<MeasurePlan | undefined>();
 
-  // Fortschritt des Tages über Trainings + Messeinträge
+  // Fortschritt des Tages über Trainings + Messpläne (ein Plan zählt, wenn die geplante Anzahl erreicht ist)
   const training = todayProgress(plans, completed, today);
-  const total = training.total + measureEntries.length;
-  const done = training.done + measureEntries.filter((e) => e.measurement).length;
+  const total = training.total + measureCards.length;
+  const done = training.done + measureCards.filter((c) => c.measurements.length >= plannedPerDay(c.plan)).length;
   const dayState = total === 0 ? (training.state === "done" ? "done" : "none") : done === total ? "done" : done > 0 ? "partial" : "none";
 
   const next = nextEvent(plans, planWeekdays(measurePlans), today);
@@ -95,7 +96,7 @@ export function HomePage() {
   };
 
   const relativeDay = (date: Date) => (isTomorrow(date) ? t("home.tomorrow") : format(date, "EEEE", { locale }));
-  const hasTodayItems = plannedToday.length > 0 || measureEntries.length > 0;
+  const hasTodayItems = plannedToday.length > 0 || measureCards.length > 0;
 
   return (
     <Page>
@@ -170,41 +171,17 @@ export function HomePage() {
                   </li>
                 );
               })}
-              {measureEntries.map((entry) => {
-                const isDone = Boolean(entry.measurement);
-                const names = entry.metricKeys
-                  ? body.metrics.filter((m) => m.enabled && entry.metricKeys?.includes(m.key)).map((m) => m.name)
-                  : [];
-                return (
-                  <li key={entry.key}>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setCaptureEntry(entry);
-                        setCaptureOpen(true);
-                      }}
-                      className="flex min-h-12 w-full items-center justify-between gap-3 rounded-2xl bg-elevated px-4 py-3 text-left"
-                    >
-                      <span className="flex min-w-0 items-center gap-3">
-                        <Weight size={18} className={isDone ? "shrink-0 text-muted" : "shrink-0 text-fg"} aria-hidden />
-                        <span className="min-w-0">
-                          <span className={isDone ? "block truncate font-bold text-muted" : "block truncate font-bold"}>
-                            {entryTitle(entry, isDone ? t("home.bodyDone") : t("body.captureTitle"))}
-                          </span>
-                          <span className="block truncate text-xs text-subtle">
-                            {isDone ? t("home.bodyEdit") : names.length > 0 ? names.join(" · ") : t("home.bodyHint")}
-                          </span>
-                        </span>
-                      </span>
-                      {isDone ? (
-                        <CircleCheck size={20} className="shrink-0 text-success" aria-label={t("home.doneBadge")} />
-                      ) : (
-                        <ArrowRight size={18} className="shrink-0 text-accent" aria-hidden />
-                      )}
-                    </button>
-                  </li>
-                );
-              })}
+              {measureCards.map((card) => (
+                <li key={card.plan.id}>
+                  <MeasureCardRow
+                    card={card}
+                    onCapture={() => {
+                      setCapturePlan(card.plan);
+                      setCaptureOpen(true);
+                    }}
+                  />
+                </li>
+              ))}
             </ul>
           ) : (
             <p className="text-sm text-muted">{plans.length === 0 ? t("home.noPlans") : t("home.noPlanToday")}</p>
@@ -256,7 +233,7 @@ export function HomePage() {
 
       {backup.reminder && <BackupLine reminder={backup.reminder} onBackup={() => void exportBackup()} busy={backupBusy} />}
 
-      <MeasurementSheet open={captureOpen} entry={captureEntry} onClose={() => setCaptureOpen(false)} />
+      <MeasurementSheet open={captureOpen} plan={capturePlan} onClose={() => setCaptureOpen(false)} />
     </Page>
   );
 }

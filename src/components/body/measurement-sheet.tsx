@@ -11,8 +11,8 @@ import { useToast } from "@/components/ui/toast";
 import { bodyRepository } from "@/data";
 import { checkValue, formatMetric, fromDisplay, roundTo, toDisplay, type MetricView } from "@/domain/body";
 import { latestPoint } from "@/domain/body-stats";
-import { entryTitle, type MeasureEntry } from "@/domain/measure-plans";
-import type { BodyMeasurement } from "@/domain/types";
+import { planIncludes } from "@/domain/measure-plans";
+import type { BodyMeasurement, MeasurePlan } from "@/domain/types";
 import { useBodyData } from "@/hooks/use-body-data";
 import { useToday } from "@/hooks/use-today";
 import { dateLocale, localDateKey, parseDateKey } from "@/lib/dates";
@@ -23,31 +23,33 @@ type Props = {
   onClose: () => void;
   /** Tag der Messung (yyyy-MM-dd), Standard: heute */
   date?: string;
-  /** Eintrag eines Messplans: nur dessen Messwerte, Tag fest. Ohne Eintrag: freie Messung mit allen aktiven Werten. */
-  entry?: MeasureEntry;
+  /** Messung aus einem Plan starten: nur dessen Messwerte, Tag fest. Ohne Plan: freie Messung mit allen aktiven Werten. */
+  plan?: MeasurePlan;
+  /** vorhandene Messung bearbeiten (oder löschen) */
+  measurement?: BodyMeasurement;
 };
 
-/** Erfassung der Körperwerte – für einen Messplan-Eintrag oder frei („Jetzt messen“). */
-export function MeasurementSheet({ open, onClose, date, entry }: Props) {
+/** Erfassung der Körperwerte – aus einem Messplan, frei oder zum Bearbeiten einer gespeicherten Messung. */
+export function MeasurementSheet({ open, onClose, date, plan, measurement }: Props) {
   const { t } = useApp();
   const today = localDateKey(useToday());
   const [day, setDay] = useState(date ?? today);
   const [lastOpenKey, setLastOpenKey] = useState<string | null>(null);
   // beim Öffnen auf den gewünschten Tag springen (ohne Effekt)
-  const openKey = open ? (date ?? today) : null;
+  const openKey = open ? (date ?? measurement?.date ?? today) : null;
   if (openKey !== lastOpenKey) {
     setLastOpenKey(openKey);
     if (openKey) setDay(openKey);
   }
 
   const body = useBodyData();
+  // bearbeitet wird immer eine bestimmte Messung; sonst entsteht eine neue
   const existing = useMemo(
-    () =>
-      entry
-        ? body.measurements.find((m) => m.id === entry.measurement?.id)
-        : body.measurements.filter((m) => m.date === day && !m.planId).at(-1),
-    [body.measurements, day, entry],
+    () => (measurement ? (body.measurements.find((m) => m.id === measurement.id) ?? measurement) : undefined),
+    [body.measurements, measurement],
   );
+  // Plan: der übergebene oder der, aus dem die bearbeitete Messung stammt
+  const owner = plan ?? body.bodySettings?.plans?.find((p) => p.id === existing?.planId);
 
   const close = () => {
     dismissKeyboard();
@@ -55,15 +57,16 @@ export function MeasurementSheet({ open, onClose, date, entry }: Props) {
   };
 
   return (
-    <Sheet open={open} onClose={close} title={entry ? entryTitle(entry, t("calendar.legendBody")) : t("body.captureTitle")}
+    <Sheet open={open} onClose={close} title={owner?.name.trim() || t("body.captureTitle")}
       description={t("body.captureHint")}
       tall
     >
       {body.loaded && (
         <MeasurementForm
-          key={`${day}-${existing?.id ?? "new"}-${entry?.key ?? "free"}`}
+          key={existing?.id ?? `new-${day}-${plan?.id ?? "free"}`}
           day={day}
-          entry={entry}
+          owner={owner}
+          fixedDay={Boolean(plan)}
           today={today}
           onDayChange={setDay}
           existing={existing}
@@ -80,7 +83,8 @@ type Entry = { base: number; display: number };
 
 function MeasurementForm({
   day,
-  entry,
+  owner,
+  fixedDay,
   today,
   onDayChange,
   existing,
@@ -89,7 +93,8 @@ function MeasurementForm({
   onDone,
 }: {
   day: string;
-  entry?: MeasureEntry;
+  owner?: MeasurePlan;
+  fixedDay: boolean;
   today: string;
   onDayChange: (day: string) => void;
   existing: BodyMeasurement | undefined;
@@ -112,13 +117,13 @@ function MeasurementForm({
       }),
     ),
   );
+  const [note, setNote] = useState(existing?.note ?? "");
   const [saving, setSaving] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
 
   // aktive Messwerte + inaktive, die in dieser Messung schon einen Wert haben
-  const planKeys = entry?.metricKeys;
   const shown = metrics.filter(
-    (m) => (m.enabled && (!planKeys || planKeys.includes(m.key))) || existing?.values[m.key] !== undefined,
+    (m) => (m.enabled && planIncludes(owner, m.key)) || existing?.values[m.key] !== undefined,
   );
 
   const suggestions = useMemo(
@@ -155,8 +160,8 @@ function MeasurementForm({
           date: day,
           time: time || undefined,
           values: Object.fromEntries(Object.entries(entries).map(([key, e]) => [key, e.base])),
-          planId: entry?.planId ?? existing?.planId,
-          slot: entry?.planId ? entry.slot : existing?.slot,
+          planId: owner?.id ?? existing?.planId,
+          note,
         });
         // kleine Rückmeldung zur Veränderung beim ersten erfassten Wert mit Vorwert
         const first = shown.find((m) => entries[m.key] && suggestions.get(m.key));
@@ -197,7 +202,7 @@ function MeasurementForm({
             type="date"
             value={day}
             max={today}
-            disabled={Boolean(entry)}
+            disabled={fixedDay}
             onChange={(e) => e.target.value && onDayChange(e.target.value)}
             className="h-11 w-full rounded-xl border border-line bg-elevated px-3 text-[16px] font-semibold text-fg outline-none focus:border-accent/70"
           />
@@ -239,6 +244,19 @@ function MeasurementForm({
           );
         })}
       </div>
+
+      <label className="mt-3 block">
+        <span className="mb-1.5 block text-[11px] font-semibold text-muted">
+          {t("body.note")} <span className="font-normal text-subtle">({t("common.optional")})</span>
+        </span>
+        <input
+          type="text"
+          value={note}
+          maxLength={200}
+          onChange={(e) => setNote(e.target.value)}
+          className="h-11 w-full rounded-xl border border-line bg-elevated px-3 text-[16px] text-fg outline-none focus:border-accent/70"
+        />
+      </label>
 
       {shown.length === 0 && <p className="py-6 text-center text-sm text-muted">{t("body.noActiveMetrics")}</p>}
 

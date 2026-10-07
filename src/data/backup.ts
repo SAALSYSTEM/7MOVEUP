@@ -161,7 +161,7 @@ const measurementSchema = z.object({
     .optional(),
   values: z.record(z.string(), z.number().finite()),
   planId: z.string().optional(),
-  slot: z.number().int().min(0).max(4).optional(),
+  note: z.string().max(200).optional(),
   createdAt: isoDate,
   updatedAt: isoDate,
 });

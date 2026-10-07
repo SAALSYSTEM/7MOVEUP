@@ -66,7 +66,7 @@ export type MeasurementInput = {
   /** nur bestätigte Werte, in Basiseinheit */
   values: Record<string, number>;
   planId?: string;
-  slot?: number;
+  note?: string;
 };
 
 export interface BodyRepository {
@@ -75,6 +75,10 @@ export interface BodyRepository {
   saveSettings(patch: Partial<Pick<BodySettings, "metrics" | "custom" | "measureWeekdays" | "plans">>): Promise<BodySettings>;
   /** alle Messungen, älteste zuerst */
   getMeasurements(): Promise<BodyMeasurement[]>;
+  /** Neueste zuerst, höchstens `limit` Messungen (der letzte Tag wird vollständig geliefert); `from`/`to` = Tage inklusive */
+  getMeasurementsPage(options: { from?: string; to?: string; limit: number }): Promise<{ items: BodyMeasurement[]; hasMore: boolean }>;
+  /** erstes und letztes Jahr mit Messungen */
+  getMeasurementYearRange(): Promise<{ first: number; last: number } | undefined>;
   saveMeasurement(input: MeasurementInput): Promise<BodyMeasurement>;
   deleteMeasurement(id: string): Promise<void>;
 }

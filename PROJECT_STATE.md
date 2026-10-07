@@ -64,13 +64,16 @@ Der Kalender hat keinen eigenen Navigationspunkt; er öffnet sich über „Kalen
 - **Entwicklung** = neuester minus erster Wert im Zeitraum; bei weniger als 2 Werten „Zu wenige Werte“. Dazu Ø · Min · Max.
 - Zugang zur Verwaltung über „Messwerte“.
 
-### Messpläne
+### Messpläne und Fortschritt
 
-- `BodySettings.plans` (`MeasurePlan`: id, name, metricKeys?, weekdays, perDay 1–5). Fehlt `plans` (ältere Daten/Backups), macht `normalizeBodySettings` aus `measureWeekdays` einen Plan `legacy` (Name leer = „Körperwerte“, alle aktiven Werte, 1× täglich). Beim Speichern von Plänen wird `measureWeekdays` mit der Vereinigung der Plantage mitgeschrieben (ältere App-Versionen).
-- `BodyMeasurement.planId` / `slot` (0-basiert, optional). Backup bleibt Format 2 (Felder optional, ältere Dateien unverändert lesbar).
-- `src/domain/measure-plans.ts`: `measureEntriesForDate` ordnet Messungen den Einträgen eines Tages zu (Plan + Zeitfenster; freie Messungen füllen offene Einträge; Rest als eigener erledigter Eintrag). Heute, Kalender und die Erfassung (`MeasurementSheet` mit `entry`) nutzen es.
+- Seiten unter Fortschritt: `/progress` (Analyse, unverändert) mit Knöpfen **Messwerte** (`/progress/metrics`) | **Plan** (`/progress/plan`) | **Erfassen** (`/progress/capture`) und Link **Meine erfassten Werte** (`/progress/values`); Unterseiten mit Zurück-Knopf (`SubHeader`).
+- `BodySettings.plans` (`MeasurePlan`: id, name, metricKeys?, weekdays, perDay 1–5 als Richtwert). Fehlt `plans` (ältere Daten/Backups), macht `normalizeBodySettings` aus `measureWeekdays` einen Plan `legacy` (Name leer = „Körperwerte“, alle aktiven Werte, 1× täglich). Beim Speichern von Plänen wird `measureWeekdays` mit der Vereinigung der Plantage mitgeschrieben (ältere App-Versionen). Pläne ohne feste Auswahl werden eingefroren, sobald im Katalog etwas aktiviert oder ein eigener Messwert angelegt wird.
+- `BodyMeasurement.planId` (nur Herkunft) und `note` (optional, max. 200 Zeichen). Backup bleibt Format 2 (Felder optional).
+- `src/domain/measure-plans.ts`: `measureCardsForDate` → eine Karte pro Plan des Wochentags (Messungen mit diesem `planId` am Tag), übrige Messungen als `free`. Freie Messungen füllen nie eine Karte. Heute/Erfassen: `MeasureCardRow`; Kalender: Karte pro Plan + freie Messungen einzeln.
+- `MeasurementSheet`: `plan` (Messung aus Plan starten, nur dessen Werte, Tag fest), `measurement` (bearbeiten/löschen) oder weder noch (freie Messung, alle aktiven Werte) – speichert immer eine neue Messung bzw. aktualisiert die übergebene.
+- Auswertung: `dailySeries` (Tagesdurchschnitt, `count`) für Chart, Kacheln, Entwicklung, Ø/Min/Max; `histogram` über Einzelmessungen (nur `bp_sys`/`bp_dia`, 10er-Klassen, ab 5 Messungen).
+- Meine erfassten Werte: `bodyRepository.getMeasurementsPage({ from, to, limit })` (Index `[profileId+date]`, ein Tag wird nie zerschnitten) und `getMeasurementYearRange()`; „Weitere laden“ erhöht das Limit um 10.
 - Katalog: `bp_sys`, `bp_dia` (mmHg), `pulse` (bpm), standardmäßig inaktiv.
-- Pläne ohne feste Messwert-Auswahl werden eingefroren, sobald im Katalog etwas aktiviert oder ein eigener Messwert angelegt wird.
 
 ### Neu hier?
 

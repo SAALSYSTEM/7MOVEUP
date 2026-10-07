@@ -6,9 +6,13 @@ Alle nennenswerten Änderungen an 7MOVEUP. Neueste oben.
 
 Branch `feature-messplaene` – Preview-Test, noch keine Versionsnummer.
 
-- **Messpläne:** Unter Fortschritt → Messwerte legst du beliebig viele Messpläne an – mit eigenem Namen, eigenen Messwerten, Wochentagen und 1–5 Messungen pro Tag (z. B. „Blutdruck“ So 3×, „Wiegen“ Mi nur Gewicht, „Vollmessung“ Sa alle Werte). Auf Heute und im Kalender erscheint jede Messung einzeln („Blutdruck 2/3“), offen oben, erledigt unten; im Kalenderraster bleibt es ein Punkt pro Tag. Die Erfassung zeigt nur die Werte des Plans. „Erfassen“ (Fortschritt) bleibt die freie Messung mit allen aktiven Werten und legt eine zusätzliche Messung an.
-- **Blutdruck und Puls im Katalog:** Blutdruck oben (sys.), Blutdruck unten (dia.) in mmHg und Puls in bpm – zunächst inaktiv. Keine Bewertung, nur Anzeige und Verlauf.
-- **Bisherige Messtage:** werden automatisch zum Plan „Körperwerte“ (1× täglich, bisherige Werte). Neue Messwerte gehören erst dazu, wenn du sie im Plan anhakst. Messungen, Messtage und Backups bleiben erhalten; ältere Backups lassen sich importieren.
+- **Fortschritt neu geordnet:** Oben stehen **Messwerte | Plan | Erfassen**, direkt darunter der Link „Meine erfassten Werte“. Die Fortschrittsanalyse (3 Kacheln, Messwert, 30 Tage / 365 Tage / Gesamt, Linienchart, Entwicklung, Ø / Min / Max) bleibt, wo sie war. Solange noch keine Messung existiert, steht dort die kurze Erklärung „So funktioniert’s“.
+- **Messwerte** (Katalog, Reihenfolge, eigene Werte, Einheiten) und **Plan** (Messpläne) sind eigene Seiten mit Zurück-Knopf. **Erfassen** zeigt oben die für heute geplanten Messungen und darunter „Freie Messung“.
+- **Messpläne:** beliebig viele, je mit Name, Messwerten, Wochentagen und Messungen pro Tag (1–5, nur Richtwert). Auf Heute, Erfassen und im Kalender erscheint **eine Karte pro Plan** („Blutdruck · 3× geplant · bereits 2“) mit dem Knopf „Erfassen“. Mehr Messungen als geplant sind jederzeit möglich. Eine freie Messung hakt nie einen Plan ab.
+- **Meine erfassten Werte:** alle Messungen, neueste zuerst, Filter Jahr/Monat/Tag, in 10er-Schritten geladen („Weitere laden“), Antippen = bearbeiten oder löschen. Blutdruck als „118 / 72 mmHg · Puls 64“.
+- **Mehrere Messungen am Tag:** Der Linienchart zeigt pro Tag einen Punkt (Tagesdurchschnitt, Tooltip „Ø 118,7 mmHg · 3 Messungen“); Kacheln, Entwicklung, Ø, Min und Max rechnen mit den Tageswerten. Die Einzelmessungen bleiben unverändert gespeichert. Für Blutdruck (oben/unten) gibt es unter dem Chart eine **Verteilung** aller Einzelmessungen in 10er-Klassen.
+- **Blutdruck und Puls im Katalog:** Blutdruck oben (sys.), unten (dia.) in mmHg und Puls in bpm, zunächst inaktiv. Keine Bewertung. Messungen haben ein optionales Notizfeld.
+- **Bisherige Messtage** werden automatisch zum Plan „Körperwerte“ (1× täglich, bisherige Werte). Neue Messwerte gehören erst dazu, wenn du sie im Plan anhakst. Messungen und Backups bleiben erhalten; ältere Backups lassen sich importieren.
 
 ## 1.6.1 – 2026-10-07
 

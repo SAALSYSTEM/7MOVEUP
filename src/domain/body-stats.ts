@@ -11,7 +11,15 @@ import { localDateKey } from "@/lib/dates";
 export type BodyPeriod = "30d" | "365d" | "all";
 export const BODY_PERIODS: readonly BodyPeriod[] = ["30d", "365d", "all"];
 
-export type SeriesPoint = { date: string; time?: string; value: number; measurementId: string; createdAt: string };
+export type SeriesPoint = {
+  date: string;
+  time?: string;
+  value: number;
+  measurementId: string;
+  createdAt: string;
+  /** Tagesdurchschnitt: Anzahl der Messungen dieses Tages (bei Einzelwerten fehlt das Feld) */
+  count?: number;
+};
 
 function compareMeasurements(a: Pick<BodyMeasurement, "date" | "time" | "createdAt">, b: Pick<BodyMeasurement, "date" | "time" | "createdAt">) {
   return a.date.localeCompare(b.date) || (a.time ?? "").localeCompare(b.time ?? "") || a.createdAt.localeCompare(b.createdAt);
@@ -29,6 +37,41 @@ export function metricSeries(measurements: BodyMeasurement[], key: string): Seri
       ? [{ date: m.date, time: m.time, value, measurementId: m.id, createdAt: m.createdAt }]
       : [];
   });
+}
+
+/**
+ * Ein Wert pro Kalendertag: der Durchschnitt aller Messungen dieses Tages (bei nur einer Messung diese selbst).
+ * Grundlage für Linienchart, Kacheln, Entwicklung, Ø, Min und Max; die Einzelmessungen bleiben unverändert gespeichert.
+ */
+export function dailySeries(measurements: BodyMeasurement[], key: string): SeriesPoint[] {
+  const days = new Map<string, SeriesPoint[]>();
+  for (const point of metricSeries(measurements, key)) days.set(point.date, [...(days.get(point.date) ?? []), point]);
+  return [...days.entries()].map(([date, points]) => {
+    const last = points[points.length - 1];
+    if (points.length === 1) return { ...last, count: 1 };
+    return {
+      date,
+      value: points.reduce((sum, p) => sum + p.value, 0) / points.length,
+      measurementId: last.measurementId,
+      createdAt: last.createdAt,
+      count: points.length,
+    };
+  });
+}
+
+export type HistogramBin = { from: number; to: number; count: number };
+
+/** Verteilung aller Einzelwerte in festen Klassen (z. B. 10 mmHg); leere Klassen dazwischen bleiben erhalten. */
+export function histogram(values: number[], width: number): HistogramBin[] {
+  if (values.length === 0) return [];
+  const bins = values.map((v) => Math.floor(v / width));
+  const lo = Math.min(...bins);
+  const hi = Math.max(...bins);
+  return Array.from({ length: hi - lo + 1 }, (_, i) => ({
+    from: (lo + i) * width,
+    to: (lo + i + 1) * width - 1,
+    count: bins.filter((b) => b === lo + i).length,
+  }));
 }
 
 /** Erster Tag des Zeitraums (inklusive): 30 Tage = heute + 29 Tage davor; Gesamt = ohne Grenze */

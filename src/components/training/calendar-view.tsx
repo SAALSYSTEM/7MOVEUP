@@ -15,7 +15,7 @@ import { useMemo, useState, type ReactNode } from "react";
 import { useApp } from "@/app/app-context";
 import { Card } from "@/components/ui/card";
 import { formatMetric, type MetricView } from "@/domain/body";
-import { entryTitle, measureEntriesForDate, planWeekdays, type MeasureEntry } from "@/domain/measure-plans";
+import { measureCardsForDate, plannedPerDay, planWeekdays } from "@/domain/measure-plans";
 import { dayStatus, planKind, type DayStatus } from "@/domain/schedule";
 import type { BodyMeasurement, Exercise, MeasurePlan, WorkoutPlan, WorkoutSession } from "@/domain/types";
 import { useToday } from "@/hooks/use-today";
@@ -34,7 +34,8 @@ type Props = {
   measurements?: BodyMeasurement[];
   metrics?: MetricView[];
   measurePlans?: MeasurePlan[];
-  onOpenMeasurement?: (date: string, entry: MeasureEntry) => void;
+  /** Erfassung öffnen: aus einem Plan starten oder eine vorhandene Messung bearbeiten */
+  onOpenMeasurement?: (date: string, target: { plan?: MeasurePlan; measurement?: BodyMeasurement }) => void;
 };
 
 /** Monatskalender (Dark/Orange): Plan- und Erledigt-Status pro Tag, Tap zeigt Details. */
@@ -116,31 +117,47 @@ export function CalendarView({
     entries.push({ key: `session-${session.id}`, done: true, title: session.planName, subtitle: sessionSummary(session) });
   }
   if (onOpenMeasurement) {
-    for (const entry of measureEntriesForDate(measurePlans, measurements, selected)) {
-      const m = entry.measurement;
-      const title = entryTitle(entry, m ? t("calendar.bodyLogged") : t("body.captureTitle"));
+    const { cards, free } = measureCardsForDate(measurePlans, measurements, selected);
+    const arrow = (label: string, target: { plan?: MeasurePlan; measurement?: BodyMeasurement }) =>
+      !selectedIsFuture && (
+        <button
+          type="button"
+          onClick={() => onOpenMeasurement(selectedKey, target)}
+          className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl text-accent hover:bg-white/5"
+          aria-label={`${label} – ${format(selected, "d. MMMM", { locale })}`}
+        >
+          <ArrowRight size={18} aria-hidden />
+        </button>
+      );
+    // eine Karte pro geplantem Plan: „3× geplant · bereits 2“
+    for (const card of cards) {
+      const planned = plannedPerDay(card.plan);
+      const count = card.measurements.length;
+      const done = count >= planned;
+      const title = card.plan.name.trim() || (done ? t("calendar.bodyLogged") : t("body.captureTitle"));
       entries.push({
-        key: `body-${entry.key}`,
-        done: Boolean(m),
+        key: `plan-measure-${card.plan.id}`,
+        done,
         title,
-        subtitle: m
-          ? [m.time, measurementSummary(m)].filter(Boolean).join(" · ")
-          : entry.metricKeys
-            ? metrics
-                .filter((metric) => metric.enabled && entry.metricKeys?.includes(metric.key))
-                .map((metric) => metric.name)
-                .join(" · ")
-            : t("calendar.measureDay"),
-        action: !selectedIsFuture && (
-          <button
-            type="button"
-            onClick={() => onOpenMeasurement(selectedKey, entry)}
-            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl text-accent hover:bg-white/5"
-            aria-label={`${title} – ${format(selected, "d. MMMM", { locale })}`}
-          >
-            <ArrowRight size={18} aria-hidden />
-          </button>
-        ),
+        subtitle:
+          count === 0
+            ? t("measure.planned", { count: planned })
+            : done
+              ? t("measure.recorded", { count })
+              : `${t("measure.planned", { count: planned })} · ${t("measure.soFar", { count })}`,
+        action: arrow(title, { plan: card.plan }),
+      });
+    }
+    // alle übrigen Messungen des Tages (frei erfasst) einzeln
+    for (const m of free) {
+      const owner = m.planId ? measurePlans.find((p) => p.id === m.planId) : undefined;
+      const title = owner?.name.trim() || t("calendar.bodyLogged");
+      entries.push({
+        key: `measure-${m.id}`,
+        done: true,
+        title,
+        subtitle: [m.time, measurementSummary(m)].filter(Boolean).join(" · "),
+        action: arrow(title, { measurement: m }),
       });
     }
   }

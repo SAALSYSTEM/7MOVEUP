@@ -206,7 +206,7 @@ describe("Körperwerte: Datenbank-Version 2 und Backup-Format 2", () => {
     const plan = { id: "bp", name: "Blutdruck", metricKeys: ["bp_sys", "bp_dia"], weekdays: [7] as (1 | 2 | 3 | 4 | 5 | 6 | 7)[], perDay: 3 };
     const saved = await source.repos.body.saveSettings({ plans: [plan] });
     expect(saved.measureWeekdays).toEqual([7]);
-    await source.repos.body.saveMeasurement({ date: "2026-10-04", values: { bp_sys: 120, bp_dia: 80 }, planId: "bp", slot: 2 });
+    await source.repos.body.saveMeasurement({ date: "2026-10-04", values: { bp_sys: 120, bp_dia: 80 }, planId: "bp", note: "nach dem Training" });
 
     const parsed = parseBackup(JSON.stringify(await source.backup.exportCurrentProfile()));
     expect(parsed.ok).toBe(true);
@@ -216,7 +216,32 @@ describe("Körperwerte: Datenbank-Version 2 und Backup-Format 2", () => {
     expect((await target.repos.body.getSettings()).plans).toEqual([plan]);
     const [m] = await target.repos.body.getMeasurements();
     expect(m.planId).toBe("bp");
-    expect(m.slot).toBe(2);
+    expect(m.note).toBe("nach dem Training");
+  });
+
+  it("Messungen seitenweise laden: neueste zuerst, ein Tag wird nie zerschnitten, Filter nach Zeitraum", async () => {
+    const { repos } = freshDb("paging");
+    expect(await repos.body.getMeasurementYearRange()).toBeUndefined();
+    expect(await repos.body.getMeasurementsPage({ limit: 10 })).toEqual({ items: [], hasMore: false });
+    for (let d = 1; d <= 12; d += 1) {
+      await repos.body.saveMeasurement({ date: `2026-09-${String(d).padStart(2, "0")}`, time: "08:00", values: { weight: 80 + d } });
+    }
+    await repos.body.saveMeasurement({ date: "2026-09-12", time: "20:00", values: { weight: 99 } });
+    await repos.body.saveMeasurement({ date: "2025-12-31", values: { weight: 70 } });
+
+    expect(await repos.body.getMeasurementYearRange()).toEqual({ first: 2025, last: 2026 });
+    const first = await repos.body.getMeasurementsPage({ limit: 3 });
+    // 12.9. (abends vor morgens), 11.9., 10.9. – hasMore, weil davor noch ältere liegen
+    expect(first.items.map((m) => `${m.date} ${m.time}`)).toEqual(["2026-09-12 20:00", "2026-09-12 08:00", "2026-09-11 08:00"]);
+    expect(first.hasMore).toBe(true);
+    // limit 1 liefert trotzdem beide Messungen des 12.9.
+    expect((await repos.body.getMeasurementsPage({ limit: 1 })).items).toHaveLength(2);
+    const all = await repos.body.getMeasurementsPage({ limit: 50 });
+    expect(all.items).toHaveLength(14);
+    expect(all.hasMore).toBe(false);
+    const filtered = await repos.body.getMeasurementsPage({ from: "2026-09-05", to: "2026-09-06", limit: 10 });
+    expect(filtered.items.map((m) => m.date)).toEqual(["2026-09-06", "2026-09-05"]);
+    expect(filtered.hasMore).toBe(false);
   });
 
   it("Round-Trip: eigene Geräte und neue Standardgeräte an eigenen Übungen", async () => {

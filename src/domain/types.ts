@@ -228,7 +228,7 @@ export type MeasurePlan = {
   /** Schlüssel der Messwerte; fehlt = alle aktiven */
   metricKeys?: string[];
   weekdays: Weekday[];
-  /** Messungen pro Tag (1–5) */
+  /** geplante Messungen pro Tag (1–5) – nur Planungshilfe, mehr sind jederzeit erlaubt */
   perDay: number;
 };
 
@@ -255,9 +255,9 @@ export type BodyMeasurement = {
   time?: string;
   /** Messwert-Schlüssel → Zahl; nur bestätigte Werte */
   values: Record<string, number>;
-  /** Messplan und laufende Nummer des Zeitfensters (0-basiert), falls aus einem Plan erfasst */
+  /** Messplan, aus dem die Messung gestartet wurde (nur Herkunft – Auswertungen sind davon unabhängig) */
   planId?: string;
-  slot?: number;
+  note?: string;
   createdAt: string;
   updatedAt: string;
 };

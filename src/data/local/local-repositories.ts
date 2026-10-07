@@ -285,6 +285,31 @@ export function createLocalRepositories(db: MoveUpDatabase) {
       const profileId = await currentProfileId();
       return sortMeasurements(await db.measurements.where("profileId").equals(profileId).toArray());
     },
+    async getMeasurementsPage({ from, to, limit }) {
+      const profileId = await currentProfileId();
+      const range = db.measurements
+        .where("[profileId+date]")
+        .between([profileId, from ?? ""], [profileId, to ?? "\uffff"], true, true);
+      const head = await range.clone().reverse().limit(limit).toArray();
+      if (head.length === 0) return { items: [], hasMore: false };
+      // ein Tag wird nie zerschnitten: alle Messungen des letzten Tages dazunehmen
+      const lastDate = head[head.length - 1].date;
+      const sameDay = await db.measurements.where("[profileId+date]").equals([profileId, lastDate]).toArray();
+      const known = new Set(head.map((m) => m.id));
+      const items = sortMeasurements([...head, ...sameDay.filter((m) => !known.has(m.id))]).reverse();
+      const older = await db.measurements
+        .where("[profileId+date]")
+        .between([profileId, from ?? ""], [profileId, lastDate], true, false)
+        .count();
+      return { items, hasMore: older > 0 };
+    },
+    async getMeasurementYearRange() {
+      const profileId = await currentProfileId();
+      const index = db.measurements.where("[profileId+date]").between([profileId, ""], [profileId, "\uffff"]);
+      const [first, last] = await Promise.all([index.clone().first(), index.clone().last()]);
+      if (!first || !last) return undefined;
+      return { first: Number(first.date.slice(0, 4)), last: Number(last.date.slice(0, 4)) };
+    },
     async saveMeasurement(input) {
       const profileId = await currentProfileId();
       const timestamp = now();
@@ -299,7 +324,7 @@ export function createLocalRepositories(db: MoveUpDatabase) {
         time: input.time || undefined,
         values,
         planId: input.planId,
-        slot: input.planId ? input.slot : undefined,
+        note: input.note?.trim() ? input.note.trim().slice(0, 200) : undefined,
         createdAt: existing?.profileId === profileId ? existing.createdAt : timestamp,
         updatedAt: timestamp,
       };

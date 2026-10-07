@@ -1,20 +1,21 @@
 import { format } from "date-fns";
-import { Activity, ChevronDown, Plus, SlidersHorizontal } from "lucide-react";
+import { ChevronDown, ChevronRight, ClipboardList, Plus, SlidersHorizontal } from "lucide-react";
 import { useMemo, useState } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 
 import { useApp } from "@/app/app-context";
 import { LineChart, type ChartPoint } from "@/components/body/line-chart";
 import { MeasurementSheet } from "@/components/body/measurement-sheet";
 import { AppHeader, PageTitle } from "@/components/layout/app-header";
-import { EmptyState, Page } from "@/components/layout/page";
+import { Page } from "@/components/layout/page";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Segmented } from "@/components/ui/segmented";
 import { formatMetric, formatNumber, kpiMetrics, roundTo, toDisplay, type MetricView } from "@/domain/body";
 import {
   BODY_PERIODS,
-  latestPoint,
+  dailySeries,
+  histogram,
   metricSeries,
   periodStartKey,
   periodStats,
@@ -22,6 +23,7 @@ import {
   type BodyPeriod,
   type SeriesPoint,
 } from "@/domain/body-stats";
+import type { BodyMeasurement } from "@/domain/types";
 import { useBodyData } from "@/hooks/use-body-data";
 import { useToday } from "@/hooks/use-today";
 import { dateLocale, localDateKey, parseDateKey } from "@/lib/dates";
@@ -63,8 +65,12 @@ export function ProgressPage() {
   };
 
   const shortDate = (key: string) => format(parseDateKey(key), language === "de" ? "d. MMM" : "MMM d", { locale });
-  const longDate = (point: SeriesPoint) =>
-    `${format(parseDateKey(point.date), language === "de" ? "EEE, d. MMM yyyy" : "EEE, MMM d, yyyy", { locale })}${point.time ? ` · ${point.time}` : ""}`;
+  // pro Tag ein Punkt: bei mehreren Messungen mit Anzahl statt Uhrzeit
+  const longDate = (point: SeriesPoint) => {
+    const day = format(parseDateKey(point.date), language === "de" ? "EEE, d. MMM yyyy" : "EEE, MMM d, yyyy", { locale });
+    if (point.count && point.count > 1) return `${day} · ${t("progress.measurements", { count: point.count })}`;
+    return `${day}${point.time ? ` · ${point.time}` : ""}`;
+  };
 
   if (!body.loaded) return <Page />;
 
@@ -74,14 +80,25 @@ export function ProgressPage() {
     <Page>
       <AppHeader left={<PageTitle>{t("progress.title")}</PageTitle>} />
 
-      <div className="mb-5 grid grid-cols-2 gap-2">
-        <Button variant="secondary" onClick={() => navigate("/progress/metrics")}>
-          <SlidersHorizontal size={17} aria-hidden /> {t("metrics.title")}
+      <div className="mb-3 grid grid-cols-3 gap-2">
+        <Button variant="secondary" size="sm" onClick={() => navigate("/progress/metrics")}>
+          <SlidersHorizontal size={16} className="shrink-0" aria-hidden /> {t("metrics.title")}
         </Button>
-        <Button onClick={() => setCaptureOpen(true)}>
-          <Plus size={18} aria-hidden /> {t("progress.capture")}
+        <Button variant="secondary" size="sm" onClick={() => navigate("/progress/plan")}>
+          <ClipboardList size={16} className="shrink-0" aria-hidden /> {t("progress.tabPlan")}
+        </Button>
+        <Button size="sm" onClick={() => navigate("/progress/capture")}>
+          <Plus size={17} className="shrink-0" aria-hidden /> {t("progress.capture")}
         </Button>
       </div>
+      {hasAny && (
+        <Link
+          to="/progress/values"
+          className="mb-4 inline-flex h-10 items-center gap-1 rounded-xl px-1 text-sm font-bold text-accent-light hover:bg-white/5"
+        >
+          {t("progress.myValues")} <ChevronRight size={16} aria-hidden />
+        </Link>
+      )}
 
       {/* Drei Kacheln: aktueller Wert, Einheit, Datum der letzten Messung */}
       <div className="mb-5 grid grid-cols-3 gap-2">
@@ -89,7 +106,7 @@ export function ProgressPage() {
           <KpiTile
             key={kpi.key}
             metric={kpi}
-            latest={latestPoint(body.measurements, kpi.key)}
+            latest={dailySeries(body.measurements, kpi.key).at(-1)}
             selected={metric?.key === kpi.key}
             onSelect={() => setParam("metric", kpi.key)}
             onCapture={() => setCaptureOpen(true)}
@@ -99,29 +116,40 @@ export function ProgressPage() {
       </div>
 
       {!hasAny || !metric ? (
-        <EmptyState
-          icon={<Activity size={28} aria-hidden />}
-          title={t("progress.emptyTitle")}
-          action={
-            <Button onClick={() => setCaptureOpen(true)}>
-              <Plus size={18} aria-hidden /> {t("progress.firstCapture")}
-            </Button>
-          }
-        >
-          {t("progress.emptyText")}
-        </EmptyState>
+        <Card className="p-5">
+          <h2 className="text-lg font-black tracking-tight">{t("progress.howTitle")}</h2>
+          <ol className="mt-3 space-y-2 text-sm leading-relaxed text-muted">
+            {(["progress.how1", "progress.how2", "progress.how3"] as const).map((key, i) => (
+              <li key={key} className="flex gap-3">
+                <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-accent/15 text-xs font-black text-accent-light">
+                  {i + 1}
+                </span>
+                <span className="pt-0.5">{t(key)}</span>
+              </li>
+            ))}
+          </ol>
+          <p className="mt-3 text-sm leading-relaxed text-muted">{t("progress.howEnd")}</p>
+          <Button className="mt-4 w-full" onClick={() => setCaptureOpen(true)}>
+            <Plus size={18} aria-hidden /> {t("progress.firstCapture")}
+          </Button>
+        </Card>
       ) : (
-        <Analysis
-          metric={metric}
-          selectable={selectable}
-          onMetric={(key) => setParam("metric", key)}
-          period={period}
-          onPeriod={(p) => setParam("period", p)}
-          series={metricSeries(body.measurements, metric.key)}
-          today={today}
-          shortDate={shortDate}
-          longDate={longDate}
-        />
+        <>
+          <Analysis
+            metric={metric}
+            selectable={selectable}
+            onMetric={(key) => setParam("metric", key)}
+            period={period}
+            onPeriod={(p) => setParam("period", p)}
+            series={dailySeries(body.measurements, metric.key)}
+            today={today}
+            shortDate={shortDate}
+            longDate={longDate}
+          />
+          {(metric.key === "bp_sys" || metric.key === "bp_dia") && (
+            <Distribution metric={metric} measurements={body.measurements} period={period} today={today} />
+          )}
+        </>
       )}
 
       <MeasurementSheet open={captureOpen} onClose={() => setCaptureOpen(false)} />
@@ -200,10 +228,10 @@ function Analysis({
   const startKey = periodStartKey(period, today) ?? points[0]?.date ?? localDateKey(today);
   const endKey = period === "all" ? (points.at(-1)?.date ?? localDateKey(today)) : localDateKey(today);
   const chartPoints: ChartPoint[] = points.map((p) => ({
-    t: dayNumber(p.date, p.time),
+    t: dayNumber(p.date, p.count && p.count > 1 ? undefined : p.time),
     value: toDisplay(metric, p.value),
     dateLabel: longDate(p),
-    valueLabel: fmt(p.value),
+    valueLabel: p.count && p.count > 1 ? t("progress.dayAvg", { value: fmt(p.value) }) : fmt(p.value),
   }));
   const tickDecimals = metric.decimals > 0 && Math.abs((stats.max ?? 0) - (stats.min ?? 0)) < 3 ? 1 : 0;
 
@@ -292,6 +320,62 @@ function Analysis({
           ))}
         </tbody>
       </table>
+    </Card>
+  );
+}
+
+/** Verteilung aller Einzelmessungen im Zeitraum (nur Blutdruck) – ruhige Balken in 10er-Klassen, keine Bewertung. */
+function Distribution({
+  metric,
+  measurements,
+  period,
+  today,
+}: {
+  metric: MetricView;
+  measurements: BodyMeasurement[];
+  period: BodyPeriod;
+  today: Date;
+}) {
+  const { t, language } = useApp();
+  const raw = pointsInPeriod(metricSeries(measurements, metric.key), period, today);
+  const bins = histogram(
+    raw.map((p) => p.value),
+    10,
+  );
+  const max = Math.max(1, ...bins.map((b) => b.count));
+  const periodLabel = t(period === "30d" ? "progress.period30" : period === "365d" ? "progress.period365" : "progress.periodAll");
+  const mean = raw.length > 0 ? raw.reduce((sum, p) => sum + p.value, 0) / raw.length : undefined;
+
+  return (
+    <Card className="mt-3 p-4">
+      <h2 className="text-lg font-black tracking-tight">{t("progress.distribution")}</h2>
+      <p className="mt-0.5 text-xs text-subtle">
+        {t("progress.distributionInfo", { name: metric.name, period: periodLabel, count: raw.length })}
+      </p>
+      {raw.length < 5 ? (
+        <p className="mt-3 text-sm text-muted">{t("progress.distributionFew")}</p>
+      ) : (
+        <>
+          <ul className="mt-3 space-y-1.5">
+            {bins.map((bin) => (
+              <li key={bin.from} className="flex items-center gap-3 text-sm">
+                <span className="tabular w-[76px] shrink-0 text-xs font-semibold text-muted">
+                  {bin.from}–{bin.to}
+                </span>
+                <span className="h-3 min-w-0 flex-1 overflow-hidden rounded-full bg-elevated">
+                  <span className="block h-full rounded-full bg-accent" style={{ width: `${(bin.count / max) * 100}%` }} />
+                </span>
+                <span className="tabular w-6 shrink-0 text-right text-xs font-black">{bin.count}</span>
+              </li>
+            ))}
+          </ul>
+          {mean !== undefined && (
+            <p className="mt-3 text-xs text-subtle">
+              {t("progress.distributionAvg", { value: formatMetric(metric, mean, language) })}
+            </p>
+          )}
+        </>
+      )}
     </Card>
   );
 }
