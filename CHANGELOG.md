@@ -2,9 +2,7 @@
 
 Alle nennenswerten Änderungen an 7MOVEUP. Neueste oben.
 
-## Unveröffentlicht
-
-Branch `feature-je-seite` – Preview-Test, noch keine Versionsnummer.
+## 1.7.3 – 2026-10-08
 
 - **Je Seite (einseitige Übungen):** Jede Planübung hat in „Training bearbeiten“ den Schalter „Je Seite“. „3 × 10 je Seite“ bleibt **3 Sätze**: Jeder Satz hat eine Zeile für LINKS und eine für RECHTS. Ein Satz zählt erst, wenn **beide** Seiten erledigt sind – im Fortschritt „x von y“, im Kalender und in den Zusammenfassungen; eine einzelne Seite ist nie ein ganzer Satz. Die Satzpause startet erst nach der zweiten Seite. Die Seite steht an jeder Zeile fest gespeichert; die Startseite wechselt von Einheit zu Einheit (zuerst links, beim nächsten Mal rechts, …). „Letztes Mal“ zeigt Links und Rechts getrennt.
 - **Zeitübungen je Seite (z. B. Side Plank):** ein Timer pro Satz – LINKS → Wechsel (Standard 5 s, im Plan 0–60 s) → RECHTS → Satzpause. Danach wartet der nächste Satz mit „Bereit – Satz 2 · beginnt LINKS“ und großem Start-Knopf; es gibt keinen automatischen Start und kein Timeout. Pause/Fortsetzen, Sperrbildschirm und Neustart der App funktionieren wie bei normalen Zeitübungen (Endzeit wird gespeichert, die Phase wird aus der Zeit berechnet). Jede Seite wird abgehakt, sobald sie zu Ende ist. „Übernehmen & abhaken“ vor dem Ende hakt die gelaufenen Seiten ab; wer das Fenster in der Satzpause schließt, behält die Restpause unten als Pausenleiste. Auf dem iPhone sind Töne bei gesperrtem Bildschirm nicht garantiert.
