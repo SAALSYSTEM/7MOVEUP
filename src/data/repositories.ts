@@ -53,6 +53,12 @@ export interface WorkoutRepository {
   getActiveSession(): Promise<WorkoutSession | undefined>;
   getCompletedSessions(): Promise<WorkoutSession[]>;
   saveSession(session: WorkoutSession): Promise<WorkoutSession>;
+  /**
+   * Legt ein neues Training nur an, wenn noch keines offen ist – sonst kommt das offene zurück
+   * (`created: false`). Prüfen und Anlegen laufen in einer Transaktion: Doppeltippen oder zwei
+   * Fenster können keine zweite offene Session erzeugen.
+   */
+  startSession(session: WorkoutSession): Promise<{ session: WorkoutSession; created: boolean }>;
   deleteSession(id: string): Promise<void>;
   /** letzte abgeschlossene Leistung einer Übung, optional vor einem Zeitpunkt */
   getLastPerformance(exerciseId: string, beforeIso?: string): Promise<PerformanceSnapshot | undefined>;

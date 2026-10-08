@@ -18,16 +18,15 @@ export function CalendarPage() {
   const body = useBodyData();
   const [capture, setCapture] = useState<{ date: string; plan?: MeasurePlan; measurement?: BodyMeasurement } | null>(null);
   const { data } = useData(async () => {
-    const [plans, completed, active, exercises] = await Promise.all([
+    const [plans, completed, exercises] = await Promise.all([
       planRepository.getAll(),
       workoutRepository.getCompletedSessions(),
-      workoutRepository.getActiveSession(),
       exerciseRepository.getAll(),
     ]);
-    return { plans, completed, active, exercises };
+    return { plans, completed, exercises };
   });
   const exercisesById = useMemo(() => new Map((data?.exercises ?? []).map((e) => [e.id, e])), [data]);
-  const { start, busy } = useStartPlan(data?.active);
+  const { start, busy } = useStartPlan();
 
   return (
     <Page>

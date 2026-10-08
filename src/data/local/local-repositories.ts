@@ -209,12 +209,11 @@ export function createLocalRepositories(db: MoveUpDatabase) {
     },
   };
 
+  const sessionsQuery = (profileId: string) =>
+    db.sessions.where("[profileId+startedAt]").between([profileId, ""], [profileId, "\uffff"]);
+
   async function sessionsOfProfile(): Promise<WorkoutSession[]> {
-    const profileId = await currentProfileId();
-    return db.sessions
-      .where("[profileId+startedAt]")
-      .between([profileId, ""], [profileId, "￿"])
-      .toArray();
+    return sessionsQuery(await currentProfileId()).toArray();
   }
 
   const workouts: WorkoutRepository = {
@@ -237,6 +236,18 @@ export function createLocalRepositories(db: MoveUpDatabase) {
       await db.sessions.put(next);
       notifyDataChanged();
       return next;
+    },
+    async startSession(session) {
+      const profileId = await currentProfileId();
+      const result = await db.transaction("rw", db.sessions, async () => {
+        const open = (await sessionsQuery(profileId).toArray()).filter((s) => !s.completedAt).at(-1);
+        if (open) return { session: open, created: false };
+        const next = { ...session, profileId };
+        await db.sessions.put(next);
+        return { session: next, created: true };
+      });
+      if (result.created) notifyDataChanged();
+      return result;
     },
     async deleteSession(id) {
       await db.sessions.delete(id);

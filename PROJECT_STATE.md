@@ -42,6 +42,7 @@ Der Kalender hat keinen eigenen Navigationspunkt; er öffnet sich über „Kalen
 - Zeigt nur, was jetzt bzw. als Nächstes ansteht: heute geplante Trainings und (am Messtag) „Körperwerte erfassen“, mit „x von y erledigt“.
 - „Als Nächstes“ = erster Tag nach heute (bis 14 Tage) mit Training oder Messtag.
 - „Letztes Training“ entfällt – Verlauf steht im Kalender.
+- **Training starten:** ein gemeinsamer Weg für Heute, Training und Kalender (`useStartPlan` → `startSessionFromPlan`). Höchstens **ein offenes Training pro Profil**: `workoutRepository.startSession` prüft und legt in einer Transaktion an (Doppeltippen, zwei Fenster); läuft schon eines, kommt dieses zurück. Die Karte unter „Heute fällig“ startet, setzt fort oder öffnet das laufende Training; erledigte Karten sind inaktiv, der große Knopf und die Karte nutzen dieselbe Session.
 
 ### Körperwerte
 

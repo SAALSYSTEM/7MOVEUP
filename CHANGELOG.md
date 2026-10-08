@@ -2,6 +2,13 @@
 
 Alle nennenswerten Änderungen an 7MOVEUP. Neueste oben.
 
+## Unveröffentlicht
+
+Branch `fix-heute-start` – Preview-Test, noch keine Versionsnummer.
+
+- **Heute: Trainingskarte immer antippbar:** Die ganze Karte unter „Heute“ („Tag 3 – Pull“) startet das Training, setzt es fort (mit dem Zusatz „läuft gerade“) oder öffnet – wenn ein anderes Training läuft – dieses laufende, mit Hinweis. Erledigte Karten bleiben inaktiv. Bisher war die Karte ausgegraut, sobald irgendein Training lief.
+- **Nie eine zweite offene Session:** Heute, Training und Kalender starten über denselben Weg. Die Absicherung sitzt zentral in der Datenschicht (Prüfen und Anlegen in einer Transaktion) und hält auch bei schnellem Doppeltippen oder zwei offenen Fenstern. Der große Knopf und die Karte führen immer in dieselbe Session. Keine Änderung an Trainingsdaten oder Backup.
+
 ## 1.7.1 – 2026-10-07
 
 - **Messkarte wie die Trainingszeile:** Ist die geplante Anzahl erfasst, steht der Name durchgestrichen mit grünem Haken rechts – ohne „Erfassen“-Knopf, genau wie ein erledigtes Training. Offene Karten behalten den Knopf. Ein Tipp auf die erledigte Zeile erlaubt weiterhin eine zusätzliche Messung.

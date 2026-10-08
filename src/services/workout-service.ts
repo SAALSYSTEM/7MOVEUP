@@ -67,7 +67,17 @@ async function buildSessionExercise(item: WorkoutPlanItem): Promise<SessionExerc
   };
 }
 
-export async function startSessionFromPlan(plan: WorkoutPlan, date = new Date()): Promise<WorkoutSession> {
+/**
+ * Training aus einem Trainingstag starten – zentral abgesichert: Läuft schon eines, wird nichts
+ * angelegt, sondern das offene zurückgegeben (`created: false`). Die endgültige Prüfung passiert
+ * atomar im Repository (`startSession`), die Vorab-Prüfung spart nur Arbeit.
+ */
+export async function startSessionFromPlan(
+  plan: WorkoutPlan,
+  date = new Date(),
+): Promise<{ session: WorkoutSession; created: boolean }> {
+  const open = await workoutRepository.getActiveSession();
+  if (open) return { session: open, created: false };
   const profile = await profileRepository.getCurrent();
   const exercises = (await Promise.all(plan.items.map(buildSessionExercise))).filter(
     (e): e is SessionExercise => Boolean(e),
@@ -82,7 +92,7 @@ export async function startSessionFromPlan(plan: WorkoutPlan, date = new Date())
     progressionStepKg: plan.progressionStepKg,
     exercises,
   };
-  return workoutRepository.saveSession(session);
+  return workoutRepository.startSession(session);
 }
 
 export function emptySet(exercise: SessionExercise): SetLog {

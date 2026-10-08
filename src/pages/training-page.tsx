@@ -54,7 +54,7 @@ export function TrainingPage() {
     return Array.from(map.entries()).sort(([a], [b]) => (a === "" ? 1 : b === "" ? -1 : 0));
   }, [plans]);
 
-  const { start: startPlan, busy: starting } = useStartPlan(active);
+  const { start: startPlan, busy: starting } = useStartPlan();
   const busy = starting || adopting;
 
   /** Genau ein persönlicher Plan: eine Vorlage ersetzt ihn – absolvierte Trainings bleiben unberührt. */

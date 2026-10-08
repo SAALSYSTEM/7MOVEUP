@@ -34,6 +34,7 @@ export const en: Record<TranslationKey, string> = {
 
   "home.start": "Start workout",
   "home.continue": "Continue workout",
+  "home.running": "in progress",
   "home.week": "This week",
   "home.workouts": "Workouts",
   "home.minutes": "Minutes",

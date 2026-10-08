@@ -17,14 +17,14 @@ import { measureCardsForDate, plannedPerDay, planWeekdays } from "@/domain/measu
 import { getDailyQuote } from "@/domain/motivation";
 import { countImprovements } from "@/domain/progression";
 import { nextEvent, openPlansToday, plansForDate, sessionsForDate, sessionsThisWeek, todayProgress, weekSummary } from "@/domain/schedule";
-import type { MeasurePlan, WorkoutPlan } from "@/domain/types";
+import type { MeasurePlan } from "@/domain/types";
 import { useBackupExport, useBackupStatus } from "@/hooks/use-backup";
 import { useBodyData } from "@/hooks/use-body-data";
 import { useData } from "@/hooks/use-data";
+import { useStartPlan } from "@/hooks/use-start-plan";
 import { useToday } from "@/hooks/use-today";
 import { dateLocale } from "@/lib/dates";
 import { exerciseCountLabel } from "@/lib/weekdays";
-import { startSessionFromPlan } from "@/services/workout-service";
 
 /**
  * Heute beantwortet: Was steht jetzt bzw. als Nächstes an?
@@ -34,7 +34,6 @@ import { startSessionFromPlan } from "@/services/workout-service";
 export function HomePage() {
   const { t, language } = useApp();
   const navigate = useNavigate();
-  const [starting, setStarting] = useState(false);
   const [captureOpen, setCaptureOpen] = useState(false);
   const locale = dateLocale(language);
   const today = useToday();
@@ -78,16 +77,8 @@ export function HomePage() {
 
   const next = nextEvent(plans, planWeekdays(measurePlans), today);
 
-  const startPlan = async (plan: WorkoutPlan) => {
-    if (starting) return;
-    setStarting(true);
-    try {
-      const session = await startSessionFromPlan(plan);
-      navigate(`/training/session/${session.id}`);
-    } finally {
-      setStarting(false);
-    }
-  };
+  // Eine gemeinsame Startlogik (wie Training und Kalender): starten, fortsetzen oder das laufende öffnen
+  const { start: startPlan, busy: starting } = useStartPlan();
 
   const onStart = () => {
     if (active) return navigate(`/training/session/${active.id}`);
@@ -148,11 +139,12 @@ export function HomePage() {
             <ul className="space-y-2">
               {plannedToday.map((plan) => {
                 const isDone = doneToday.some((s) => s.planId === plan.id);
+                const isRunning = !isDone && active?.planId === plan.id;
                 return (
                   <li key={plan.id}>
                     <button
                       type="button"
-                      disabled={isDone || Boolean(active) || starting}
+                      disabled={isDone || starting}
                       onClick={() => void startPlan(plan)}
                       className="flex min-h-12 w-full items-center justify-between gap-3 rounded-2xl bg-elevated px-4 py-3 text-left disabled:cursor-default"
                     >
@@ -160,7 +152,10 @@ export function HomePage() {
                         <span className={isDone ? "block truncate font-bold text-muted line-through" : "block truncate font-bold"}>
                           {plan.name}
                         </span>
-                        <span className="block text-xs text-subtle">{exerciseCountLabel(t, plan.items.length)}</span>
+                        <span className="block text-xs text-subtle">
+                          {exerciseCountLabel(t, plan.items.length)}
+                          {isRunning && <span className="font-bold text-accent-light"> · {t("home.running")}</span>}
+                        </span>
                       </span>
                       {isDone ? (
                         <CircleCheck size={20} className="shrink-0 text-success" aria-label={t("home.doneBadge")} />

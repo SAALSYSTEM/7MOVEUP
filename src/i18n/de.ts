@@ -35,6 +35,7 @@ export const de = {
   // Heute
   "home.start": "Training starten",
   "home.continue": "Training fortsetzen",
+  "home.running": "läuft gerade",
   "home.week": "Diese Woche",
   "home.workouts": "Trainings",
   "home.minutes": "Minuten",
