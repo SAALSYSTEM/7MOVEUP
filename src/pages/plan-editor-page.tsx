@@ -17,8 +17,11 @@ import { Input, Textarea } from "@/components/ui/input";
 import { FieldError, FieldHint, Label } from "@/components/ui/label";
 import { NumberField } from "@/components/ui/number-field";
 import { Sheet } from "@/components/ui/sheet";
+import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/components/ui/toast";
 import { exerciseRepository, planRepository, profileRepository } from "@/data";
+import { perSideDefaults } from "@/data/seed";
+import { DEFAULT_SWITCH_SEC, MAX_SWITCH_SEC } from "@/domain/sides";
 import type { Exercise, WorkoutPlan, WorkoutPlanItem } from "@/domain/types";
 import { useData } from "@/hooks/use-data";
 import { exerciseName } from "@/i18n";
@@ -36,6 +39,8 @@ function newItem(exercise: Exercise): WorkoutPlanItem {
     repMax: exercise.defaultRepMax,
     durationSec: exercise.defaultDurationSec,
     restSec: exercise.defaultRestSec,
+    // nur für NEU hinzugefügte Übungen – bestehende Planübungen bleiben, wie sie sind
+    ...perSideDefaults(exercise),
   };
 }
 
@@ -170,55 +175,54 @@ export function PlanEditorPage() {
                 return (
                   <li key={item.id}>
                     <Card className="p-4">
-                      <div className="mb-3 flex items-start gap-2">
-                        <span className="tabular mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-elevated text-[11px] font-black text-muted">
-                          {index + 1}
-                        </span>
-                        <div className="min-w-0 flex-1">
-                          <p className="font-bold leading-snug">{exercise ? exerciseName(exercise, language) : item.exerciseId}</p>
-                        </div>
-                        <div className="-mr-2 -mt-2 flex shrink-0">
-                          {exercise && (
+                      <div className="mb-2">
+                        <div className="-mt-3 flex items-center justify-between">
+                          <span className="tabular flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-elevated text-[11px] font-black text-muted">
+                            {index + 1}
+                          </span>
+                          <div className="-mr-2 flex shrink-0">
+                            {exercise && (
+                              <Button
+                                size="icon"
+                                variant="ghost"
+                                className={hasInfo ? "relative text-accent" : "relative"}
+                                onClick={() => setInfo({ exerciseId: exercise.id, open: true })}
+                                aria-label={`${t("session.info")}: ${exerciseName(exercise, language)}`}
+                              >
+                                <Info size={18} aria-hidden />
+                                {hasInfo && <span className="absolute right-2 top-2 h-2 w-2 rounded-full bg-accent ring-2 ring-card" aria-hidden />}
+                              </Button>
+                            )}
+                            <Button size="icon" variant="ghost" disabled={index === 0} onClick={() => moveItem(index, -1)} aria-label={t("plan.moveUp")}>
+                              <ArrowUp size={17} aria-hidden />
+                            </Button>
                             <Button
                               size="icon"
                               variant="ghost"
-                              className={hasInfo ? "relative text-accent" : "relative"}
-                              onClick={() => setInfo({ exerciseId: exercise.id, open: true })}
-                              aria-label={`${t("session.info")}: ${exerciseName(exercise, language)}`}
+                              disabled={index === plan.items.length - 1}
+                              onClick={() => moveItem(index, 1)}
+                              aria-label={t("plan.moveDown")}
                             >
-                              <Info size={18} aria-hidden />
-                              {hasInfo && <span className="absolute right-2 top-2 h-2 w-2 rounded-full bg-accent ring-2 ring-card" aria-hidden />}
+                              <ArrowDown size={17} aria-hidden />
                             </Button>
-                          )}
-                          <Button size="icon" variant="ghost" disabled={index === 0} onClick={() => moveItem(index, -1)} aria-label={t("plan.moveUp")}>
-                            <ArrowUp size={17} aria-hidden />
-                          </Button>
-                          <Button
-                            size="icon"
-                            variant="ghost"
-                            disabled={index === plan.items.length - 1}
-                            onClick={() => moveItem(index, 1)}
-                            aria-label={t("plan.moveDown")}
-                          >
-                            <ArrowDown size={17} aria-hidden />
-                          </Button>
-                          <Button
-                            size="icon"
-                            variant="ghost"
-                            className="hover:text-danger"
-                            onClick={() => update({ items: plan.items.filter((i) => i.id !== item.id) })}
-                            aria-label={t("plan.removeItem")}
-                          >
-                            <Trash2 size={17} aria-hidden />
-                          </Button>
+                            <Button
+                              size="icon"
+                              variant="ghost"
+                              className="hover:text-danger"
+                              onClick={() => update({ items: plan.items.filter((i) => i.id !== item.id) })}
+                              aria-label={t("plan.removeItem")}
+                            >
+                              <Trash2 size={17} aria-hidden />
+                            </Button>
+                          </div>
                         </div>
+                        <p className="font-bold leading-snug">{exercise ? exerciseName(exercise, language) : item.exerciseId}</p>
+                        <p className="mt-0.5 text-xs text-subtle">
+                          {[t(`tracking.${tracking}`), exercise ? equipmentSummary(exercise.equipment, t, settings.customEquipment) : undefined]
+                            .filter(Boolean)
+                            .join(" · ")}
+                        </p>
                       </div>
-
-                      <p className="-mt-1.5 mb-3 pl-8 text-xs text-subtle">
-                        {[t(`tracking.${tracking}`), exercise ? equipmentSummary(exercise.equipment, t, settings.customEquipment) : undefined]
-                          .filter(Boolean)
-                          .join(" · ")}
-                      </p>
 
                       <div className="grid grid-cols-2 gap-2.5 min-[400px]:grid-cols-4">
                         {tracking !== "cardio" && (
@@ -233,6 +237,15 @@ export function PlanEditorPage() {
                         {tracking === "duration" && (
                           <NumberField label={t("plan.duration")} value={item.durationSec} max={3600} onChange={(v) => updateItem(item.id, { durationSec: v })} />
                         )}
+                        {tracking === "duration" && item.perSide && (
+                          <NumberField
+                            label={t("plan.switchSec")}
+                            value={item.switchSec}
+                            placeholder={String(DEFAULT_SWITCH_SEC)}
+                            max={MAX_SWITCH_SEC}
+                            onChange={(v) => updateItem(item.id, { switchSec: v })}
+                          />
+                        )}
                         {tracking === "cardio" && (
                           <NumberField
                             label={t("plan.durationMin")}
@@ -245,6 +258,33 @@ export function PlanEditorPage() {
                           <NumberField label={t("plan.restSec")} value={item.restSec} max={900} onChange={(v) => updateItem(item.id, { restSec: v })} />
                         )}
                       </div>
+
+                      {tracking !== "cardio" && (
+                        <div className="mt-3 flex items-center justify-between gap-3">
+                          <div className="min-w-0">
+                            <label htmlFor={`per-side-${item.id}`} className="block text-sm font-semibold">
+                              {t("plan.perSide")}
+                            </label>
+                            {item.perSide && (
+                              <p id={`per-side-hint-${item.id}`} className="text-xs text-subtle">
+                                {t("plan.perSideHint", { total: item.sets * 2 })}
+                              </p>
+                            )}
+                          </div>
+                          <Switch
+                            id={`per-side-${item.id}`}
+                            checked={Boolean(item.perSide)}
+                            aria-describedby={item.perSide ? `per-side-hint-${item.id}` : undefined}
+                            onCheckedChange={(on) =>
+                              updateItem(item.id, {
+                                perSide: on || undefined,
+                                // Zeitübung: Wechselpause beim Einschalten sichtbar vorbelegen
+                                ...(on && tracking === "duration" ? { switchSec: item.switchSec ?? DEFAULT_SWITCH_SEC } : {}),
+                              })
+                            }
+                          />
+                        </div>
+                      )}
 
                       {showSteps && (
                         <StepsField

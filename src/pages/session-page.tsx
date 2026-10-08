@@ -22,6 +22,7 @@ import { formatDuration } from "@/lib/dates";
 import { dismissKeyboard } from "@/lib/viewport";
 import { tick, unlockAudio } from "@/services/feedback";
 import { restoreTimers, type TimerResume } from "@/domain/active-session";
+import { countSets, partnerIndex, usesSides } from "@/domain/sides";
 import type { CountdownSnapshot } from "@/hooks/use-countdown";
 import { finishSession } from "@/services/workout-service";
 
@@ -169,10 +170,8 @@ export function SessionPage() {
     });
   }, []);
 
-  const totals = useMemo(() => {
-    const all = session?.exercises.flatMap((e) => e.sets) ?? [];
-    return { done: all.filter((s) => s.done).length, total: all.length };
-  }, [session]);
+  /** bei „Je Seite“ zählt ein Satz erst, wenn beide Seiten erledigt sind */
+  const totals = useMemo(() => countSets(session?.exercises ?? []), [session]);
 
   if (notFound) {
     return (
@@ -212,7 +211,10 @@ export function SessionPage() {
   const startRest = (entry: SessionExercise, setIndex: number) => {
     unlockAudio();
     tick();
-    const isLastSetOfExercise = setIndex >= entry.sets.length - 1;
+    const paired = usesSides(entry);
+    // „Je Seite“: Pause erst, wenn mit diesem Haken beide Seiten des Satzes erledigt sind
+    if (paired && !entry.sets[partnerIndex(setIndex)]?.done) return;
+    const isLastSetOfExercise = setIndex >= entry.sets.length - (paired ? 2 : 1);
     const isLastExercise = session.exercises.at(-1)?.id === entry.id;
     const seconds = entry.target.restSec ?? 0;
     if (seconds > 0 && !(isLastSetOfExercise && isLastExercise)) {

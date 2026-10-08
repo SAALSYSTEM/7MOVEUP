@@ -1,3 +1,4 @@
+import { hasSides } from "@/domain/sides";
 import type { PerformanceSnapshot, SetLog, TrackingType, WorkoutSession } from "@/domain/types";
 
 /**
@@ -10,7 +11,8 @@ export function isProgressionReady(last: PerformanceSnapshot | undefined): boole
   const repMax = last.target.repMax;
   if (!repMax) return false;
   const workingSets = last.sets.filter((s) => s.done);
-  if (workingSets.length === 0 || workingSets.length < last.target.sets) return false;
+  const required = last.target.perSide ? last.target.sets * 2 : last.target.sets;
+  if (workingSets.length === 0 || workingSets.length < required) return false;
   return workingSets.every((s) => (s.reps ?? 0) >= repMax);
 }
 
@@ -54,6 +56,8 @@ function score(trackingType: TrackingType, sets: SetLog[]): Score | undefined {
 
 /** true, wenn die heutige Leistung besser ist als die vorherige */
 export function isImprovement(trackingType: TrackingType, previous: SetLog[], current: SetLog[]): boolean {
+  // „Je Seite“ verdoppelt die Summen – nur gleich aufgebaute Einheiten sind vergleichbar
+  if (hasSides(previous) !== hasSides(current)) return false;
   const before = score(trackingType, previous);
   const now = score(trackingType, current);
   if (!before || !now) return false;

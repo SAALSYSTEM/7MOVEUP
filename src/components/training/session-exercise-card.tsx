@@ -6,6 +6,7 @@ import { Card } from "@/components/ui/card";
 import { HapticTap } from "@/components/ui/haptic-tap";
 import { Stepper } from "@/components/ui/stepper";
 import { isProgressionReady, progressionStepKg } from "@/domain/progression";
+import { setNumber, usesSides } from "@/domain/sides";
 import type { Exercise, PerformanceSnapshot, SessionExercise, SetLog } from "@/domain/types";
 import { localized } from "@/i18n";
 import { dateLocale, parseDateKey } from "@/lib/dates";
@@ -13,7 +14,7 @@ import { equipmentSummary } from "@/lib/equipment";
 import { formatKg, targetSummary, usesPerDumbbellWeight, weightUnitLabel } from "@/lib/exercise-format";
 import { formatPerformance } from "@/lib/performance-format";
 import { cn } from "@/lib/utils";
-import { emptySet } from "@/services/workout-service";
+import { newSetRows } from "@/services/workout-service";
 
 type Props = {
   index: number;
@@ -51,6 +52,9 @@ export function SessionExerciseCard({
   const showWeight = tracking === "weight_reps" || (tracking === "duration" && usesPerDumbbellWeight(exercise));
   const doneCount = entry.sets.filter((s) => s.done).length;
   const allDone = doneCount === entry.sets.length && entry.sets.length > 0;
+  /** „Je Seite“: Zeilen paarweise (Satz = links + rechts) */
+  const perSide = usesSides(entry);
+  const sideText = (side: SetLog["side"]) => (side ? t(side === "left" ? "common.left" : "common.right") : "");
 
   const ready = isProgressionReady(last);
   const stepKg = ready ? progressionStepKg(last, planStepKg) : undefined;
@@ -76,11 +80,13 @@ export function SessionExerciseCard({
     }
   };
 
-  const addSet = () => onChange({ ...entry, sets: [...entry.sets, emptySet(entry)] });
+  const addSet = () => onChange({ ...entry, sets: [...entry.sets, ...newSetRows(entry)] });
+  /** bei „Je Seite“ fällt ein ganzer Satz (beide Seiten) weg – nur, wenn noch nichts davon erledigt ist */
+  const rowsPerSet = perSide ? 2 : 1;
+  const canRemoveSet = entry.sets.length > rowsPerSet && !entry.sets.slice(-rowsPerSet).some((s) => s.done);
   const removeSet = () => {
-    const lastIndex = entry.sets.length - 1;
-    if (lastIndex < 1 || entry.sets[lastIndex].done) return;
-    onChange({ ...entry, sets: entry.sets.slice(0, lastIndex) });
+    if (!canRemoveSet) return;
+    onChange({ ...entry, sets: entry.sets.slice(0, entry.sets.length - rowsPerSet) });
   };
 
   const hasInfo = Boolean(personalNote) || hasVideo;
@@ -160,7 +166,7 @@ export function SessionExerciseCard({
           {lastText ? (
             <>
               {lastText.headline && <p className="mt-1 text-[15px] font-bold">{lastText.headline}</p>}
-              <p className="tabular mt-0.5 text-[15px] font-semibold text-muted">{lastText.detail}</p>
+              <p className="tabular mt-0.5 whitespace-pre-line text-[15px] font-semibold text-muted">{lastText.detail}</p>
             </>
           ) : (
             <p className="mt-1 text-sm text-subtle">{t("session.firstTime")}</p>
@@ -215,20 +221,40 @@ export function SessionExerciseCard({
           />
         ) : (
           <ol className="space-y-1.5">
-            {entry.sets.map((set, setIndex) => (
+            {entry.sets.map((set, setIndex) => {
+              const number = perSide ? setNumber(setIndex) : setIndex + 1;
+              /** z. B. „2 Rechts“ bzw. „Satz 2 Rechts“ für Screenreader und Beschriftungen */
+              const numberLabel = `${number}${set.side ? ` ${sideText(set.side)}` : ""}`;
+              const rowName = t("session.set", { n: numberLabel });
+              return (
               <li
                 key={setIndex}
                 className={cn(
                   "flex items-center gap-2 rounded-2xl py-1 pl-3 pr-1 transition-colors",
                   set.done ? "bg-success/[0.07]" : "bg-transparent",
+                  // etwas mehr Luft zwischen den Sätzen als zwischen den beiden Seiten eines Satzes
+                  perSide && setIndex % 2 === 1 && setIndex < entry.sets.length - 1 && "mb-3",
                 )}
               >
-                <div className="w-12 shrink-0">
+                <div className={cn("shrink-0", perSide ? "w-14" : "w-12")}>
                   <span className={cn("block text-sm font-bold", set.done ? "text-success" : "text-muted")}>
-                    {t("session.set", { n: setIndex + 1 })}
+                    {t("session.set", { n: number })}
                   </span>
-                  {set.done && showWeight && set.weightPerDumbbellKg != null && (
-                    <span className="tabular block text-[10px] font-semibold text-subtle">{formatKg(set.weightPerDumbbellKg, language)} kg</span>
+                  {set.side ? (
+                    <span
+                      className={cn(
+                        "block text-[10px] font-extrabold uppercase tracking-wider",
+                        set.done ? "text-success" : "text-accent-light",
+                      )}
+                    >
+                      {sideText(set.side)}
+                    </span>
+                  ) : (
+                    set.done &&
+                    showWeight &&
+                    set.weightPerDumbbellKg != null && (
+                      <span className="tabular block text-[10px] font-semibold text-subtle">{formatKg(set.weightPerDumbbellKg, language)} kg</span>
+                    )
                   )}
                 </div>
                 {tracking === "duration" ? (
@@ -237,7 +263,7 @@ export function SessionExerciseCard({
                       className="flex-1"
                       value={set.durationSec}
                       onChange={(v) => updateSet(setIndex, { durationSec: v })}
-                      label={`${t("session.seconds")} ${t("session.set", { n: setIndex + 1 })} · ${name}`}
+                      label={`${t("session.seconds")} ${rowName} · ${name}`}
                       step={5}
                       max={3600}
                     />
@@ -245,7 +271,7 @@ export function SessionExerciseCard({
                       type="button"
                       onClick={() => onOpenTimer(setIndex)}
                       className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-accent/15 text-accent"
-                      aria-label={`${t("session.openTimer", { n: setIndex + 1 })} · ${name}`}
+                      aria-label={`${t("session.openTimer", { n: number })} · ${name}`}
                     >
                       <Timer size={19} aria-hidden />
                     </button>
@@ -255,7 +281,7 @@ export function SessionExerciseCard({
                     className="flex-1"
                     value={set.reps}
                     onChange={(v) => updateSet(setIndex, { reps: v })}
-                    label={`${t("session.reps")} ${t("session.set", { n: setIndex + 1 })} · ${name}`}
+                    label={`${t("session.reps")} ${rowName} · ${name}`}
                     max={500}
                   />
                 )}
@@ -264,7 +290,7 @@ export function SessionExerciseCard({
                     type="button"
                     onClick={() => toggleDone(setIndex)}
                     aria-pressed={set.done}
-                    aria-label={`${set.done ? t("session.markUndone", { n: setIndex + 1 }) : t("session.markDone", { n: setIndex + 1 })} · ${name}`}
+                    aria-label={`${set.done ? t("session.markUndone", { n: numberLabel }) : t("session.markDone", { n: numberLabel })} · ${name}`}
                     className={cn(
                       "flex h-11 w-11 shrink-0 items-center justify-center rounded-full border-2 transition-colors",
                       set.done ? "border-success bg-success text-black" : "border-line text-subtle hover:border-muted",
@@ -274,7 +300,8 @@ export function SessionExerciseCard({
                   </button>
                 </HapticTap>
               </li>
-            ))}
+              );
+            })}
           </ol>
         )}
 
@@ -283,7 +310,7 @@ export function SessionExerciseCard({
             <button
               type="button"
               onClick={removeSet}
-              disabled={entry.sets.length <= 1 || Boolean(entry.sets.at(-1)?.done)}
+              disabled={!canRemoveSet}
               className="inline-flex h-10 items-center gap-1 rounded-xl px-2 text-xs font-bold text-subtle hover:text-fg disabled:opacity-30"
             >
               <Minus size={14} aria-hidden /> {t("session.removeSet")}

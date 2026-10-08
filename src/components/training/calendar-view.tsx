@@ -17,6 +17,7 @@ import { Card } from "@/components/ui/card";
 import { formatMetric, type MetricView } from "@/domain/body";
 import { measureCardsForDate, plannedPerDay, planWeekdays } from "@/domain/measure-plans";
 import { dayStatus, planKind, type DayStatus } from "@/domain/schedule";
+import { countSets } from "@/domain/sides";
 import type { BodyMeasurement, Exercise, MeasurePlan, WorkoutPlan, WorkoutSession } from "@/domain/types";
 import { useToday } from "@/hooks/use-today";
 import { dateLocale, isoWeekday, localDateKey } from "@/lib/dates";
@@ -76,7 +77,7 @@ export function CalendarView({
       .join(" · ");
 
   const sessionSummary = (session: WorkoutSession) => {
-    const doneSets = session.exercises.reduce((acc, e) => acc + e.sets.filter((x) => x.done).length, 0);
+    const doneSets = countSets(session.exercises).done;
     const minutes = session.durationSec ? `${t("home.minutesShort", { count: Math.round(session.durationSec / 60) })} · ` : "";
     return `${minutes}${doneSets} ${t("common.sets")}`;
   };

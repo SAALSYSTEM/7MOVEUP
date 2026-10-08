@@ -268,6 +268,8 @@ export function createLocalRepositories(db: MoveUpDatabase) {
             trackingType: entry.trackingType,
             target: entry.target,
             sets: entry.sets.filter((set) => set.done),
+            // erste geplante Zeile (nicht die erste erledigte) – bestimmt die Startseite der nächsten Einheit
+            startSide: entry.sets[0]?.side,
           };
           return snapshot;
         }

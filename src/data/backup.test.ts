@@ -84,6 +84,70 @@ describe("Export/Import", () => {
     expect((await target.repos.exercises.getAll()).some((e) => e.id === "custom-1")).toBe(true);
   });
 
+  it("Je Seite überlebt Export und Import (Plan, Ziel, Seite je Zeile); alte Dateien ohne die Felder bleiben gültig", async () => {
+    const source = freshDb("per-side-source");
+    const profile = await source.repos.profiles.getCurrent();
+    const stamp = "2026-10-08T08:00:00.000Z";
+    await source.repos.plans.save({
+      id: "plan-side",
+      profileId: profile.id,
+      name: "Tag 3",
+      items: [
+        { id: "i1", exerciseId: "side-plank", sets: 3, durationSec: 30, restSec: 45, perSide: true, switchSec: 0 },
+        { id: "i2", exerciseId: "plank", sets: 3, durationSec: 40 },
+      ],
+      weekdays: [3],
+      createdAt: stamp,
+      updatedAt: stamp,
+    });
+    await source.repos.workouts.saveSession({
+      id: "s-side",
+      profileId: profile.id,
+      planId: "plan-side",
+      planName: "Tag 3",
+      date: "2026-10-08",
+      startedAt: stamp,
+      completedAt: "2026-10-08T09:00:00.000Z",
+      exercises: [
+        {
+          id: "e1",
+          exerciseId: "side-plank",
+          name: { de: "Side Plank", en: "Side Plank" },
+          trackingType: "duration",
+          target: { sets: 1, durationSec: 30, perSide: true, switchSec: 5 },
+          sets: [
+            { durationSec: 30, done: true, side: "right" },
+            { durationSec: 28, done: true, side: "left" },
+          ],
+        },
+      ],
+    });
+
+    const exported = await source.backup.exportCurrentProfile();
+    const parsed = parseBackup(JSON.stringify(exported));
+    expect(parsed.ok).toBe(true);
+    if (!parsed.ok) return;
+    const target = freshDb("per-side-target");
+    await target.backup.importReplacingCurrentProfile(parsed.backup);
+
+    const [plan] = await target.repos.plans.getAll();
+    expect(plan.items[0]).toMatchObject({ perSide: true, switchSec: 0 });
+    expect(plan.items[1].perSide).toBeUndefined();
+    const [session] = await target.repos.workouts.getCompletedSessions();
+    expect(session.exercises[0].target).toMatchObject({ perSide: true, switchSec: 5 });
+    expect(session.exercises[0].sets.map((x) => x.side)).toEqual(["right", "left"]);
+    // die Startseite der nächsten Einheit folgt aus den importierten Daten
+    expect((await target.repos.workouts.getLastPerformance("side-plank"))?.startSide).toBe("right");
+
+    // Backup aus einer älteren App-Version (ohne die neuen Felder) bleibt importierbar
+    const legacy = JSON.parse(JSON.stringify(exported));
+    for (const item of legacy.plans[0].items) {
+      delete item.perSide;
+      delete item.switchSec;
+    }
+    expect(parseBackup(JSON.stringify(legacy)).ok).toBe(true);
+  });
+
   it("letzte Leistung kommt aus der jüngsten abgeschlossenen Einheit", async () => {
     const { repos } = freshDb("last-performance");
     const profile = await repos.profiles.getCurrent();

@@ -98,6 +98,9 @@ export type ExerciseNote = {
   updatedAt: string;
 };
 
+/** Seite einer einseitigen Ausführung (Planübung mit „Je Seite“) */
+export type Side = "left" | "right";
+
 export type WorkoutPlanItem = {
   id: string;
   exerciseId: string;
@@ -108,6 +111,10 @@ export type WorkoutPlanItem = {
   restSec?: number;
   /** Gewichtsstufen als Schnellauswahl, Angabe in kg je Hantel */
   weightStepsKg?: number[];
+  /** „Je Seite“: Sätze, Wiederholungen und Zeit gelten für jede Seite. Fehlt = false (nie nachträglich ableiten). */
+  perSide?: boolean;
+  /** Wechselpause zwischen den Seiten in Sekunden – nur bei Zeitübungen mit „Je Seite“ */
+  switchSec?: number;
   note?: string;
 };
 
@@ -140,6 +147,8 @@ export type SetLog = {
   heartRate?: number;
   done: boolean;
   completedAt?: string;
+  /** nur bei „Je Seite“: auf welcher Seite diese Ausführung stattfindet; fehlt bei älteren Daten */
+  side?: Side;
 };
 
 export type SessionTarget = {
@@ -149,6 +158,9 @@ export type SessionTarget = {
   durationSec?: number;
   restSec?: number;
   weightStepsKg?: number[];
+  /** Snapshot von WorkoutPlanItem.perSide – `sets` bleibt die Zahl der Sätze je Seite */
+  perSide?: boolean;
+  switchSec?: number;
   note?: string;
 };
 
@@ -205,6 +217,8 @@ export type PerformanceSnapshot = {
   trackingType: TrackingType;
   target: SessionTarget;
   sets: SetLog[];
+  /** Startseite der damaligen Einheit (Seite der ersten geplanten Zeile) – daraus folgt die nächste Startseite */
+  startSide?: Side;
 };
 
 // ------------------------------------------------------------------ Körperwerte

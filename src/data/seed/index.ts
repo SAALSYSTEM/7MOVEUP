@@ -1,3 +1,4 @@
+import { DEFAULT_SWITCH_SEC } from "@/domain/sides";
 import type { BodyRegion, Equipment, Exercise, LocalizedText, TrackingType, Weekday } from "@/domain/types";
 
 import rawExercises from "./exercises.json";
@@ -78,6 +79,32 @@ export const BUILT_IN_EXERCISES: Exercise[] = [
   ERGOMETER_EXERCISE,
 ];
 
+/**
+ * Eindeutig einseitige Übungen: Beim NEUEN Anlegen einer Planübung (Vorlage übernehmen, Übung aus dem
+ * Katalog hinzufügen) startet „Je Seite“ eingeschaltet. Bestehende Planübungen werden nie angefasst –
+ * diese Liste wird weder beim Laden noch beim Starten eines Trainings gelesen. Alles andere (z. B.
+ * Ausfallschritte, Step-ups, Wadenheben) schaltet der Nutzer selbst ein.
+ */
+const PER_SIDE_DEFAULT_IDS = new Set([
+  "one-arm-db-row",
+  "bulgarian-split-squat",
+  "single-leg-glute-bridge",
+  "clamshell",
+  "side-plank",
+  "single-leg-stand",
+  "suitcase-carry",
+]);
+
+/** `{ perSide, switchSec }` für eine neue Planübung dieser Übung – leer, wenn kein Default gilt. */
+export function perSideDefaults(
+  exercise: Pick<Exercise, "id" | "builtIn" | "trackingType"> | undefined,
+): { perSide?: true; switchSec?: number } {
+  if (!exercise?.builtIn || !PER_SIDE_DEFAULT_IDS.has(exercise.id) || exercise.trackingType === "cardio") return {};
+  return exercise.trackingType === "duration" ? { perSide: true, switchSec: DEFAULT_SWITCH_SEC } : { perSide: true };
+}
+
+const BUILT_IN_BY_ID = new Map(BUILT_IN_EXERCISES.map((e) => [e.id, e]));
+
 // ---------------------------------------------------------------------------
 // Vorlagen
 // ---------------------------------------------------------------------------
@@ -127,6 +154,8 @@ export type TemplateItem = {
   durationSec?: number;
   restSec?: number;
   weightStepsKg?: number[];
+  perSide?: boolean;
+  switchSec?: number;
   note?: LocalizedText;
 };
 
@@ -206,6 +235,7 @@ function mapTemplate(raw: RawTemplate): WorkoutTemplate {
           durationSec: item.durationSec,
           restSec: item.restSec,
           weightStepsKg: item.suggestedWeightPerDumbbellKg ?? item.suggestedWeightKg,
+          ...perSideDefaults(BUILT_IN_BY_ID.get(item.exerciseId)),
         }));
     days.push({ name: day.name, weekday, items, notes: day.notes });
   }

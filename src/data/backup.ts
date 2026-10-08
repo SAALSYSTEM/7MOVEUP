@@ -68,6 +68,8 @@ const planItemSchema = z.object({
   durationSec: optionalNumber,
   restSec: optionalNumber,
   weightStepsKg: z.array(z.number().nonnegative()).optional(),
+  perSide: z.boolean().optional(),
+  switchSec: optionalNumber,
   note: z.string().optional(),
 });
 
@@ -94,6 +96,7 @@ const setSchema = z.object({
   heartRate: optionalNumber,
   done: z.boolean(),
   completedAt: isoDate.optional(),
+  side: z.enum(["left", "right"]).optional(),
 });
 
 const sessionSchema = z.object({
@@ -119,6 +122,8 @@ const sessionSchema = z.object({
         durationSec: optionalNumber,
         restSec: optionalNumber,
         weightStepsKg: z.array(z.number().nonnegative()).optional(),
+        perSide: z.boolean().optional(),
+        switchSec: optionalNumber,
         note: z.string().optional(),
       }),
       sets: z.array(setSchema),

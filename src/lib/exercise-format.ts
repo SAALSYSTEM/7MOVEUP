@@ -28,16 +28,17 @@ export function repRange(min?: number, max?: number): string | undefined {
   return String(min ?? max);
 }
 
-/** z. B. "4 × 8–10" oder "3 × 40 s" oder "30 Min" */
+/** z. B. "4 × 8–10" oder "3 × 40 s" oder "30 Min" – bei „Je Seite“ mit Zusatz: "3 × 8–10 je Seite" */
 export function targetSummary(
   trackingType: TrackingType,
-  target: Pick<SessionTarget, "sets" | "repMin" | "repMax" | "durationSec">,
+  target: Pick<SessionTarget, "sets" | "repMin" | "repMax" | "durationSec" | "perSide">,
   t: Translate,
 ): string {
   if (trackingType === "cardio") return formatSeconds(target.durationSec, t);
-  if (trackingType === "duration") return `${target.sets} × ${formatSeconds(target.durationSec, t)}`;
+  const suffix = target.perSide ? ` ${t("common.perSide")}` : "";
+  if (trackingType === "duration") return `${target.sets} × ${formatSeconds(target.durationSec, t)}${suffix}`;
   const reps = repRange(target.repMin, target.repMax);
-  return reps ? `${target.sets} × ${reps}` : `${target.sets} ${t("common.sets")}`;
+  return `${reps ? `${target.sets} × ${reps}` : `${target.sets} ${t("common.sets")}`}${suffix}`;
 }
 
 export function exerciseDefaultsSummary(exercise: Exercise, t: Translate): string | undefined {
