@@ -2,6 +2,16 @@
 
 Alle nennenswerten Änderungen an 7MOVEUP. Neueste oben.
 
+## Unveröffentlicht
+
+Branch `feature-je-seite` – Preview-Test, noch keine Versionsnummer.
+
+- **Je Seite (einseitige Übungen):** Jede Planübung hat in „Training bearbeiten“ den Schalter „Je Seite“. „3 × 10 je Seite“ bleibt **3 Sätze**: Jeder Satz hat eine Zeile für LINKS und eine für RECHTS. Ein Satz zählt erst, wenn **beide** Seiten erledigt sind – im Fortschritt „x von y“, im Kalender und in den Zusammenfassungen; eine einzelne Seite ist nie ein ganzer Satz. Die Satzpause startet erst nach der zweiten Seite. Die Seite steht an jeder Zeile fest gespeichert; die Startseite wechselt von Einheit zu Einheit (zuerst links, beim nächsten Mal rechts, …). „Letztes Mal“ zeigt Links und Rechts getrennt.
+- **Zeitübungen je Seite (z. B. Side Plank):** ein Timer pro Satz – LINKS → Wechsel (Standard 5 s, im Plan 0–60 s) → RECHTS → Satzpause. Danach wartet der nächste Satz mit „Bereit – Satz 2 · beginnt LINKS“ und großem Start-Knopf; es gibt keinen automatischen Start und kein Timeout. Pause/Fortsetzen, Sperrbildschirm und Neustart der App funktionieren wie bei normalen Zeitübungen (Endzeit wird gespeichert, die Phase wird aus der Zeit berechnet). Jede Seite wird abgehakt, sobald sie zu Ende ist. „Übernehmen & abhaken“ vor dem Ende hakt die gelaufenen Seiten ab; wer das Fenster in der Satzpause schließt, behält die Restpause unten als Pausenleiste. Auf dem iPhone sind Töne bei gesperrtem Bildschirm nicht garantiert.
+- **Kompakterer Kartenkopf im Planeditor:** drei Zeilen – Nummer links, Info/Hoch/Runter/Löschen rechts; darunter der Name in voller Breite; darunter klein und grau Messart und Equipment. Lange Namen brechen nicht mehr in vier Zeilen um.
+- **Bestehende Pläne bleiben unverändert:** keine Migration, fehlendes „Je Seite“ gilt als aus – nie abgeleitet aus Übungsname oder -ID. Nur beim bewussten Neuanlegen (Vorlage übernehmen, Übung neu aus dem Katalog in den Plan aufnehmen) ist „Je Seite“ für sieben eindeutig einseitige Übungen vorbelegt (Einarmiges Rudern, Bulgarian Split Squat, Einbeinige Glute Bridge, Clamshell, Side Plank, Einbein-Stand, Suitcase Carry). Satzzahlen der Vorlagen bleiben gleich, gelten dort jetzt je Seite.
+- **Backup:** Version 2 bleibt; `perSide`, `switchSec` und `side` sind optionale Felder. Ältere Dateien und Daten ohne Seiten laufen unverändert.
+
 ## 1.7.2 – 2026-10-08
 
 - **Heute: Trainingskarte immer antippbar:** Die ganze Karte unter „Heute“ („Tag 3 – Pull“) startet das Training, setzt es fort (mit dem Zusatz „läuft gerade“) oder öffnet – wenn ein anderes Training läuft – dieses laufende, mit Hinweis. Erledigte Karten bleiben inaktiv. Bisher war die Karte ausgegraut, sobald irgendein Training lief.

@@ -267,14 +267,20 @@ export function SessionExerciseCard({
                       step={5}
                       max={3600}
                     />
-                    <button
-                      type="button"
-                      onClick={() => onOpenTimer(setIndex)}
-                      className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-accent/15 text-accent"
-                      aria-label={`${t("session.openTimer", { n: number })} · ${name}`}
-                    >
-                      <Timer size={19} aria-hidden />
-                    </button>
+                    {perSide && setIndex % 2 === 1 ? (
+                      // ein Timer pro Satz (Seite → Wechsel → Seite): der Knopf sitzt in der ersten Zeile des Satzes
+                      <span className="h-11 w-11 shrink-0" aria-hidden />
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() => onOpenTimer(setIndex)}
+                        disabled={perSide && entry.sets[setIndex].done && entry.sets[setIndex + 1]?.done}
+                        className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-accent/15 text-accent disabled:opacity-30"
+                        aria-label={`${t("session.openTimer", { n: number })} · ${name}`}
+                      >
+                        <Timer size={19} aria-hidden />
+                      </button>
+                    )}
                   </>
                 ) : (
                   <Stepper

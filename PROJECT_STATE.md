@@ -36,6 +36,8 @@ Der Kalender hat keinen eigenen Navigationspunkt; er öffnet sich über „Kalen
 - **Geräte:** feste Standardliste (Körpergewicht, Kurzhanteln, Langhantel, Kettlebell, Hantelbank, Kraftmaschine, Kabelzug, Klimmzugstange, Widerstandsband, Bauchrolle, Step, Ergometer/Cardio) plus **eigene Geräte**: einmal anlegen (Übung → „Eigenes Gerät“), lokal gespeichert, danach bei allen eigenen Übungen wählbar. Gleiche Namen – auch zu Standardgeräten, deutsch/englisch, Groß-/Kleinschreibung, Umlaute – werden erkannt und das vorhandene Gerät gewählt. Löschen nur, solange keine Übung das Gerät nutzt; Umbenennen gibt es (noch) nicht.
 - **Anzeige:** Equipment steht als graue Kurzzeile unter dem Übungsnamen (Plan-Editor, Übungsliste, Training, Detail als Schilder): bis zu zwei Geräte, dann „+N"; „Körpergewicht“ allein wird nicht gezeigt (`equipmentSummary`).
 - Der Übungsfilter zeigt nur Geräte, für die es mindestens eine Übung gibt.
+- **Je Seite** (einseitige Übungen, `src/domain/sides.ts`, `side-sequence.ts`): Planübung `perSide?` (fehlt = aus), Zeitübungen zusätzlich `switchSec?` (Standard 5 s, 0–60). `sets` = Sätze **je Seite**; im Training 2 × `sets` Zeilen, immer paarweise (Zeile 2p/2p+1 = Satz p+1), die Seite steht **explizit** in `SetLog.side` (nie aus Position/Zeilennummer abgeleitet). Ein Satz zählt erst, wenn beide Zeilen erledigt sind (`countSets`); Pause erst nach der zweiten Seite. Startseite der nächsten Einheit = Gegenseite der letzten (`PerformanceSnapshot.startSide`, ohne Vorgeschichte LINKS). Keine Migration; Defaults (`PER_SIDE_DEFAULT_IDS` in `data/seed`) nur beim Neuanlegen (`plansFromTemplate`, Planeditor `newItem`), nie beim Laden oder Starten. Steigerungshinweis nur, wenn beide Seiten das Ziel erreichen; Verbesserung nur zwischen gleich aufgebauten Einheiten.
+- **Timer je Seite:** Ein Countdown pro Satz (Seite → Wechsel → Seite → Satzpause), Phase wird aus der verstrichenen Zeit berechnet (`phaseAt`); gespeichert wie jeder Zeit-Timer (`timers.set`, zusätzlich `sequence: { rows, restSec }`, nicht im Backup). Seiten werden einzeln abgehakt, sobald sie zu Ende sind; `restoreTimers` hakt auch nach Neustart fertig gelaufene Seiten ab. Nach der Satzpause steht der nächste Satz startbereit (Variante B: kein automatischer Start). Nur Zeitübungen haben Wechselpause; Cardio kennt keine Seiten.
 
 ### Heute
 
@@ -100,8 +102,8 @@ Typen: `src/domain/types.ts`. Jede Zeile gehört zu genau einem Profil (`profile
 | `Settings` | Ton, Haptik, `unitSystem?` (`metric` \| `imperial`, Standard metric), `customEquipment?` (eigene Geräte: `key` = `equip-…`, `name`) |
 | `Exercise` | eigene Übungen (Built-ins kommen aus `src/data/seed`); `equipment` = Standard-Schlüssel oder `equip-…` |
 | `ExerciseNote` | persönliche Notiz + Video-Links je Übung |
-| `WorkoutPlan` | ein Trainingstag des Plans: Übungen, Wochentage, `templateId?` |
-| `WorkoutSession` | ein Training mit Sätzen/Zeiten; offenes Training inkl. laufender Timer |
+| `WorkoutPlan` | ein Trainingstag des Plans: Übungen (`perSide?`, `switchSec?`), Wochentage, `templateId?` |
+| `WorkoutSession` | ein Training mit Sätzen/Zeiten (bei „Je Seite“ Zeilenpaare mit `side`); offenes Training inkl. laufender Timer |
 | `BodySettings` | Reihenfolge + aktiv je Messwert (`metrics`), eigene Messwerte (`custom`), `measureWeekdays` |
 | `BodyMeasurement` | `date` (lokal), `time?`, `values: { [messwertSchlüssel]: Zahl in Basiseinheit }` |
 
@@ -118,7 +120,7 @@ IndexedDB-Datenbank `7moveup` über Dexie (`src/data/local/db.ts`):
 
 `meta` enthält das aktuelle Profil und `lastBackupAt`.
 
-**Backup-Datei** (`src/data/backup.ts`, zod): `schemaVersion: 2` mit zusätzlich `bodySettings?`, `measurements`, `settings.unitSystem?` und `settings.customEquipment?` (Geräte-Schlüssel an Übungen: Standard oder `equip-…`). Dateien mit `schemaVersion: 1` werden weiterhin importiert (fehlende Felder = leer). Import ersetzt alle Daten des Profils – auch Körperwerte. Version 1.2.0 lehnt Dateien mit Version 2 ab („neuere Version“), statt Daten still zu verlieren.
+**Backup-Datei** (`src/data/backup.ts`, zod): `schemaVersion: 2` mit zusätzlich `bodySettings?`, `measurements`, `settings.unitSystem?` und `settings.customEquipment?` (Geräte-Schlüssel an Übungen: Standard oder `equip-…`). Dateien mit `schemaVersion: 1` werden weiterhin importiert (fehlende Felder = leer). Import ersetzt alle Daten des Profils – auch Körperwerte. Version 1.2.0 lehnt Dateien mit Version 2 ab („neuere Version“), statt Daten still zu verlieren. „Je Seite“ ergänzt nur optionale Felder (`perSide`, `switchSec` am Plan und Ziel, `side` am Satz) – keine neue Schemaversion, alte Dateien bleiben gültig.
 
 ## Tests
 

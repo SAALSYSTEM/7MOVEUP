@@ -8,6 +8,7 @@ import { EmptyState, Page } from "@/components/layout/page";
 import { ExerciseInfoSheet } from "@/components/training/exercise-info-sheet";
 import { RestTimer } from "@/components/training/rest-timer";
 import { SessionExerciseCard } from "@/components/training/session-exercise-card";
+import { SideTimerSheet, type SideTimerInfo } from "@/components/training/side-timer-sheet";
 import { TimerSheet } from "@/components/training/timer-sheet";
 import { Button } from "@/components/ui/button";
 import { ConfirmSheet } from "@/components/ui/confirm-sheet";
@@ -22,7 +23,8 @@ import { formatDuration } from "@/lib/dates";
 import { dismissKeyboard } from "@/lib/viewport";
 import { tick, unlockAudio } from "@/services/feedback";
 import { restoreTimers, type TimerResume } from "@/domain/active-session";
-import { countSets, partnerIndex, usesSides } from "@/domain/sides";
+import { markSidesDone, openRows, type SideResult } from "@/domain/side-sequence";
+import { countSets, isPairDone, partnerIndex, usesSides } from "@/domain/sides";
 import type { CountdownSnapshot } from "@/hooks/use-countdown";
 import { finishSession } from "@/services/workout-service";
 
@@ -51,7 +53,13 @@ export function SessionPage() {
   const [session, setSession] = useState<WorkoutSession | null>(null);
   const [context, setContext] = useState<Loaded | null>(null);
   const [notFound, setNotFound] = useState(false);
-  const [timerTarget, setTimerTarget] = useState<{ exerciseIndex: number; setIndex: number; resume?: TimerResume } | null>(null);
+  /** `sequence`: „Je Seite“-Zeitsatz (Seite → Wechsel → Seite → Satzpause in einem Timer), `setIndex` = erste Zeile des Satzes */
+  const [timerTarget, setTimerTarget] = useState<{
+    exerciseIndex: number;
+    setIndex: number;
+    resume?: TimerResume;
+    sequence?: { rows: number[]; restSec: number };
+  } | null>(null);
   const [rest, setRest] = useState<{ runId: number; seconds: number; label: string; endAt?: number } | null>(null);
   const [finishOpen, setFinishOpen] = useState(false);
   const [discardOpen, setDiscardOpen] = useState(false);
@@ -207,19 +215,88 @@ export function SessionPage() {
     }
   };
 
+  /** Sekunden Pause nach dem Satz, der mit Zeile `setIndex` endet – 0 = keine (auch nicht nach dem allerletzten Satz) */
+  const restAfter = (entry: SessionExercise, setIndex: number): number => {
+    const isLastSetOfExercise = setIndex >= entry.sets.length - (usesSides(entry) ? 2 : 1);
+    const isLastExercise = session.exercises.at(-1)?.id === entry.id;
+    const seconds = entry.target.restSec ?? 0;
+    return seconds > 0 && !(isLastSetOfExercise && isLastExercise) ? seconds : 0;
+  };
+
   /** läuft synchron im Tap auf den Haken → Ton und Haptik sind auf iOS entsperrt */
   const startRest = (entry: SessionExercise, setIndex: number) => {
     unlockAudio();
     tick();
-    const paired = usesSides(entry);
     // „Je Seite“: Pause erst, wenn mit diesem Haken beide Seiten des Satzes erledigt sind
-    if (paired && !entry.sets[partnerIndex(setIndex)]?.done) return;
-    const isLastSetOfExercise = setIndex >= entry.sets.length - (paired ? 2 : 1);
-    const isLastExercise = session.exercises.at(-1)?.id === entry.id;
-    const seconds = entry.target.restSec ?? 0;
-    if (seconds > 0 && !(isLastSetOfExercise && isLastExercise)) {
+    if (usesSides(entry) && !entry.sets[partnerIndex(setIndex)]?.done) return;
+    const seconds = restAfter(entry, setIndex);
+    if (seconds > 0) {
       restRunId.current += 1;
       setRest({ runId: restRunId.current, seconds, label: localized(entry.name, language) });
+    }
+  };
+
+  /** Timer eines Satzes öffnen – bei „Je Seite“ mit Zeit: die ganze Folge für die noch offenen Seiten */
+  const openTimer = (exerciseIndex: number, setIndex: number) => {
+    const entry = session.exercises[exerciseIndex];
+    if (usesSides(entry) && entry.trackingType === "duration") {
+      const first = setIndex - (setIndex % 2);
+      const rows = openRows(entry, first);
+      if (rows.length > 0) setTimerTarget({ exerciseIndex, setIndex: first, sequence: { rows, restSec: restAfter(entry, first) } });
+      return;
+    }
+    setTimerTarget({ exerciseIndex, setIndex });
+  };
+
+  const onSideTimerChange = (snapshot: CountdownSnapshot, info: SideTimerInfo) => {
+    if (!timerEntry) return;
+    const base = {
+      entryId: timerEntry.id,
+      setIndex: info.rows[0],
+      durationSec: info.totalSec,
+      sequence: { rows: info.rows, restSec: info.restSec },
+    };
+    if (snapshot.status === "running" && snapshot.endAt) {
+      updateTimers({ set: { ...base, status: "running", endAt: new Date(snapshot.endAt).toISOString() } });
+    } else if (snapshot.status === "paused") {
+      updateTimers({ set: { ...base, status: "paused", remainingMs: snapshot.remainingMs } });
+    } else {
+      updateTimers({ set: undefined });
+    }
+  };
+
+  /** fertig gelaufene Seiten im Training abhaken (nie eine Seite doppelt, nie eine halbe als Satz) */
+  const applySides = (results: SideResult[], originMs: number) => {
+    if (!timerTarget) return undefined;
+    const before = sessionRef.current?.exercises[timerTarget.exerciseIndex];
+    if (!before) return undefined;
+    const after = markSidesDone(before, results, originMs);
+    if (after !== before) updateExercise(timerTarget.exerciseIndex, after);
+    return { before, after };
+  };
+
+  const closeSideTimer = (restLeftSec?: number) => {
+    const label = timerEntry ? localized(timerEntry.name, language) : "";
+    setTimerTarget(null);
+    updateTimers({ set: undefined });
+    // wer die Satzpause wegtippt, behält sie unten als Pausenleiste
+    if (restLeftSec && restLeftSec > 0) {
+      restRunId.current += 1;
+      setRest({ runId: restRunId.current, seconds: restLeftSec, label });
+    }
+  };
+
+  /** Folge fertig (oder Satzpause übersprungen): nächster offener Satz derselben Übung steht bereit – ohne Start. */
+  const onSideSequenceEnd = (skipped: boolean) => {
+    updateTimers({ set: undefined });
+    if (!timerTarget) return;
+    const entry = sessionRef.current?.exercises[timerTarget.exerciseIndex];
+    const nextFirst = timerTarget.setIndex + 2;
+    const rows = entry ? openRows(entry, nextFirst) : [];
+    if (entry && rows.length > 0) {
+      setTimerTarget({ exerciseIndex: timerTarget.exerciseIndex, setIndex: nextFirst, sequence: { rows, restSec: restAfter(entry, nextFirst) } });
+    } else if (skipped) {
+      setTimerTarget(null);
     }
   };
 
@@ -322,7 +399,7 @@ export function SessionPage() {
                 planStepKg={session.progressionStepKg}
                 onChange={(next) => updateExercise(index, next)}
                 onSetDone={(setIndex) => startRest(entry, setIndex)}
-                onOpenTimer={(setIndex) => setTimerTarget({ exerciseIndex: index, setIndex })}
+                onOpenTimer={(setIndex) => openTimer(index, setIndex)}
                 onOpenInfo={() => {
                   dismissKeyboard();
                   setInfo({ exerciseId: entry.exerciseId, open: true });
@@ -357,8 +434,30 @@ export function SessionPage() {
         </div>
       </div>
 
+      <SideTimerSheet
+        open={Boolean(timerTarget?.sequence && timerEntry)}
+        onClose={closeSideTimer}
+        title={timerEntry ? localized(timerEntry.name, language) : ""}
+        entry={timerEntry}
+        firstRow={timerTarget?.setIndex ?? 0}
+        rows={timerTarget?.sequence?.rows ?? []}
+        restSec={timerTarget?.sequence?.restSec ?? 0}
+        resume={timerTarget?.resume}
+        onTimerChange={onSideTimerChange}
+        onSidesDone={(results, originMs) => void applySides(results, originMs)}
+        onTakeOver={(results, originMs) => {
+          const applied = applySides(results, originMs);
+          const first = timerTarget?.setIndex ?? 0;
+          // der Satz ist erst mit der zweiten Seite vollständig → erst dann Pause (unten, das Fenster schließt)
+          const completed = applied && !isPairDone(applied.before.sets, first) && isPairDone(applied.after.sets, first);
+          closeSideTimer();
+          if (completed) startRest(applied.after, first + 1);
+        }}
+        onSequenceEnd={onSideSequenceEnd}
+      />
+
       <TimerSheet
-        open={Boolean(timerTarget && timerSet)}
+        open={Boolean(timerTarget && timerSet && !timerTarget.sequence)}
         onClose={() => {
           setTimerTarget(null);
           updateTimers({ set: undefined });

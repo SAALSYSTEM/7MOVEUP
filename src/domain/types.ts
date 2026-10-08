@@ -200,6 +200,11 @@ export type SetTimerState = {
   endAt?: string;
   /** Restzeit, solange pausiert */
   remainingMs?: number;
+  /**
+   * „Je Seite“-Zeitsatz: ein Timer für Seite → Wechsel → Seite → Satzpause. `rows` = die Zeilen, die er
+   * abhakt (1 oder 2), `restSec` = Satzpause am Ende; `durationSec` ist die Gesamtdauer. `setIndex` = erste Zeile.
+   */
+  sequence?: { rows: number[]; restSec: number };
 };
 
 export type RestTimerState = { endAt: string; seconds: number; label: string };

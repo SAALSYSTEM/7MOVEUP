@@ -1,4 +1,5 @@
-import type { SessionTimers, WorkoutSession } from "@/domain/types";
+import { buildSequence, markSidesDone, sideResults } from "@/domain/side-sequence";
+import type { SessionExercise, SessionTimers, SetTimerState, WorkoutSession } from "@/domain/types";
 
 /** Ein offenes Training gilt beim App-Start als „läuft noch“, wenn es vor höchstens so vielen Stunden begann. */
 export const RESUME_WITHIN_HOURS = 6;
@@ -20,12 +21,44 @@ export type RestoredTimers = {
   /** muss gespeichert werden */
   changed: boolean;
   /** Zeit-Timer wieder öffnen */
-  setTimer?: { exerciseIndex: number; setIndex: number; resume: TimerResume };
+  setTimer?: { exerciseIndex: number; setIndex: number; resume: TimerResume; sequence?: SetTimerState["sequence"] };
   /** Pausen-Timer läuft noch */
   rest?: { endAt: number; seconds: number; label: string };
   /** Zeit-Satz ist abgelaufen, während die App weg war → wurde abgehakt */
   completedWhileAway?: { exerciseIndex: number; setIndex: number };
 };
+
+/**
+ * „Je Seite“-Zeitsatz (ein Timer für Seite → Wechsel → Seite → Satzpause): fertig gelaufene Seiten
+ * abhaken – auch die, die nur in der Zeit liefen, als die App weg war. `resume` nur, wenn der Timer
+ * noch läuft bzw. pausiert ist; `undefined` = gespeicherter Timer ist ungültig.
+ */
+function restoreSideTimer(
+  entry: SessionExercise,
+  timer: SetTimerState,
+  sequence: NonNullable<SetTimerState["sequence"]>,
+  now: number,
+): { entry: SessionExercise; resume?: TimerResume } | undefined {
+  const { rows, restSec } = sequence;
+  const valid =
+    rows.length >= 1 && rows.length <= 2 && rows.every((row) => Number.isInteger(row) && entry.sets[row] !== undefined) && restSec >= 0;
+  if (!valid) return undefined;
+  const phases = buildSequence(entry, rows, restSec);
+  const totalMs = timer.durationSec * 1000;
+  if (timer.status === "running") {
+    const endAt = timer.endAt ? new Date(timer.endAt).getTime() : NaN;
+    if (!Number.isFinite(endAt)) return undefined;
+    const startMs = endAt - totalMs;
+    const done = markSidesDone(entry, sideResults(phases, Math.min(now - startMs, totalMs), true), startMs);
+    return endAt > now ? { entry: done, resume: { status: "running", endAt } } : { entry: done };
+  }
+  if (typeof timer.remainingMs === "number" && timer.remainingMs > 0) {
+    const elapsed = Math.max(0, totalMs - timer.remainingMs);
+    const done = markSidesDone(entry, sideResults(phases, elapsed, true), now - elapsed);
+    return { entry: done, resume: { status: "paused", remainingMs: timer.remainingMs } };
+  }
+  return undefined;
+}
 
 /**
  * Beim Öffnen eines Trainings: gespeicherte Timer auswerten.
@@ -43,7 +76,21 @@ export function restoreTimers(session: WorkoutSession, now: number): RestoredTim
   const result: Omit<RestoredTimers, "session" | "changed"> = {};
 
   const setTimer = timers.set;
-  if (setTimer) {
+  const sideEntry = setTimer?.sequence ? exercises.find((e) => e.id === setTimer.entryId) : undefined;
+  if (setTimer?.sequence && sideEntry) {
+    // „Je Seite“: schon abgehakte Seiten sind normal – die Folge läuft ggf. noch (Wechsel/Satzpause)
+    const exerciseIndex = exercises.indexOf(sideEntry);
+    const restored = restoreSideTimer(sideEntry, setTimer, setTimer.sequence, now);
+    if (restored) {
+      if (restored.entry !== sideEntry) exercises = exercises.map((e, i) => (i === exerciseIndex ? restored.entry : e));
+      if (restored.resume) {
+        nextTimers.set = setTimer;
+        result.setTimer = { exerciseIndex, setIndex: setTimer.setIndex, resume: restored.resume, sequence: setTimer.sequence };
+      } else if (restored.entry !== sideEntry) {
+        result.completedWhileAway = { exerciseIndex, setIndex: setTimer.setIndex };
+      }
+    }
+  } else if (setTimer) {
     const exerciseIndex = exercises.findIndex((e) => e.id === setTimer.entryId);
     const set = exercises[exerciseIndex]?.sets[setTimer.setIndex];
     if (set && !set.done) {
