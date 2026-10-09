@@ -2,6 +2,17 @@
 
 Alle nennenswerten Änderungen an 7MOVEUP. Neueste oben.
 
+## Unveröffentlicht
+
+Branch `feature-progression` – Preview-Test, noch keine Versionsnummer.
+
+- **Progression als 2×-Regel:** 7MOVEUP ändert nie selbst Gewicht, Wiederholungen oder Zeit. In „Letztes Mal“ erscheint nur dann eine kleine Zeile, wenn **zwei vergleichbare Einheiten hintereinander** ein eindeutiges Bild zeigen: **jeder** Satz erreicht die obere Grenze (Wdh. bis bzw. Zielzeit) → „Gewicht prüfen – ggf. erhöhen.“ / „Zeit prüfen – ggf. erhöhen.“; **jeder** Satz liegt unter der unteren Grenze (Wdh. von bzw. Zielzeit) → „… ggf. reduzieren.“. Alles dazwischen (z. B. 15/14/12 oder 10/9/7 bei 8–10): kein Hinweis. Wiederholungsübungen ohne Gewicht: „Schwierigkeit prüfen – ggf. erhöhen/reduzieren.“ Ein einzelner guter oder schlechter Tag löst nichts aus, die Zahl der Einheiten (2) steht als eine Konstante im Code.
+- **Vergleichbar** sind Einheiten nur bei gleicher Satzzahl, gleichem Wdh. von/bis (bei Zeit: gleicher Zielzeit), gleichem Je-Seite-Status und **gleichem Gewicht in allen Sätzen** – und nur, wenn auch das heutige Ziel so aussieht. Zusätzliche oder fehlende Sätze, gemischte Gewichte (12/12/10 kg), fehlende Werte oder fehlende Zielgrenzen machen eine Einheit nicht auswertbar: dann gibt es **keinen** Hinweis. Eine Einheit mit anderem Gewicht dazwischen unterbricht die Kette; nach einer Gewichtsänderung beginnt sie von selbst neu.
+- **Je Seite:** Es zählen alle Ausführungen beider Seiten; LINKS 15/15/15 und RECHTS 15/14/15 ist nicht „oben“. Fehlt eine Seite oder ein Satz, ist die Einheit nicht auswertbar.
+- **Hinweis verschwindet,** sobald heute schon ein anderes Gewicht eingetragen ist (er soll beim Entscheiden helfen, nicht kommentieren, was schon geschehen ist).
+- **Entfallen:** die Anzeige „Steigerung möglich“ / „+2 kg“, die feste Grenze „nur bis 12 Wiederholungen“ und das Plan-Feld „Steigerungshinweis“. Vorhandene Pläne und Einheiten behalten den alten Wert unverändert (Backup, Import und Speichern verändern ihn nicht), er wird nur nicht mehr ausgewertet. Die Vorlage „4-Tage Kraft & Core“ trägt ihn nicht mehr ein, ihre Plannotiz beschreibt die neue Regel (bereits übernommene Pläne behalten ihre eigene Notiz).
+- Keine Änderung an Datenbank, Backup-Format oder Trainingsdaten; die Hinweise werden aus den vorhandenen Einheiten abgeleitet. Der Zähler „Steigerungen“ auf Heute arbeitet unabhängig weiter.
+
 ## 1.7.3 – 2026-10-08
 
 - **Je Seite (einseitige Übungen):** Jede Planübung hat in „Training bearbeiten“ den Schalter „Je Seite“. „3 × 10 je Seite“ bleibt **3 Sätze**: Jeder Satz hat eine Zeile für LINKS und eine für RECHTS. Ein Satz zählt erst, wenn **beide** Seiten erledigt sind – im Fortschritt „x von y“, im Kalender und in den Zusammenfassungen; eine einzelne Seite ist nie ein ganzer Satz. Die Satzpause startet erst nach der zweiten Seite. Die Seite steht an jeder Zeile fest gespeichert; die Startseite wechselt von Einheit zu Einheit (zuerst links, beim nächsten Mal rechts, …). „Letztes Mal“ zeigt Links und Rechts getrennt.

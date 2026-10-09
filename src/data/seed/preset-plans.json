@@ -229,11 +229,11 @@
     ],
     "planNotes": {
       "de": [
-        "Wenn die obere Wiederholungszahl in allen Sätzen erreicht wird: Steigerung möglich; bei passenden Übungen +2 kg als Hinweis.",
+        "Wird die obere Wiederholungszahl in allen Sätzen zweimal hintereinander erreicht, weist 7MOVEUP darauf hin, das Gewicht zu prüfen.",
         "Ca. 2 Wiederholungen im Tank lassen."
       ],
       "en": [
-        "When the top rep target is reached in every set: progression may be possible; show +2 kg as a hint where appropriate.",
+        "When the top rep target is reached in every set twice in a row, 7MOVEUP suggests checking the weight.",
         "Keep about 2 reps in reserve."
       ]
     }

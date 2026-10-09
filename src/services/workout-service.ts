@@ -116,7 +116,6 @@ export async function startSessionFromPlan(
     planName: plan.name,
     date: localDateKey(date),
     startedAt: new Date().toISOString(),
-    progressionStepKg: plan.progressionStepKg,
     exercises,
   };
   return workoutRepository.startSession(session);

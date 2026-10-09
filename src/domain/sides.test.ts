@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest";
 
-import { isImprovement, isProgressionReady } from "./progression";
+import { isImprovement } from "./progression";
 import { countSets, nextStartSide, otherSide, partnerIndex, setNumber, sideSequence, usesSides } from "./sides";
-import type { PerformanceSnapshot, SessionExercise, SetLog, Side } from "./types";
+import type { SessionExercise, SetLog, Side } from "./types";
 
 const row = (side: Side | undefined, done: boolean, reps = 10): SetLog => ({ reps, done, ...(side ? { side } : {}) });
 
@@ -59,24 +59,7 @@ describe("Je Seite – Zählung: Links + Rechts = ein Satz", () => {
   });
 });
 
-describe("Je Seite – bestehende Hinweise bleiben korrekt", () => {
-  const snap = (sets: SetLog[], perSide: boolean): PerformanceSnapshot => ({
-    sessionId: "s",
-    date: "2026-10-01",
-    trackingType: "reps",
-    target: { sets: 2, repMin: 8, repMax: 10, perSide: perSide || undefined },
-    sets,
-  });
-
-  it("‚Steigerung möglich‘ erst, wenn beide Seiten aller Sätze das Ziel erreichten", () => {
-    const leftOnly = snap([row("left", true), row("left", true)], true);
-    expect(isProgressionReady(leftOnly)).toBe(false);
-    const all = snap([row("left", true), row("right", true), row("left", true), row("right", true)], true);
-    expect(isProgressionReady(all)).toBe(true);
-    const rightShort = snap([row("left", true), row("right", true, 9), row("left", true), row("right", true)], true);
-    expect(isProgressionReady(rightShort)).toBe(false);
-  });
-
+describe("Je Seite – Verbesserungen bleiben korrekt", () => {
   it("Umstellen auf Je Seite wirkt nicht wie doppelte Leistung (keine falsche Steigerung)", () => {
     const before = [row(undefined, true, 10), row(undefined, true, 10)];
     const now = [row("left", true, 10), row("right", true, 10), row("left", true, 10), row("right", true, 10)];

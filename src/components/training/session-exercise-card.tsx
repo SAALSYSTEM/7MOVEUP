@@ -1,11 +1,11 @@
 import { format } from "date-fns";
-import { Check, Info, Minus, Plus, StickyNote, Timer, TrendingUp } from "lucide-react";
+import { Check, Info, Minus, Plus, StickyNote, Timer, TrendingDown, TrendingUp } from "lucide-react";
 
 import { useApp } from "@/app/app-context";
 import { Card } from "@/components/ui/card";
 import { HapticTap } from "@/components/ui/haptic-tap";
 import { Stepper } from "@/components/ui/stepper";
-import { isProgressionReady, progressionStepKg } from "@/domain/progression";
+import { progressionHint } from "@/domain/progression";
 import { setNumber, usesSides } from "@/domain/sides";
 import type { Exercise, PerformanceSnapshot, SessionExercise, SetLog } from "@/domain/types";
 import { localized } from "@/i18n";
@@ -20,10 +20,10 @@ type Props = {
   index: number;
   entry: SessionExercise;
   exercise: Exercise | undefined;
-  last: PerformanceSnapshot | undefined;
+  /** die letzten Einheiten dieser Übung, neueste zuerst */
+  recent: PerformanceSnapshot[];
   personalNote?: string;
   hasVideo: boolean;
-  planStepKg?: number;
   onChange: (entry: SessionExercise) => void;
   onSetDone: (setIndex: number) => void;
   onOpenTimer: (setIndex: number) => void;
@@ -35,10 +35,9 @@ export function SessionExerciseCard({
   index,
   entry,
   exercise,
-  last,
+  recent,
   personalNote,
   hasVideo,
-  planStepKg,
   onChange,
   onSetDone,
   onOpenTimer,
@@ -56,8 +55,8 @@ export function SessionExerciseCard({
   const perSide = usesSides(entry);
   const sideText = (side: SetLog["side"]) => (side ? t(side === "left" ? "common.left" : "common.right") : "");
 
-  const ready = isProgressionReady(last);
-  const stepKg = ready ? progressionStepKg(last, planStepKg) : undefined;
+  const last = recent[0];
+  const hint = progressionHint(entry, recent);
   const lastText = last ? formatPerformance(last.trackingType, last.sets, exercise, t, language) : undefined;
 
   const openSets = entry.sets.filter((s) => !s.done);
@@ -156,12 +155,6 @@ export function SessionExerciseCard({
                 </span>
               )}
             </p>
-            {ready && (
-              <span className="inline-flex items-center gap-1 rounded-full bg-success/12 px-2 py-0.5 text-[11px] font-bold text-success">
-                <TrendingUp size={12} aria-hidden />
-                {stepKg ? t("session.progressionKg", { kg: formatKg(stepKg, language) }) : t("session.progression")}
-              </span>
-            )}
           </div>
           {lastText ? (
             <>
@@ -170,6 +163,15 @@ export function SessionExerciseCard({
             </>
           ) : (
             <p className="mt-1 text-sm text-subtle">{t("session.firstTime")}</p>
+          )}
+          {hint && (
+            <p
+              data-progression-hint={hint.direction}
+              className="mt-2 flex items-center gap-1.5 border-t border-line/70 pt-2 text-[13px] font-semibold text-accent-light"
+            >
+              {hint.direction === "up" ? <TrendingUp size={14} aria-hidden /> : <TrendingDown size={14} aria-hidden />}
+              {t(`progression.${hint.subject}.${hint.direction}`)}
+            </p>
           )}
         </div>
       </div>

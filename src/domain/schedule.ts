@@ -148,7 +148,6 @@ export function plansFromTemplate(template: WorkoutTemplate, language: Language,
       templateId: template.id,
       weekdays: day.weekday ? [day.weekday as Weekday] : [],
       notes: notes || undefined,
-      progressionStepKg: template.progressionStepKg,
       items: day.items.map((item) => ({
         id: createId(),
         exerciseId: item.exerciseId,

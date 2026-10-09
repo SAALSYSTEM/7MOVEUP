@@ -330,21 +330,6 @@ export function PlanEditorPage() {
           />
         </div>
 
-        <div className="max-w-[220px]">
-          <NumberField
-            label={`${t("plan.progressionStep")} (kg)`}
-            value={plan.progressionStepKg}
-            decimal
-            max={20}
-            onChange={(v) => update({ progressionStepKg: v || undefined })}
-          />
-          <FieldHint>
-            {plan.progressionStepKg
-              ? t("plan.progressionStepValue", { kg: String(plan.progressionStepKg).replace(".", language === "de" ? "," : ".") })
-              : t("session.progression")}
-          </FieldHint>
-        </div>
-
         {!isNew && (
           <Button variant="danger" className="w-full" onClick={() => setConfirmDelete(true)}>
             <Trash2 size={16} aria-hidden /> {t("plan.delete")}

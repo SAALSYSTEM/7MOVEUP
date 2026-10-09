@@ -171,7 +171,6 @@ export type WorkoutTemplate = {
   name: LocalizedText;
   days: TemplateDay[];
   planNotes?: LocalizedText;
-  progressionStepKg?: number;
 };
 
 /** Vorschlag für Wochentage beim Übernehmen – jederzeit änderbar. */
@@ -179,11 +178,6 @@ const DEFAULT_WEEKDAYS: Record<string, Weekday[]> = {
   "template-4day-strength-core": [1, 2, 4, 5],
   "template-6day-fitness-strength": [1, 2, 3, 4, 5, 6, 7],
   "template-4day-bodyweight": [1, 2, 4, 5],
-};
-
-/** Strengere Kraftvorlage: +2 kg als Hinweis bei erreichtem Wiederholungsziel */
-const PROGRESSION_STEP: Record<string, number> = {
-  "template-4day-strength-core": 2,
 };
 
 function cardioItem(cardio: RawCardio): TemplateItem {
@@ -247,7 +241,6 @@ function mapTemplate(raw: RawTemplate): WorkoutTemplate {
     planNotes: raw.planNotes
       ? { de: raw.planNotes.de.join("\n"), en: raw.planNotes.en.join("\n") }
       : undefined,
-    progressionStepKg: PROGRESSION_STEP[raw.id],
   };
 }
 

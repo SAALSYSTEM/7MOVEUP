@@ -131,7 +131,7 @@ export type WorkoutPlan = {
   /** Gruppenname, z. B. Name der übernommenen Vorlage */
   group?: string;
   templateId?: string;
-  /** Empfohlene Steigerung in kg je Hantel, wenn das Wiederholungsziel erreicht ist */
+  /** Veraltet (bis 1.7.3: „Steigerungshinweis“ in kg). Wird nicht mehr ausgewertet; bleibt, damit vorhandene Pläne und Backups unverändert bleiben. */
   progressionStepKg?: number;
   createdAt: string;
   updatedAt: string;
@@ -184,6 +184,7 @@ export type WorkoutSession = {
   startedAt: string;
   completedAt?: string;
   durationSec?: number;
+  /** Veraltet – Kopie des Plan-Werts älterer Einheiten; wird nicht mehr ausgewertet, bleibt für vorhandene Daten */
   progressionStepKg?: number;
   exercises: SessionExercise[];
   /** laufende Timer eines offenen Trainings – überstehen so einen Neustart der App (nicht im Backup) */

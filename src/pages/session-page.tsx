@@ -23,6 +23,7 @@ import { formatDuration } from "@/lib/dates";
 import { dismissKeyboard } from "@/lib/viewport";
 import { tick, unlockAudio } from "@/services/feedback";
 import { restoreTimers, type TimerResume } from "@/domain/active-session";
+import { REQUIRED_SESSIONS } from "@/domain/progression";
 import { markSidesDone, openRows, type SideResult } from "@/domain/side-sequence";
 import { countSets, isPairDone, partnerIndex, usesSides } from "@/domain/sides";
 import type { CountdownSnapshot } from "@/hooks/use-countdown";
@@ -31,7 +32,8 @@ import { finishSession } from "@/services/workout-service";
 type Loaded = {
   exercises: Map<string, Exercise>;
   notes: Map<string, ExerciseNote>;
-  last: Map<string, PerformanceSnapshot | undefined>;
+  /** die letzten Einheiten je Übung, neueste zuerst (höchstens zwei – für Vorbelegung und Progressionshinweis) */
+  recent: Map<string, PerformanceSnapshot[]>;
   planNotes?: string;
 };
 
@@ -87,17 +89,17 @@ export function SessionPage() {
         return;
       }
       const ids = Array.from(new Set(loaded.exercises.map((e) => e.exerciseId)));
-      const [exercises, notes, lasts, plan] = await Promise.all([
+      const [exercises, notes, recents, plan] = await Promise.all([
         Promise.all(ids.map((id) => exerciseRepository.getById(id))),
         exerciseRepository.getNotes(),
-        Promise.all(ids.map((id) => workoutRepository.getLastPerformance(id, loaded.startedAt))),
+        Promise.all(ids.map((id) => workoutRepository.getRecentPerformances(id, REQUIRED_SESSIONS, loaded.startedAt))),
         loaded.planId ? planRepository.getById(loaded.planId) : Promise.resolve(undefined),
       ]);
       if (cancelled) return;
       setContext({
         exercises: new Map(exercises.filter((e): e is Exercise => Boolean(e)).map((e) => [e.id, e])),
         notes: new Map(notes.map((n) => [n.exerciseId, n])),
-        last: new Map(ids.map((id, i) => [id, lasts[i]])),
+        recent: new Map(ids.map((id, i) => [id, recents[i]])),
         planNotes: plan?.notes,
       });
       // laufende Timer aus der Zeit vor einem Neustart übernehmen
@@ -393,10 +395,9 @@ export function SessionPage() {
                 index={index}
                 entry={entry}
                 exercise={exercise}
-                last={context.last.get(entry.exerciseId)}
+                recent={context.recent.get(entry.exerciseId) ?? []}
                 personalNote={note?.note?.trim() || undefined}
                 hasVideo={Boolean(exercise?.videoUrls?.length || note?.videoUrls?.length)}
-                planStepKg={session.progressionStepKg}
                 onChange={(next) => updateExercise(index, next)}
                 onSetDone={(setIndex) => startRest(entry, setIndex)}
                 onOpenTimer={(setIndex) => openTimer(index, setIndex)}

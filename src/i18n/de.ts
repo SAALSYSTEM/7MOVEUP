@@ -120,8 +120,6 @@ export const de = {
   "plan.nameRequired": "Bitte einen Namen eingeben.",
   "plan.pickTitle": "Übung auswählen",
   "plan.added": "{name} hinzugefügt",
-  "plan.progressionStep": "Steigerungshinweis",
-  "plan.progressionStepValue": "+{kg} kg bei erreichtem Wiederholungsziel",
 
   // Kalender
   "calendar.prev": "Vorheriger Monat",
@@ -142,8 +140,12 @@ export const de = {
   "session.lastTime": "Letztes Mal",
   "session.today": "Heute",
   "session.firstTime": "Erstes Mal – noch keine Werte.",
-  "session.progression": "Steigerung möglich",
-  "session.progressionKg": "Steigerung möglich · +{kg} kg",
+  "progression.weight.up": "Gewicht prüfen – ggf. erhöhen.",
+  "progression.weight.down": "Gewicht prüfen – ggf. reduzieren.",
+  "progression.time.up": "Zeit prüfen – ggf. erhöhen.",
+  "progression.time.down": "Zeit prüfen – ggf. reduzieren.",
+  "progression.difficulty.up": "Schwierigkeit prüfen – ggf. erhöhen.",
+  "progression.difficulty.down": "Schwierigkeit prüfen – ggf. reduzieren.",
   "session.set": "Satz {n}",
   "session.addSet": "Satz hinzufügen",
   "session.removeSet": "Satz entfernen",

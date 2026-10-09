@@ -173,6 +173,38 @@ describe("Export/Import", () => {
     expect(last?.sets.map((s) => s.reps)).toEqual([10, 9]);
     expect((await repos.workouts.getActiveSession())?.id).toBe("s3");
   });
+
+  it("die letzten Leistungen kommen neueste zuerst – begrenzt, vor einem Zeitpunkt, nur abgeschlossene mit erledigten Sätzen", async () => {
+    const { repos } = freshDb("recent-performances");
+    const profile = await repos.profiles.getCurrent();
+    const base = { profileId: profile.id, planName: "Push" };
+    const entry = (weight: number, done = true, exerciseId = "db-flat-bench-press") => ({
+      id: `e-${exerciseId}-${weight}`,
+      exerciseId,
+      name: { de: "Bank", en: "Bench" },
+      trackingType: "weight_reps" as const,
+      target: { sets: 1, repMin: 8, repMax: 10 },
+      sets: [{ weightPerDumbbellKg: weight, reps: 10, done }],
+    });
+    const day = (n: number) => `2026-10-0${n}T10:00:00.000Z`;
+    const finished = (id: string, n: number, exercises: ReturnType<typeof entry>[]) =>
+      repos.workouts.saveSession({ ...base, id, date: day(n).slice(0, 10), startedAt: day(n), completedAt: day(n), exercises });
+    await finished("s1", 1, [entry(16)]);
+    await finished("s2", 2, [entry(18, false)]); // nichts erledigt: zählt nicht
+    await finished("s3", 3, [entry(20), entry(5, true, "plank")]);
+    await finished("s4", 4, [entry(22)]);
+    await repos.workouts.saveSession({ ...base, id: "s5", date: "2026-10-05", startedAt: day(5), exercises: [entry(24)] }); // läuft noch
+
+    const weights = (list: Awaited<ReturnType<typeof repos.workouts.getRecentPerformances>>) =>
+      list.map((p) => p.sets[0].weightPerDumbbellKg);
+    expect(weights(await repos.workouts.getRecentPerformances("db-flat-bench-press", 2))).toEqual([22, 20]);
+    expect(weights(await repos.workouts.getRecentPerformances("db-flat-bench-press", 10))).toEqual([22, 20, 16]);
+    expect(weights(await repos.workouts.getRecentPerformances("db-flat-bench-press", 2, day(4)))).toEqual([20, 16]);
+    expect(await repos.workouts.getRecentPerformances("unbekannt", 2)).toEqual([]);
+    // dieselbe Quelle wie die letzte Leistung
+    expect((await repos.workouts.getLastPerformance("db-flat-bench-press"))?.sessionId).toBe("s4");
+    expect((await repos.workouts.getRecentPerformances("db-flat-bench-press", 2))[0].target).toEqual({ sets: 1, repMin: 8, repMax: 10 });
+  });
 });
 
 describe("Körperwerte: Datenbank-Version 2 und Backup-Format 2", () => {

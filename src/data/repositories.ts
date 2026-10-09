@@ -62,6 +62,8 @@ export interface WorkoutRepository {
   deleteSession(id: string): Promise<void>;
   /** letzte abgeschlossene Leistung einer Übung, optional vor einem Zeitpunkt */
   getLastPerformance(exerciseId: string, beforeIso?: string): Promise<PerformanceSnapshot | undefined>;
+  /** die letzten `limit` abgeschlossenen Leistungen einer Übung, neueste zuerst (für den Progressionshinweis) */
+  getRecentPerformances(exerciseId: string, limit: number, beforeIso?: string): Promise<PerformanceSnapshot[]>;
 }
 
 export type MeasurementInput = {

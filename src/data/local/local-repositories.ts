@@ -254,15 +254,19 @@ export function createLocalRepositories(db: MoveUpDatabase) {
       notifyDataChanged();
     },
     async getLastPerformance(exerciseId, beforeIso) {
+      return (await workouts.getRecentPerformances(exerciseId, 1, beforeIso))[0];
+    },
+    async getRecentPerformances(exerciseId, limit, beforeIso) {
       const completed = await workouts.getCompletedSessions();
-      for (let i = completed.length - 1; i >= 0; i -= 1) {
+      const found: PerformanceSnapshot[] = [];
+      for (let i = completed.length - 1; i >= 0 && found.length < limit; i -= 1) {
         const session = completed[i];
         if (beforeIso && session.startedAt >= beforeIso) continue;
         const entry = session.exercises.find(
           (ex) => ex.exerciseId === exerciseId && ex.sets.some((set) => set.done),
         );
         if (entry) {
-          const snapshot: PerformanceSnapshot = {
+          found.push({
             sessionId: session.id,
             date: session.date,
             trackingType: entry.trackingType,
@@ -270,11 +274,10 @@ export function createLocalRepositories(db: MoveUpDatabase) {
             sets: entry.sets.filter((set) => set.done),
             // erste geplante Zeile (nicht die erste erledigte) – bestimmt die Startseite der nächsten Einheit
             startSide: entry.sets[0]?.side,
-          };
-          return snapshot;
+          });
         }
       }
-      return undefined;
+      return found;
     },
   };
 
