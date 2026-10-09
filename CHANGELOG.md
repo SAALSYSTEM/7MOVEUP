@@ -2,12 +2,10 @@
 
 Alle nennenswerten Änderungen an 7MOVEUP. Neueste oben.
 
-## Unveröffentlicht
-
-Branch `feature-progression` – Preview-Test, noch keine Versionsnummer.
+## 1.8.0 – 2026-10-09
 
 - **Progression als 2×-Regel:** 7MOVEUP ändert nie selbst Gewicht, Wiederholungen oder Zeit. In „Letztes Mal“ erscheint nur dann eine kleine Zeile, wenn **zwei vergleichbare Einheiten hintereinander** ein eindeutiges Bild zeigen: **jeder** Satz erreicht die obere Grenze (Wdh. bis bzw. Zielzeit) → „Gewicht prüfen – ggf. erhöhen.“ / „Zeit prüfen – ggf. erhöhen.“; **jeder** Satz liegt unter der unteren Grenze (Wdh. von bzw. Zielzeit) → „… ggf. reduzieren.“. Alles dazwischen (z. B. 15/14/12 oder 10/9/7 bei 8–10): kein Hinweis. Wiederholungsübungen ohne Gewicht: „Schwierigkeit prüfen – ggf. erhöhen/reduzieren.“ Ein einzelner guter oder schlechter Tag löst nichts aus, die Zahl der Einheiten (2) steht als eine Konstante im Code.
-- **Vergleichbar** sind Einheiten nur bei gleicher Satzzahl, gleichem Wdh. von/bis (bei Zeit: gleicher Zielzeit), gleichem Je-Seite-Status und **gleichem Gewicht in allen Sätzen** – und nur, wenn auch das heutige Ziel so aussieht. Zusätzliche oder fehlende Sätze, gemischte Gewichte (12/12/10 kg), fehlende Werte oder fehlende Zielgrenzen machen eine Einheit nicht auswertbar: dann gibt es **keinen** Hinweis. Eine Einheit mit anderem Gewicht dazwischen unterbricht die Kette; nach einer Gewichtsänderung beginnt sie von selbst neu.
+- **Vergleichbar** sind Einheiten nur bei gleicher Satzzahl, gleichem Wdh. von/bis (bei Zeit: gleiche Zielzeit), gleichem Je-Seite-Status und **gleichem Gewicht in allen Sätzen** – und nur, wenn auch das heutige Ziel so aussieht. Zusätzliche oder fehlende Sätze, gemischte Gewichte (12/12/10 kg), fehlende Werte oder fehlende Zielgrenzen machen eine Einheit nicht auswertbar: dann gibt es **keinen** Hinweis. Eine Einheit mit anderem Gewicht dazwischen unterbricht die Kette; nach einer Gewichtsänderung beginnt sie von selbst neu.
 - **Je Seite:** Es zählen alle Ausführungen beider Seiten; LINKS 15/15/15 und RECHTS 15/14/15 ist nicht „oben“. Fehlt eine Seite oder ein Satz, ist die Einheit nicht auswertbar.
 - **Hinweis verschwindet,** sobald heute schon ein anderes Gewicht eingetragen ist (er soll beim Entscheiden helfen, nicht kommentieren, was schon geschehen ist).
 - **Entfallen:** die Anzeige „Steigerung möglich“ / „+2 kg“, die feste Grenze „nur bis 12 Wiederholungen“ und das Plan-Feld „Steigerungshinweis“. Vorhandene Pläne und Einheiten behalten den alten Wert unverändert (Backup, Import und Speichern verändern ihn nicht), er wird nur nicht mehr ausgewertet. Die Vorlage „4-Tage Kraft & Core“ trägt ihn nicht mehr ein, ihre Plannotiz beschreibt die neue Regel (bereits übernommene Pläne behalten ihre eigene Notiz).

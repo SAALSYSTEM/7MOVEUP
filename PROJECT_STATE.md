@@ -1,6 +1,6 @@
 # 7MOVEUP – Projektstand
 
-Stand: Version 1.7.3 (`main`, Cloudflare-Produktion), freigegeben nach dem Test der Preview auf dem Handy. Änderungen: [`CHANGELOG.md`](CHANGELOG.md).
+Stand: Version 1.8.0 (`main`, Cloudflare-Produktion), freigegeben nach dem Test der Preview auf dem Handy. Änderungen: [`CHANGELOG.md`](CHANGELOG.md).
 
 ## Grundsätze
 
@@ -131,5 +131,5 @@ IndexedDB-Datenbank `7moveup` über Dexie (`src/data/local/db.ts`):
 ## Nächste Schritte
 
 1. Neue Entwicklungsstufen wieder auf einem Feature-Branch (Cloudflare-Preview), `main` erst nach Freigabe.
-2. Marketing-Video neu rendern, wenn der Launch vorbereitet wird (Navigation hat sich geändert).
+2. Marketing-Video neu rendern, wenn der Launch vorbereitet wird (Navigation hat sich geändert; die Szene „Merkt sich alles“ zeigt noch den alten Hinweis „Steigerung möglich · +2 kg“, den es seit 1.8.0 nicht mehr gibt).
 3. Danach erst weitere Bereiche planen. Bewusst **noch nicht**: Blutdruck, Puls, Ernährung, Barcode, Lebensmitteldatenbank, Fotoanalyse, Blutwerte, Supplemente, Supabase/Accounts/Cloud-Sync, Planarchive, Dashboards.
